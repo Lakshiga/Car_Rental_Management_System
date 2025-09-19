@@ -72,6 +72,10 @@ namespace CarRentalManagementSystem.Controllers
                     {
                         HttpContext.Session.SetString("CustomerId", customer.CustomerID.ToString());
                         HttpContext.Session.SetString("CustomerName", customer.FullName);
+                        if (!string.IsNullOrWhiteSpace(customer.ImageUrl))
+                        {
+                            HttpContext.Session.SetString("AvatarUrl", customer.ImageUrl);
+                        }
                     }
                 }
 
@@ -125,8 +129,9 @@ namespace CarRentalManagementSystem.Controllers
                     Phone = string.Empty,
                     Role = userRole ?? string.Empty,
                     NIC = string.Empty,
-                    LicenseNo = string.Empty,
-                    Address = string.Empty
+                        LicenseNo = string.Empty,
+                        Address = string.Empty,
+                        ImageUrl = HttpContext.Session.GetString("AvatarUrl") ?? string.Empty
                 };
 
                 return View(adminModel);
