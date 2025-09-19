@@ -1,0 +1,315 @@
+@model IEnumerable<CarResponseDTO>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero Section -->
+<div class="hero-section py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Premium Car Rental Experience</h1>
+                <p class="lead mb-4">Discover luxury and comfort with our premium fleet. Experience seamless booking, exceptional service, and unmatched reliability.</p>
+                <div class="mt-4">
+                    <a href="@Url.Action("BrowseCars")" class="btn btn-light btn-lg me-3 shadow-lg">
+                        <i data-lucide="car" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Explore Our Fleet
+                    </a>
+                    @if (ViewBag.IsLoggedIn != true)
+                    {
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg shadow">
+                            <i data-lucide="user-plus" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Join Today
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="~/images/hero-car.jpg" alt="Premium Car Rental" class="img-fluid rounded shadow-lg" style="max-height: 400px; object-fit: cover; border-radius: 16px !important;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="display-5 fw-bold">Why Choose Us?</h2>
+            <p class="lead text-muted">Experience the best car rental service with these amazing features</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Safe & Secure</h5>
+                    <p class="card-text">All our vehicles are regularly maintained and insured for your safety.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Best Prices</h5>
+                    <p class="card-text">Competitive pricing with no hidden fees. Get the best value for your money.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">24/7 Support</h5>
+                    <p class="card-text">Round-the-clock customer support to assist you whenever you need help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Cars Section -->
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="display-6 fw-bold text-center">Available Cars</h2>
+            <p class="text-center text-muted">Choose from our wide range of vehicles</p>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var car in Model.Take(6))
+        {
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@(car.ImageUrl ?? "/images/default-car.jpg")" class="card-img-top" alt="@car.CarName" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@car.CarName</h5>
+                        <p class="card-text">
+                            <small class="text-muted">@car.Brand • @car.FuelType • @car.SeatingCapacity seats</small>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="h5 text-primary">₹@car.RentPerDay</span>
+                                <small class="text-muted">/day</small>
+                            </div>
+                            <span class="badge bg-success">@car.AvailabilityStatus</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="viewCarDetails(@car.CarID)">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="bookCar(@car.CarID)">
+                                <i class="fas fa-calendar-plus"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="text-center">
+        <a href="@Url.Action("BrowseCars")" class="btn btn-primary btn-lg">
+            <i class="fas fa-car"></i> View All Cars
+        </a>
+    </div>
+</div>
+
+<!-- Car Details Modal -->
+<div class="modal fade" id="carDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Car Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="carDetailsContent">
+                <!-- Car details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Car</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="bookingForm">
+                            <input type="hidden" id="selectedCarId" name="CarID" />
+                            <div class="mb-3">
+                                <label class="form-label">Pickup Date</label>
+                                <input type="date" class="form-control" id="pickupDate" name="PickupDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Return Date</label>
+                                <input type="date" class="form-control" id="returnDate" name="ReturnDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Number</label>
+                                <input type="text" class="form-control" id="licenseNumber" name="LicenseNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Front Image</label>
+                                <input type="file" class="form-control" name="LicenseFrontImage" accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Back Image</label>
+                                <input type="file" class="form-control" name="LicenseBackImage" accept="image/*">
+                            </div>
+                            <div class="rental-calculation mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Rental Calculation</h6>
+                                        <div id="calculationDetails">
+                                            <p>Total Days: <span id="totalDays">0</span></p>
+                                            <p>Total Rent: ₹<span id="totalRent">0</span></p>
+                                            <p><strong>Advance Payment (50%): ₹<span id="advancePayment">0</span></strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="selectedCarDetails">
+                            <!-- Selected car details will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedCarData = null;
+
+        function viewCarDetails(carId) {
+            $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
+                const content = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="${data.imageUrl || '/images/default-car.jpg'}" class="img-fluid rounded" alt="${data.carName}">
+                        </div>
+                        <div class="col-md-6">
+                            <h4>${data.carName}</h4>
+                            <p><strong>Brand:</strong> ${data.brand}</p>
+                            <p><strong>Type:</strong> ${data.carType}</p>
+                            <p><strong>Fuel:</strong> ${data.fuelType}</p>
+                            <p><strong>Seating:</strong> ${data.seatingCapacity} persons</p>
+                            <p><strong>Mileage:</strong> ${data.mileage} km/l</p>
+                            <p><strong>Number Plate:</strong> ${data.numberPlate}</p>
+                            <p><strong>Rent per Day:</strong> ₹${data.rentPerDay}</p>
+                            <p><strong>Per KM Rate:</strong> ₹${data.perKmRate}</p>
+                            <span class="badge bg-success">${data.availabilityStatus}</span>
+                        </div>
+                    </div>
+                `;
+                $('#carDetailsContent').html(content);
+                $('#carDetailsModal').modal('show');
+            });
+        }
+
+        function bookCar(carId) {
+            @if (ViewBag.IsLoggedIn != true)
+            {
+                <text>
+                window.location.href = '@Url.Action("Login", "Account")';
+                return;
+                </text>
+            }
+
+            $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
+                selectedCarData = data;
+                $('#selectedCarId').val(carId);
+                
+                const carDetails = `
+                    <div class="card">
+                        <img src="${data.imageUrl || '/images/default-car.jpg'}" class="card-img-top" alt="${data.carName}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">${data.carName}</h5>
+                            <p><strong>Brand:</strong> ${data.brand}</p>
+                            <p><strong>Type:</strong> ${data.carType}</p>
+                            <p><strong>Rent per Day:</strong> ₹${data.rentPerDay}</p>
+                            <p><strong>Per KM Rate:</strong> ₹${data.perKmRate}</p>
+                        </div>
+                    </div>
+                `;
+                $('#selectedCarDetails').html(carDetails);
+                $('#bookingModal').modal('show');
+            });
+        }
+
+        $('#pickupDate, #returnDate').on('change', function() {
+            calculateRent();
+        });
+
+        function calculateRent() {
+            const pickupDate = $('#pickupDate').val();
+            const returnDate = $('#returnDate').val();
+            const carId = $('#selectedCarId').val();
+
+            if (pickupDate && returnDate && carId) {
+                $.get('@Url.Action("CalculateRent", "Booking")', {
+                    carId: carId,
+                    pickupDate: pickupDate,
+                    returnDate: returnDate
+                }, function(data) {
+                    if (data.success) {
+                        $('#totalDays').text(data.totalDays);
+                        $('#totalRent').text(data.totalCost);
+                        $('#advancePayment').text(data.advancePayment);
+                    }
+                });
+            }
+        }
+
+        function confirmBooking() {
+            const formData = new FormData($('#bookingForm')[0]);
+            
+            $.ajax({
+                url: '@Url.Action("CreateBooking", "Booking")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#bookingModal').modal('hide');
+                        if (response.redirectUrl) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while processing your booking.');
+                }
+            });
+        }
+
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pickupDate').setAttribute('min', today);
+            document.getElementById('returnDate').setAttribute('min', today);
+        });
+    </script>
+}

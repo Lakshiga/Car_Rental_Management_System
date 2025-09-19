@@ -1,0 +1,211 @@
+@model IEnumerable<RentResponseDTO>
+@{
+    ViewData["Title"] = "Rent Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Rent Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="@Url.Action("ActiveRents")" class="btn btn-sm btn-primary">
+                <i class="fas fa-car"></i> Active Rents
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Rents</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-car fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card warning h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Active Rents</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(r => !r.IsReturned)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-key fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card success h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Returned</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(r => r.IsReturned)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-undo fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card danger h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Revenue</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">₹@Model.Where(r => r.TotalDue.HasValue).Sum(r => r.TotalDue ?? 0)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-rupee-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rents Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Rents</h6>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered" id="rentsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Rent ID</th>
+                            <th>Customer</th>
+                            <th>Car</th>
+                            <th>Rent Date</th>
+                            <th>Odometer Start</th>
+                            <th>Return Date</th>
+                            <th>Odometer End</th>
+                            <th>Status</th>
+                            <th>Extra Charges</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rent in Model)
+                        {
+                            <tr>
+                                <td>#@rent.RentID</td>
+                                <td>@rent.BookingDetails?.CustomerName</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(rent.BookingDetails?.CarDetails?.ImageUrl ?? "/images/default-car.jpg")" 
+                                             alt="@rent.BookingDetails?.CarDetails?.CarName" class="car-image me-2">
+                                        <div>
+                                            <div class="fw-bold">@rent.BookingDetails?.CarDetails?.CarName</div>
+                                            <small class="text-muted">@rent.BookingDetails?.CarDetails?.NumberPlate</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@rent.RentDate.ToString("MMM dd, yyyy")</td>
+                                <td>@rent.OdometerStart km</td>
+                                <td>
+                                    @if (rent.ActualReturnDate.HasValue)
+                                    {
+                                        @rent.ActualReturnDate.Value.ToString("MMM dd, yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not returned</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (rent.OdometerEnd.HasValue)
+                                    {
+                                        @($"{rent.OdometerEnd.Value} km")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (rent.IsReturned)
+                                    {
+                                        <span class="badge bg-success">Returned</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Active</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (rent.ExtraCharges.HasValue)
+                                    {
+                                        @($"₹{rent.ExtraCharges.Value}")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Details", new { id = rent.RentID })" 
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        @if (!rent.IsReturned)
+                                        {
+                                            <a href="@Url.Action("ProcessReturn", new { rentId = rent.RentID })" 
+                                               class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-undo"></i> Return
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                <h5>No Rents Found</h5>
+                <p class="text-muted">No rent records available yet.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#rentsTable').DataTable({
+                "pageLength": 25,
+                "order": [[0, "desc"]],
+                "columnDefs": [
+                    { "orderable": false, "targets": [9] }
+                ]
+            });
+        });
+    </script>
+}

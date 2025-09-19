@@ -1,0 +1,187 @@
+@model CustomerRegistrationRequestDTO
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-3x text-primary"></i>
+                        <h3 class="mt-2">Create Account</h3>
+                        <p class="text-muted">Join us today! Create your account to start renting cars.</p>
+                        <div class="small text-muted">It only takes a minute — all fields marked required.</div>
+                    </div>
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control form-control-lg" placeholder="Enter first name" required autocomplete="given-name" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control form-control-lg" placeholder="Enter last name" required autocomplete="family-name" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="Enter email address" required autocomplete="email" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <div class="form-text">We'll send booking confirmations to this email.</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="NIC" class="form-label">NIC Number</label>
+                                <input asp-for="NIC" class="form-control form-control-lg" placeholder="Enter NIC number" required />
+                                <span asp-validation-for="NIC" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LicenseNo" class="form-label">License Number</label>
+                                <input asp-for="LicenseNo" class="form-control form-control-lg" placeholder="Enter license number" required />
+                                <span asp-validation-for="LicenseNo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input asp-for="Phone" type="tel" class="form-control form-control-lg" placeholder="Enter phone number" required autocomplete="tel" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                            <div class="form-text">Mobile number for quick contact about your bookings.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control form-control-lg" rows="3" placeholder="Enter your address" required autocomplete="street-address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input asp-for="Username" class="form-control form-control-lg" placeholder="Choose a username" required autocomplete="username" />
+                            </div>
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input asp-for="Password" class="form-control form-control-lg" placeholder="Enter password" required autocomplete="new-password" id="passwordInput" />
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <div class="progress mt-2" style="height: 6px;">
+                                    <div id="pwdStrengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small id="pwdStrengthText" class="text-muted"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="Confirm password" required autocomplete="new-password" id="confirmPasswordInput" />
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword2" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                <small id="pwdMatchText" class="text-muted"></small>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="true" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                I agree to the Terms and Conditions
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Already have an account? 
+                            <a asp-action="Login" class="text-decoration-none">Sign in here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function() {
+            const pwd = document.getElementById('passwordInput');
+            const confirm = document.getElementById('confirmPasswordInput');
+            const bar = document.getElementById('pwdStrengthBar');
+            const strengthText = document.getElementById('pwdStrengthText');
+            const matchText = document.getElementById('pwdMatchText');
+            const toggle1 = document.getElementById('togglePassword');
+            const toggle2 = document.getElementById('togglePassword2');
+
+            function calcStrength(value) {
+                let score = 0;
+                if (!value) return 0;
+                if (value.length >= 8) score += 25;
+                if (/[A-Z]/.test(value)) score += 25;
+                if (/[0-9]/.test(value)) score += 25;
+                if (/[^A-Za-z0-9]/.test(value)) score += 25;
+                return score;
+            }
+
+            function updateStrength() {
+                const score = calcStrength(pwd.value);
+                bar.style.width = score + '%';
+                bar.className = 'progress-bar';
+                if (score < 50) { bar.classList.add('bg-danger'); strengthText.textContent = 'Weak password'; }
+                else if (score < 75) { bar.classList.add('bg-warning'); strengthText.textContent = 'Fair password'; }
+                else { bar.classList.add('bg-success'); strengthText.textContent = 'Strong password'; }
+            }
+
+            function updateMatch() {
+                if (!confirm.value) { matchText.textContent = ''; return; }
+                matchText.textContent = (pwd.value === confirm.value) ? 'Passwords match' : 'Passwords do not match';
+                matchText.className = (pwd.value === confirm.value) ? 'text-success' : 'text-danger';
+            }
+
+            if (pwd) {
+                pwd.addEventListener('input', updateStrength);
+                pwd.addEventListener('input', updateMatch);
+            }
+            if (confirm) confirm.addEventListener('input', updateMatch);
+
+            function toggle(el, input) {
+                el.addEventListener('click', function() {
+                    const isPwd = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPwd ? 'text' : 'password');
+                    this.querySelector('i').className = isPwd ? 'fas fa-eye-slash' : 'fas fa-eye';
+                });
+            }
+            if (toggle1 && pwd) toggle(toggle1, pwd);
+            if (toggle2 && confirm) toggle(toggle2, confirm);
+        })();
+    </script>
+}

@@ -1,0 +1,185 @@
+@model BookingResponseDTO
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-credit-card"></i> Payment Processing</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Booking Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Booking Summary</h5>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p><strong>Booking ID:</strong> #@Model.BookingID</p>
+                                    <p><strong>Car:</strong> @Model.CarDetails.CarName</p>
+                                    <p><strong>Pickup Date:</strong> @Model.PickupDate.ToString("MMM dd, yyyy")</p>
+                                    <p><strong>Return Date:</strong> @Model.ReturnDate.ToString("MMM dd, yyyy")</p>
+                                    <p><strong>Total Cost:</strong> ₹@Model.TotalCost</p>
+                                    <p><strong>Advance Payment (50%):</strong> <span class="text-primary fw-bold">₹@ViewBag.Amount</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Car Details</h5>
+                            <div class="card">
+                                <img src="@(Model.CarDetails.ImageUrl ?? "/images/default-car.jpg")" 
+                                     class="card-img-top" alt="@Model.CarDetails.CarName" 
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h6 class="card-title">@Model.CarDetails.CarName</h6>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            @Model.CarDetails.Brand • @Model.CarDetails.NumberPlate
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Payment Information</h5>
+                            <form id="payment-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Card Information</label>
+                                    <div id="card-element" class="form-control" style="height: 40px; padding: 10px;">
+                                        <!-- Stripe Elements will create form elements here -->
+                                    </div>
+                                    <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            I agree to the <a href="#" target="_blank">Terms and Conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="submit-payment" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely
+                                    </button>
+                                    <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Bookings
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Security Info -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-shield-alt"></i>
+                                <strong>Secure Payment:</strong> Your payment information is encrypted and secure. 
+                                We use Stripe for payment processing and do not store your card details.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Initialize Stripe
+        const stripe = Stripe('@ViewBag.StripePublishableKey');
+        const elements = stripe.elements();
+
+        // Create card element
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4',
+                    },
+                },
+            },
+        });
+
+        cardElement.mount('#card-element');
+
+        // Handle real-time validation errors from the card Element
+        cardElement.on('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const submitButton = document.getElementById('submit-payment');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                // Create payment intent
+                const response = await fetch('@Url.Action("CreatePaymentIntent")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        BookingID: @ViewBag.BookingId,
+                        Amount: @ViewBag.Amount,
+                        PaymentType: 'Advance'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Confirm payment with Stripe
+                    const {error} = await stripe.confirmCardPayment(result.clientSecret, {
+                        payment_method: {
+                            card: cardElement,
+                        }
+                    });
+
+                    if (error) {
+                        // Show error to customer
+                        document.getElementById('card-errors').textContent = error.message;
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+                    } else {
+                        // Payment succeeded
+                        window.location.href = '@Url.Action("ConfirmPayment")' + '?paymentIntentId=' + result.clientSecret;
+                    }
+                } else {
+                    alert(result.message);
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('An error occurred during payment processing.');
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+            }
+        });
+    </script>
+}

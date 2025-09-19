@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Car Rental Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark @(ViewBag.UserRole == "Customer" ? "customer-navbar" : "bg-primary") fixed-top modern-navbar">
+            <div class="container">
+                <a class="navbar-brand modern-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <div class="brand-icon-wrapper">
+                        <i data-lucide="car" class="brand-icon"></i>
+                    </div>
+                    <span class="brand-text">CarRental<span class="brand-accent">Pro</span></span>
+                </a>
+                <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i data-lucide="home" class="nav-icon"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="About">
+                                <i data-lucide="info" class="nav-icon"></i>About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="BrowseCars">
+                                <i data-lucide="car" class="nav-icon"></i>Cars
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Gallery">
+                                <i data-lucide="image" class="nav-icon"></i>Gallery
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
+                                <i data-lucide="phone" class="nav-icon"></i>Contact
+                            </a>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (ViewBag.IsLoggedIn == true)
+                        {
+                            @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "Staff")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link modern-nav-link" asp-controller="Admin" asp-action="Dashboard">
+                                        <i data-lucide="layout-dashboard" class="nav-icon"></i>Dashboard
+                                    </a>
+                                </li>
+                            }
+                            else if (ViewBag.UserRole == "Customer")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link modern-nav-link" asp-controller="Customer" asp-action="Dashboard">
+                                        <i data-lucide="layout-dashboard" class="nav-icon"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link modern-nav-link" asp-controller="Booking" asp-action="MyBookings">
+                                        <i data-lucide="calendar" class="nav-icon"></i>My Bookings
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle modern-nav-link user-dropdown" href="#" role="button" data-bs-toggle="dropdown">
+                                    <div class="user-avatar">
+                                        <i data-lucide="user" class="avatar-icon"></i>
+                                    </div>
+                                    <span class="user-name">@ViewBag.CustomerName</span>
+                                </a>
+                                <ul class="dropdown-menu modern-dropdown">
+                                    <li><a class="dropdown-item modern-dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i data-lucide="settings" class="dropdown-icon"></i>Profile
+                                    </a></li>
+                                    <li><hr class="dropdown-divider modern-divider"></li>
+                                    <li><a class="dropdown-item modern-dropdown-item logout-item" asp-controller="Account" asp-action="Logout">
+                                        <i data-lucide="log-out" class="dropdown-icon"></i>Logout
+                                    </a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link modern-nav-link auth-link" asp-controller="Account" asp-action="Login">
+                                    <i data-lucide="log-in" class="nav-icon"></i>Sign In
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link modern-nav-link auth-link signup-btn" asp-controller="Account" asp-action="Register">
+                                    <i data-lucide="user-plus" class="nav-icon"></i>Sign Up
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="main-content">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success modern-alert alert-dismissible fade show" role="alert">
+                <div class="alert-content">
+                    <i data-lucide="check-circle" class="alert-icon"></i>
+                    <span>@TempData["SuccessMessage"]</span>
+                </div>
+                <button type="button" class="btn-close modern-close-btn" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger modern-alert alert-dismissible fade show" role="alert">
+                <div class="alert-content">
+                    <i data-lucide="alert-circle" class="alert-icon"></i>
+                    <span>@TempData["ErrorMessage"]</span>
+                </div>
+                <button type="button" class="btn-close modern-close-btn" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="modern-footer">
+        <div class="footer-content">
+            <div class="container">
+                <div class="row gy-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-brand">
+                            <div class="footer-logo">
+                                <i data-lucide="car" class="footer-logo-icon"></i>
+                                <span class="footer-brand-text">CarRental<span class="footer-brand-accent">Pro</span></span>
+                            </div>
+                            <p class="footer-description">Your trusted partner for premium car rental experiences. Reliable, comfortable, and affordable.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Quick Links</h5>
+                        <ul class="footer-links">
+                            <li><a href="@Url.Action("Index", "Home")" class="footer-link">
+                                <i data-lucide="home" class="footer-link-icon"></i>Home
+                            </a></li>
+                            <li><a href="@Url.Action("About", "Home")" class="footer-link">
+                                <i data-lucide="info" class="footer-link-icon"></i>About
+                            </a></li>
+                            <li><a href="@Url.Action("BrowseCars", "Home")" class="footer-link">
+                                <i data-lucide="car" class="footer-link-icon"></i>Fleet
+                            </a></li>
+                            <li><a href="@Url.Action("Contact", "Home")" class="footer-link">
+                                <i data-lucide="phone" class="footer-link-icon"></i>Contact
+                            </a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="footer-title">Contact Info</h5>
+                        <div class="footer-contact">
+                            <div class="contact-item">
+                                <i data-lucide="mail" class="contact-icon"></i>
+                                <span>infocynexblazer@gmail.com</span>
+                            </div>
+                            <div class="contact-item">
+                                <i data-lucide="phone" class="contact-icon"></i>
+                                <span>+1 (555) 123-4567</span>
+                            </div>
+                            <div class="contact-item">
+                                <i data-lucide="map-pin" class="contact-icon"></i>
+                                <span>123 Main Street, City</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <h5 class="footer-title">Follow Us</h5>
+                        <div class="social-section">
+                            <p class="social-description">Stay connected for updates and special offers</p>
+                            <div class="social-links">
+                                <a href="#" class="social-link">
+                                    <i data-lucide="facebook" class="social-icon"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i data-lucide="twitter" class="social-icon"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i data-lucide="instagram" class="social-icon"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i data-lucide="linkedin" class="social-icon"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; 2024 CarRentalPro. All rights reserved.</p>
+                    </div>
+                    <div class="footer-bottom-links">
+                        <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                        <a href="#" class="footer-bottom-link">Terms of Service</a>
+                        <a href="#" class="footer-bottom-link">Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

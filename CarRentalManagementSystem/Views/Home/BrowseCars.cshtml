@@ -1,0 +1,588 @@
+@model IEnumerable<CarResponseDTO>
+@{
+    ViewData["Title"] = "Browse Cars";
+}
+
+<!-- Browse Cars Hero Section -->
+<div class="cars-hero">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i data-lucide="car" class="hero-icon"></i>
+                        Browse Our Premium Fleet
+                    </h1>
+                    <p class="hero-subtitle">Find the perfect car for your journey from our extensive collection of well-maintained vehicles.</p>
+                    <div class="hero-features">
+                        <div class="feature-tag">
+                            <i data-lucide="shield-check" class="feature-icon"></i>
+                            <span>Fully Insured</span>
+                        </div>
+                        <div class="feature-tag">
+                            <i data-lucide="clock" class="feature-icon"></i>
+                            <span>24/7 Support</span>
+                        </div>
+                        <div class="feature-tag">
+                            <i data-lucide="star" class="feature-icon"></i>
+                            <span>Top Rated</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="hero-visual">
+                    <div class="floating-cards">
+                        <div class="car-preview-card card-1">
+                            <i data-lucide="car" class="car-icon"></i>
+                            <span>Sedan</span>
+                        </div>
+                        <div class="car-preview-card card-2">
+                            <i data-lucide="truck" class="car-icon"></i>
+                            <span>SUV</span>
+                        </div>
+                        <div class="car-preview-card card-3">
+                            <i data-lucide="zap" class="car-icon"></i>
+                            <span>Electric</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="search-filter-section">
+    <div class="container">
+        <div class="search-filter-card">
+            <div class="filter-header">
+                <h5 class="filter-title">
+                    <i data-lucide="search" class="filter-icon"></i>
+                    Search & Filter Cars
+                </h5>
+                <div class="filter-toggle">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleFilters()">
+                        <i data-lucide="filter" class="toggle-icon"></i>
+                        <span id="toggleText">Hide Filters</span>
+                    </button>
+                </div>
+            </div>
+            <div class="filter-body" id="filterBody">
+                <form id="searchForm" method="get">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="searchTerm" class="modern-label">
+                                <i data-lucide="search" class="label-icon"></i>
+                                Search
+                            </label>
+                            <input type="text" class="modern-input" id="searchTerm" name="searchTerm"
+                                   placeholder="Car name, brand, or plate..." value="@ViewBag.SearchTerm">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="carType" class="modern-label">
+                                <i data-lucide="car" class="label-icon"></i>
+                                Car Type
+                            </label>
+                            <select class="modern-select" id="carType" name="carType">
+                                <option value="">All Types</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Convertible">Convertible</option>
+                                <option value="Coupe">Coupe</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="fuelType" class="modern-label">
+                                <i data-lucide="fuel" class="label-icon"></i>
+                                Fuel Type
+                            </label>
+                            <select class="modern-select" id="fuelType" name="fuelType">
+                                <option value="">All Fuels</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="seatingCapacity" class="modern-label">
+                                <i data-lucide="users" class="label-icon"></i>
+                                Seating
+                            </label>
+                            <select class="modern-select" id="seatingCapacity" name="seatingCapacity">
+                                <option value="">Any</option>
+                                <option value="2">2 Seater</option>
+                                <option value="4">4 Seater</option>
+                                <option value="5">5 Seater</option>
+                                <option value="7">7 Seater</option>
+                                <option value="8">8+ Seater</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="priceRange" class="modern-label">
+                                <i data-lucide="indian-rupee" class="label-icon"></i>
+                                Price Range
+                            </label>
+                            <select class="modern-select" id="priceRange" name="priceRange">
+                                <option value="">Any Price</option>
+                                <option value="0-3000">₹0 - ₹3,000</option>
+                                <option value="3000-5000">₹3,000 - ₹5,000</option>
+                                <option value="5000-8000">₹5,000 - ₹8,000</option>
+                                <option value="8000-99999">₹8,000+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 mb-3 d-flex align-items-end">
+                            <button type="submit" class="search-btn">
+                                <i data-lucide="search" class="search-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Summary -->
+<div class="results-section">
+    <div class="container">
+        <div class="results-header">
+            <div class="results-info">
+                <h4 class="results-title">
+                    <i data-lucide="car" class="results-icon"></i>
+                    Available Cars
+                    <span class="results-count">(@Model.Count() found)</span>
+                </h4>
+                <p class="results-subtitle">Choose from our premium collection</p>
+            </div>
+            <div class="view-controls">
+                <div class="view-toggle">
+                    <button type="button" class="view-btn" id="gridView" onclick="switchView('grid')">
+                        <i data-lucide="grid-3x3" class="view-icon"></i>
+                        Grid
+                    </button>
+                    <button type="button" class="view-btn" id="listView" onclick="switchView('list')">
+                        <i data-lucide="list" class="view-icon"></i>
+                        List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cars Grid/List -->
+<div class="cars-listing-section">
+    <div class="container">
+        <div id="carsContainer" class="cars-grid">
+            @if (Model.Any())
+            {
+                @foreach (var car in Model)
+                {
+                    <div class="car-item">
+                        <div class="modern-car-card">
+                            <div class="car-image-container">
+                                <img src="@(car.ImageUrl ?? "/images/default-car.jpg")"
+                                     class="car-image" alt="@car.CarName">
+                                <div class="car-status-badge">
+                                    <span class="status-indicator @(car.AvailabilityStatus == "Available" ? "available" : "unavailable")">
+                                        <i data-lucide="@(car.AvailabilityStatus == "Available" ? "check-circle" : "x-circle")" class="status-icon"></i>
+                                        @car.AvailabilityStatus
+                                    </span>
+                                </div>
+                                <div class="car-overlay">
+                                    <div class="overlay-actions">
+                                        <button type="button" class="overlay-btn view-btn" onclick="viewCarDetails(@car.CarID)">
+                                            <i data-lucide="eye" class="btn-icon"></i>
+                                        </button>
+                                        <button type="button" class="overlay-btn book-btn" onclick="bookCar(@car.CarID)"
+                                                @(car.AvailabilityStatus != "Available" ? "disabled" : "")>
+                                            <i data-lucide="calendar-plus" class="btn-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="car-content">
+                                <div class="car-header">
+                                    <h5 class="car-name">@car.CarName</h5>
+                                    <div class="car-brand">@car.Brand</div>
+                                </div>
+                                <div class="car-features">
+                                    <div class="feature-item">
+                                        <i data-lucide="settings" class="feature-icon"></i>
+                                        <span>@car.CarType</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i data-lucide="fuel" class="feature-icon"></i>
+                                        <span>@car.FuelType</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i data-lucide="users" class="feature-icon"></i>
+                                        <span>@car.SeatingCapacity seats</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i data-lucide="gauge" class="feature-icon"></i>
+                                        <span>@car.Mileage km/l</span>
+                                    </div>
+                                </div>
+                                <div class="car-pricing">
+                                    <div class="price-main">
+                                        <span class="price-amount">₹@car.RentPerDay</span>
+                                        <span class="price-period">/day</span>
+                                    </div>
+                                    <div class="price-additional">
+                                        <span class="km-rate">+ ₹@car.PerKmRate/km</span>
+                                    </div>
+                                </div>
+                                <div class="car-actions">
+                                    <button type="button" class="action-btn secondary" onclick="viewCarDetails(@car.CarID)">
+                                        <i data-lucide="eye" class="action-icon"></i>
+                                        View Details
+                                    </button>
+                                    <button type="button" class="action-btn primary" onclick="bookCar(@car.CarID)"
+                                            @(car.AvailabilityStatus != "Available" ? "disabled" : "")>
+                                        <i data-lucide="calendar-plus" class="action-icon"></i>
+                                        Book Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-cars-found">
+                    <div class="no-cars-content">
+                        <div class="no-cars-icon">
+                            <i data-lucide="car" class="empty-icon"></i>
+                        </div>
+                        <h3 class="no-cars-title">No Cars Found</h3>
+                        <p class="no-cars-text">Try adjusting your search criteria or browse all available cars.</p>
+                        <a href="@Url.Action("BrowseCars")" class="reset-btn">
+                            <i data-lucide="refresh-cw" class="reset-icon"></i>
+                            View All Cars
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Quick Filters -->
+<div class="quick-filters-section">
+    <div class="container">
+        <div class="quick-filters-card">
+            <div class="filters-header">
+                <h6 class="filters-title">
+                    <i data-lucide="zap" class="filters-icon"></i>
+                    Quick Filters
+                </h6>
+                <p class="filters-subtitle">Popular search options</p>
+            </div>
+            <div class="filters-grid">
+                <button class="quick-filter-btn sedan" onclick="quickFilter('carType', 'Sedan')">
+                    <i data-lucide="car" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Sedans Only</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn electric" onclick="quickFilter('fuelType', 'Electric')">
+                    <i data-lucide="zap" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Electric Cars</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn budget" onclick="quickFilter('priceRange', '0-3000')">
+                    <i data-lucide="indian-rupee" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Budget Friendly</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn family" onclick="quickFilter('seatingCapacity', '7')">
+                    <i data-lucide="users" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Family Cars</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Car Details Modal -->
+<div class="modal fade" id="carDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Car Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="carDetailsContent">
+                <!-- Car details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Car</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="bookingForm">
+                            <input type="hidden" id="selectedCarId" name="CarID" />
+                            <div class="mb-3">
+                                <label class="form-label">Pickup Date</label>
+                                <input type="date" class="form-control" id="pickupDate" name="PickupDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Return Date</label>
+                                <input type="date" class="form-control" id="returnDate" name="ReturnDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Number</label>
+                                <input type="text" class="form-control" id="licenseNumber" name="LicenseNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Front Image</label>
+                                <input type="file" class="form-control" name="LicenseFrontImage" accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Back Image</label>
+                                <input type="file" class="form-control" name="LicenseBackImage" accept="image/*">
+                            </div>
+                            <div class="rental-calculation mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Rental Calculation</h6>
+                                        <div id="calculationDetails">
+                                            <p>Total Days: <span id="totalDays">0</span></p>
+                                            <p>Total Rent: ₹<span id="totalRent">0</span></p>
+                                            <p><strong>Advance Payment (50%): ₹<span id="advancePayment">0</span></strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="selectedCarDetails">
+                            <!-- Selected car details will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedCarData = null;
+        let currentView = 'grid';
+
+        // Set filter values from query parameters
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            $('#carType').val(urlParams.get('carType') || '');
+            $('#fuelType').val(urlParams.get('fuelType') || '');
+            $('#seatingCapacity').val(urlParams.get('seatingCapacity') || '');
+            $('#priceRange').val(urlParams.get('priceRange') || '');
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pickupDate').setAttribute('min', today);
+            document.getElementById('returnDate').setAttribute('min', today);
+        });
+
+        let filtersVisible = true;
+
+        function toggleFilters() {
+            filtersVisible = !filtersVisible;
+            const filterBody = $('#filterBody');
+            const toggleText = $('#toggleText');
+
+            if (filtersVisible) {
+                filterBody.slideDown();
+                toggleText.text('Hide Filters');
+            } else {
+                filterBody.slideUp();
+                toggleText.text('Show Filters');
+            }
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const container = $('#carsContainer');
+
+            if (view === 'list') {
+                container.removeClass('cars-grid').addClass('cars-list');
+                $('.car-item .modern-car-card').addClass('list-mode');
+                $('#listView').addClass('active');
+                $('#gridView').removeClass('active');
+            } else {
+                container.removeClass('cars-list').addClass('cars-grid');
+                $('.car-item .modern-car-card').removeClass('list-mode');
+                $('#gridView').addClass('active');
+                $('#listView').removeClass('active');
+            }
+        }
+
+        function quickFilter(filterType, value) {
+            $('#' + filterType).val(value);
+            $('#searchForm').submit();
+        }
+
+        function viewCarDetails(carId) {
+            $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
+                const content = `
+                    <div class="modal-car-details">
+                        <div class="car-detail-image">
+                            <img src="${data.imageUrl || '/images/default-car.jpg'}" class="detail-image" alt="${data.carName}">
+                            <div class="detail-status">
+                                <span class="status-badge ${data.availabilityStatus === 'Available' ? 'available' : 'unavailable'}">
+                                    ${data.availabilityStatus}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="car-detail-info">
+                            <div class="detail-header">
+                                <h4 class="detail-title">${data.carName}</h4>
+                                <div class="detail-brand">${data.brand}</div>
+                            </div>
+                            <div class="detail-specs">
+                                <div class="spec-item">
+                                    <div class="spec-label">Type</div>
+                                    <div class="spec-value">${data.carType}</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Fuel</div>
+                                    <div class="spec-value">${data.fuelType}</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Seating</div>
+                                    <div class="spec-value">${data.seatingCapacity} persons</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Mileage</div>
+                                    <div class="spec-value">${data.mileage} km/l</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Number Plate</div>
+                                    <div class="spec-value">${data.numberPlate}</div>
+                                </div>
+                            </div>
+                            <div class="detail-pricing">
+                                <div class="pricing-card">
+                                    <div class="price-item">
+                                        <div class="price-label">Rent per Day</div>
+                                        <div class="price-value primary">₹${data.rentPerDay}</div>
+                                    </div>
+                                    <div class="price-item">
+                                        <div class="price-label">Per KM Rate</div>
+                                        <div class="price-value secondary">₹${data.perKmRate}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#carDetailsContent').html(content);
+                $('#carDetailsModal').modal('show');
+            });
+        }
+
+        function bookCar(carId) {
+            @if (ViewBag.IsLoggedIn != true)
+            {
+                <text>
+                window.location.href = '@Url.Action("Login", "Account")';
+                return;
+                </text>
+            }
+
+            $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
+                selectedCarData = data;
+                $('#selectedCarId').val(carId);
+                
+                const carDetails = `
+                    <div class="card">
+                        <img src="${data.imageUrl || '/images/default-car.jpg'}" class="card-img-top" alt="${data.carName}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">${data.carName}</h5>
+                            <p><strong>Brand:</strong> ${data.brand}</p>
+                            <p><strong>Type:</strong> ${data.carType}</p>
+                            <p><strong>Rent per Day:</strong> ₹${data.rentPerDay}</p>
+                            <p><strong>Per KM Rate:</strong> ₹${data.perKmRate}</p>
+                        </div>
+                    </div>
+                `;
+                $('#selectedCarDetails').html(carDetails);
+                $('#bookingModal').modal('show');
+            });
+        }
+
+        $('#pickupDate, #returnDate').on('change', function() {
+            calculateRent();
+        });
+
+        function calculateRent() {
+            const pickupDate = $('#pickupDate').val();
+            const returnDate = $('#returnDate').val();
+            const carId = $('#selectedCarId').val();
+
+            if (pickupDate && returnDate && carId) {
+                $.get('@Url.Action("CalculateRent", "Booking")', {
+                    carId: carId,
+                    pickupDate: pickupDate,
+                    returnDate: returnDate
+                }, function(data) {
+                    if (data.success) {
+                        $('#totalDays').text(data.totalDays);
+                        $('#totalRent').text(data.totalCost);
+                        $('#advancePayment').text(data.advancePayment);
+                    }
+                });
+            }
+        }
+
+        function confirmBooking() {
+            const formData = new FormData($('#bookingForm')[0]);
+            
+            $.ajax({
+                url: '@Url.Action("CreateBooking", "Booking")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#bookingModal').modal('hide');
+                        if (response.redirectUrl) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while processing your booking.');
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,181 @@
+@model ProcessReturnRequestDTO
+@{
+    ViewData["Title"] = "Process Return";
+    Layout = "_AdminLayout";
+    var rent = ViewBag.Rent as RentResponseDTO;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Process Return</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="@Url.Action("ActiveRents")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Active Rents
+        </a>
+    </div>
+</div>
+
+@if (rent != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-undo"></i> Process Car Return</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ProcessReturn" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input asp-for="RentID" type="hidden" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="OdometerEnd" class="form-label">Ending Odometer Reading (KM) *</label>
+                            <input asp-for="OdometerEnd" class="form-control" type="number" 
+                                   min="@rent.OdometerStart" placeholder="e.g., 15500" required 
+                                   onchange="calculateExtraCharges()" />
+                            <span asp-validation-for="OdometerEnd" class="text-danger"></span>
+                            <div class="form-text">
+                                Starting reading was: <strong>@rent.OdometerStart KM</strong>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ActualReturnDate" class="form-label">Actual Return Date & Time</label>
+                            <input asp-for="ActualReturnDate" class="form-control" type="datetime-local" 
+                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="ActualReturnDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Extra Charges Calculation -->
+                        <div class="card bg-light mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Extra Charges Calculation</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Starting Odometer:</strong> @rent.OdometerStart KM</p>
+                                        <p><strong>Ending Odometer:</strong> <span id="endingKM">-</span> KM</p>
+                                        <p><strong>Total Distance:</strong> <span id="totalDistance">-</span> KM</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Expected Distance:</strong> <span id="expectedDistance">@((rent.BookingDetails?.ReturnDate - rent.BookingDetails?.PickupDate)?.Days * 100 ?? 0)</span> KM</p>
+                                        <p><strong>Extra Distance:</strong> <span id="extraDistance">-</span> KM</p>
+                                        <p><strong>Per KM Rate:</strong> ₹@(rent.BookingDetails?.CarDetails?.PerKmRate ?? 0)</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6><strong>Base Amount:</strong> ₹@rent.BookingDetails?.TotalCost</h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><strong>Extra Charges:</strong> ₹<span id="extraCharges">0.00</span></h6>
+                                    </div>
+                                </div>
+                                <hr>
+                                <h5 class="text-primary"><strong>Total Due:</strong> ₹<span id="totalDue">@rent.BookingDetails?.TotalCost</span></h5>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Return Checklist:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Inspect car for any new damages</li>
+                                <li>Check fuel level (should match pickup level)</li>
+                                <li>Verify all car accessories are present</li>
+                                <li>Record accurate final odometer reading</li>
+                                <li>Collect any outstanding payments</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("ActiveRents")" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-undo"></i> Process Return
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Rent Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Rent ID:</strong> #@rent.RentID
+                    </div>
+                    <div class="mb-3">
+                        <strong>Customer:</strong> @rent.BookingDetails?.CustomerName
+                    </div>
+                    <div class="mb-3">
+                        <strong>Car:</strong> @rent.BookingDetails?.CarDetails?.CarName
+                        <br><small class="text-muted">@rent.BookingDetails?.CarDetails?.NumberPlate</small>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Rent Started:</strong> @rent.RentDate.ToString("MMM dd, yyyy HH:mm")
+                    </div>
+                    <div class="mb-3">
+                        <strong>Expected Return:</strong> @rent.BookingDetails?.ReturnDate.ToString("MMM dd, yyyy")
+                    </div>
+                    <div class="mb-3">
+                        <strong>Starting Odometer:</strong> @rent.OdometerStart KM
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(rent.BookingDetails?.CarDetails?.ImageUrl))
+            {
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <img src="@rent.BookingDetails.CarDetails.ImageUrl" alt="@rent.BookingDetails.CarDetails.CarName" 
+                             class="img-fluid rounded">
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        Rent information not found or invalid.
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const perKmRate = @(rent?.BookingDetails?.CarDetails?.PerKmRate ?? 0);
+        const baseAmount = @(rent?.BookingDetails?.TotalCost ?? 0);
+        const startingKM = @(rent?.OdometerStart ?? 0);
+        const expectedDistance = @((rent?.BookingDetails?.ReturnDate - rent?.BookingDetails?.PickupDate)?.Days * 100 ?? 0);
+
+        function calculateExtraCharges() {
+            const endingKM = parseInt(document.getElementById('OdometerEnd').value) || 0;
+            
+            if (endingKM < startingKM) {
+                alert('Ending odometer reading cannot be less than starting reading!');
+                document.getElementById('OdometerEnd').value = '';
+                return;
+            }
+
+            const totalDistance = endingKM - startingKM;
+            const extraDistance = Math.max(0, totalDistance - expectedDistance);
+            const extraCharges = extraDistance * perKmRate;
+            const totalDue = baseAmount + extraCharges;
+
+            document.getElementById('endingKM').textContent = endingKM;
+            document.getElementById('totalDistance').textContent = totalDistance;
+            document.getElementById('extraDistance').textContent = extraDistance;
+            document.getElementById('extraCharges').textContent = extraCharges.toFixed(2);
+            document.getElementById('totalDue').textContent = totalDue.toFixed(2);
+        }
+    </script>
+}

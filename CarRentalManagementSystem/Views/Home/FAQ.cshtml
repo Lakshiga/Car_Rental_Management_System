@@ -1,0 +1,504 @@
+@{
+    ViewData["Title"] = "FAQ";
+}
+
+<!-- FAQ Hero Section -->
+<div class="hero-section bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold">Frequently Asked Questions</h1>
+                <p class="lead">Find answers to common questions about our car rental services.</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fas fa-question-circle fa-5x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search FAQ -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="faqSearch" placeholder="Search FAQ...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Categories -->
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-pills nav-fill" id="faqTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button" role="tab">
+                        <i class="fas fa-info-circle me-2"></i>General
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="booking-tab" data-bs-toggle="pill" data-bs-target="#booking" type="button" role="tab">
+                        <i class="fas fa-calendar-alt me-2"></i>Booking
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="payment-tab" data-bs-toggle="pill" data-bs-target="#payment" type="button" role="tab">
+                        <i class="fas fa-credit-card me-2"></i>Payment
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="policies-tab" data-bs-toggle="pill" data-bs-target="#policies" type="button" role="tab">
+                        <i class="fas fa-file-contract me-2"></i>Policies
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Content -->
+<div class="container mb-5">
+    <div class="tab-content" id="faqTabContent">
+        <!-- General FAQ -->
+        <div class="tab-pane fade show active" id="general" role="tabpanel">
+            <div class="accordion" id="generalAccordion">
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="general1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#generalCollapse1">
+                            What documents do I need to rent a car?
+                        </button>
+                    </h2>
+                    <div id="generalCollapse1" class="accordion-collapse collapse show" data-bs-parent="#generalAccordion">
+                        <div class="accordion-body">
+                            <p>To rent a car, you'll need:</p>
+                            <ul>
+                                <li>Valid driver's license (minimum 1 year old)</li>
+                                <li>Government-issued photo ID (passport, national ID)</li>
+                                <li>Credit card for security deposit</li>
+                                <li>Proof of identity (NIC/passport)</li>
+                            </ul>
+                            <p>International visitors need a valid international driving permit along with their home country license.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="general2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#generalCollapse2">
+                            What is the minimum age requirement to rent a car?
+                        </button>
+                    </h2>
+                    <div id="generalCollapse2" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                        <div class="accordion-body">
+                            <p>The minimum age to rent a car is <strong>21 years old</strong>.</p>
+                            <p>Additional conditions:</p>
+                            <ul>
+                                <li>Drivers aged 21-24: Young driver surcharge may apply</li>
+                                <li>Drivers aged 25+: Full access to all vehicle categories</li>
+                                <li>Driver must have held a valid license for at least 1 year</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="general3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#generalCollapse3">
+                            What types of vehicles do you offer?
+                        </button>
+                    </h2>
+                    <div id="generalCollapse3" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                        <div class="accordion-body">
+                            <p>We offer a diverse fleet including:</p>
+                            <ul>
+                                <li><strong>Economy Cars:</strong> Fuel-efficient compact vehicles</li>
+                                <li><strong>Sedans:</strong> Comfortable mid-size and full-size cars</li>
+                                <li><strong>SUVs:</strong> Spacious vehicles for families and groups</li>
+                                <li><strong>Luxury Cars:</strong> Premium vehicles for special occasions</li>
+                                <li><strong>Convertibles:</strong> Open-top driving experience</li>
+                                <li><strong>Electric Vehicles:</strong> Eco-friendly options</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="general4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#generalCollapse4">
+                            Do you provide 24/7 customer support?
+                        </button>
+                    </h2>
+                    <div id="generalCollapse4" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                        <div class="accordion-body">
+                            <p>Yes! We provide round-the-clock customer support.</p>
+                            <ul>
+                                <li><strong>Emergency Support:</strong> 24/7 roadside assistance</li>
+                                <li><strong>Phone Support:</strong> Available during business hours</li>
+                                <li><strong>Online Support:</strong> Contact form and live chat</li>
+                                <li><strong>Email Support:</strong> Response within 24 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking FAQ -->
+        <div class="tab-pane fade" id="booking" role="tabpanel">
+            <div class="accordion" id="bookingAccordion">
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="booking1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse1">
+                            How do I make a reservation?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse1" class="accordion-collapse collapse show" data-bs-parent="#bookingAccordion">
+                        <div class="accordion-body">
+                            <p>Making a reservation is easy:</p>
+                            <ol>
+                                <li>Browse our available cars</li>
+                                <li>Select your preferred vehicle</li>
+                                <li>Choose pickup and return dates</li>
+                                <li>Provide required documentation</li>
+                                <li>Pay advance amount (50% of total cost)</li>
+                                <li>Receive confirmation email</li>
+                            </ol>
+                            <p>You can book online through our website or visit our office.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="booking2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse2">
+                            Can I modify or cancel my reservation?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse2" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Modifications:</strong></p>
+                            <ul>
+                                <li>Free modifications up to 24 hours before pickup</li>
+                                <li>Subject to vehicle availability</li>
+                                <li>Price difference may apply</li>
+                            </ul>
+                            <p><strong>Cancellations:</strong></p>
+                            <ul>
+                                <li>Free cancellation up to 24 hours before pickup</li>
+                                <li>Full refund of advance payment</li>
+                                <li>Late cancellations may incur charges</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="booking3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse3">
+                            How far in advance can I book?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse3" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                        <div class="accordion-body">
+                            <p>You can book:</p>
+                            <ul>
+                                <li><strong>Up to 6 months in advance</strong> for guaranteed availability</li>
+                                <li><strong>Same-day bookings</strong> subject to availability</li>
+                                <li><strong>Last-minute reservations</strong> possible but not guaranteed</li>
+                            </ul>
+                            <p>We recommend booking at least 3-7 days in advance for popular dates and seasons.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="booking4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse4">
+                            What happens if the car is not available?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse4" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                        <div class="accordion-body">
+                            <p>If your reserved car is unavailable:</p>
+                            <ul>
+                                <li>We'll offer a similar or upgraded vehicle at no extra cost</li>
+                                <li>Full refund if no suitable alternative is available</li>
+                                <li>Immediate notification via email/phone</li>
+                                <li>Priority rebooking for future dates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment FAQ -->
+        <div class="tab-pane fade" id="payment" role="tabpanel">
+            <div class="accordion" id="paymentAccordion">
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="payment1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse1">
+                            What payment methods do you accept?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse1" class="accordion-collapse collapse show" data-bs-parent="#paymentAccordion">
+                        <div class="accordion-body">
+                            <p>We accept various payment methods:</p>
+                            <ul>
+                                <li><strong>Credit Cards:</strong> Visa, MasterCard, American Express</li>
+                                <li><strong>Debit Cards:</strong> Major bank cards</li>
+                                <li><strong>Online Payment:</strong> Secure payment gateway</li>
+                                <li><strong>Bank Transfer:</strong> Direct bank transfers</li>
+                                <li><strong>Cash:</strong> At pickup location</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="payment2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse2">
+                            When do I need to pay?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse2" class="accordion-collapse collapse" data-bs-parent="#paymentAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Payment Schedule:</strong></p>
+                            <ul>
+                                <li><strong>Advance Payment:</strong> 50% at booking confirmation</li>
+                                <li><strong>Remaining Payment:</strong> At vehicle pickup</li>
+                                <li><strong>Security Deposit:</strong> Refundable amount at pickup</li>
+                                <li><strong>Extra Charges:</strong> At vehicle return (if applicable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="payment3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse3">
+                            Is there a security deposit?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse3" class="accordion-collapse collapse" data-bs-parent="#paymentAccordion">
+                        <div class="accordion-body">
+                            <p>Yes, a refundable security deposit is required:</p>
+                            <ul>
+                                <li><strong>Amount:</strong> Varies by vehicle category</li>
+                                <li><strong>Purpose:</strong> Cover potential damages or extra charges</li>
+                                <li><strong>Hold Method:</strong> Credit card authorization</li>
+                                <li><strong>Refund:</strong> Released within 7-10 business days after return</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="payment4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse4">
+                            Are there any hidden fees?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse4" class="accordion-collapse collapse" data-bs-parent="#paymentAccordion">
+                        <div class="accordion-body">
+                            <p>We believe in transparent pricing with no hidden fees:</p>
+                            <ul>
+                                <li><strong>Base Rental Rate:</strong> Clearly displayed</li>
+                                <li><strong>Taxes:</strong> Included in final price</li>
+                                <li><strong>Insurance:</strong> Basic coverage included</li>
+                                <li><strong>Extra Charges:</strong> Clearly explained (fuel, mileage, late return)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Policies FAQ -->
+        <div class="tab-pane fade" id="policies" role="tabpanel">
+            <div class="accordion" id="policiesAccordion">
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="policies1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#policiesCollapse1">
+                            What is your fuel policy?
+                        </button>
+                    </h2>
+                    <div id="policiesCollapse1" class="accordion-collapse collapse show" data-bs-parent="#policiesAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Full-to-Full Policy:</strong></p>
+                            <ul>
+                                <li>Vehicle provided with full tank</li>
+                                <li>Return with full tank to avoid charges</li>
+                                <li>Fuel charges apply if returned with less fuel</li>
+                                <li>Receipts recommended for fuel purchases</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="policies2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#policiesCollapse2">
+                            What is included in the insurance coverage?
+                        </button>
+                    </h2>
+                    <div id="policiesCollapse2" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Basic Insurance Included:</strong></p>
+                            <ul>
+                                <li>Third-party liability coverage</li>
+                                <li>Collision damage waiver</li>
+                                <li>Theft protection</li>
+                                <li>Personal accident insurance</li>
+                            </ul>
+                            <p><strong>Additional Coverage Available:</strong></p>
+                            <ul>
+                                <li>Super collision damage waiver</li>
+                                <li>Personal effects coverage</li>
+                                <li>Roadside assistance plus</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="policies3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#policiesCollapse3">
+                            What happens if I return the car late?
+                        </button>
+                    </h2>
+                    <div id="policiesCollapse3" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Late Return Policy:</strong></p>
+                            <ul>
+                                <li><strong>Grace Period:</strong> 30 minutes free</li>
+                                <li><strong>Hourly Rate:</strong> Charged for each additional hour</li>
+                                <li><strong>Full Day:</strong> Charged if more than 4 hours late</li>
+                                <li><strong>Notification:</strong> Contact us if delay is expected</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header" id="policies4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#policiesCollapse4">
+                            Can someone else drive the rental car?
+                        </button>
+                    </h2>
+                    <div id="policiesCollapse4" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Additional Driver Policy:</strong></p>
+                            <ul>
+                                <li>Additional drivers must be authorized at booking</li>
+                                <li>Must meet same requirements as primary driver</li>
+                                <li>Additional driver fee may apply</li>
+                                <li>All drivers must be present at pickup</li>
+                                <li>Spouse/partner may be covered under certain conditions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Still have questions? -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-4">Still Have Questions?</h2>
+                <p class="lead mb-4">Our customer service team is here to help you!</p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-phone fa-3x mb-3"></i>
+                            <h5>Call Us</h5>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-envelope fa-3x mb-3"></i>
+                            <h5>Email Us</h5>
+                            <p>infocynexblazer@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-comments fa-3x mb-3"></i>
+                            <h5>Live Chat</h5>
+                            <button class="btn btn-light">Start Chat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // FAQ Search functionality
+        $('#faqSearch').on('keyup', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.faq-item').each(function() {
+                const faqText = $(this).text().toLowerCase();
+                if (faqText.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // Highlight search terms
+        function highlightSearchTerm(searchTerm) {
+            if (searchTerm.length > 0) {
+                $('.accordion-body').each(function() {
+                    const text = $(this).html();
+                    const highlightedText = text.replace(
+                        new RegExp(searchTerm, 'gi'),
+                        '<mark>$&</mark>'
+                    );
+                    $(this).html(highlightedText);
+                });
+            }
+        }
+
+        // Clear highlights
+        function clearHighlights() {
+            $('.accordion-body mark').each(function() {
+                $(this).replaceWith($(this).text());
+            });
+        }
+
+        // Search with highlight
+        $('#faqSearch').on('keyup', function() {
+            clearHighlights();
+            const searchTerm = $(this).val().toLowerCase();
+            
+            if (searchTerm.length >= 3) {
+                highlightSearchTerm(searchTerm);
+            }
+            
+            $('.faq-item').each(function() {
+                const faqText = $(this).text().toLowerCase();
+                if (faqText.includes(searchTerm) || searchTerm.length === 0) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    </script>
+}

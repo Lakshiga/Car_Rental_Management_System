@@ -1,0 +1,248 @@
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="customer-dashboard">
+    <!-- Page Header -->
+    <div class="customer-page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1><i data-lucide="layout-dashboard" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 12px;"></i> My Dashboard</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                </ol>
+                            </nav>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary">
+                                <i data-lucide="plus" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> New Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="customer-card">
+                    <div class="card-body text-center py-4">
+                        <h3 class="mb-0">Welcome back, <span style="color: var(--customer-primary); font-weight: 800;">@ViewContext.HttpContext.Session.GetString("CustomerName")</span>!</h3>
+                        <p class="text-muted mt-2">Manage your car rentals and bookings from your personal dashboard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="customer-stats-card">
+                    <div class="stats-icon">
+                        <i data-lucide="calendar" style="width: 40px; height: 40px; margin: 0 auto; display: block;"></i>
+                    </div>
+                    <div class="stats-number">@ViewBag.TotalBookings</div>
+                    <div class="stats-label">Total Bookings</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="customer-stats-card">
+                    <div class="stats-icon">
+                        <i data-lucide="clock" style="width: 40px; height: 40px; margin: 0 auto; display: block;"></i>
+                    </div>
+                    <div class="stats-number">@ViewBag.PendingBookings</div>
+                    <div class="stats-label">Pending</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="customer-stats-card">
+                    <div class="stats-icon">
+                        <i data-lucide="check-circle" style="width: 40px; height: 40px; margin: 0 auto; display: block;"></i>
+                    </div>
+                    <div class="stats-number">@ViewBag.ApprovedBookings</div>
+                    <div class="stats-label">Approved</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="customer-stats-card">
+                    <div class="stats-icon">
+                        <i data-lucide="banknote" style="width: 40px; height: 40px; margin: 0 auto; display: block;"></i>
+                    </div>
+                    <div class="stats-number">₹@ViewBag.TotalAmountSpent</div>
+                    <div class="stats-label">Total Spent</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="customer-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i data-lucide="zap" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary w-100 py-3">
+                                    <i data-lucide="car" style="width: 32px; height: 32px; margin: 0 auto 8px auto; display: block;"></i>
+                                    Browse Cars
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-customer-secondary w-100 py-3">
+                                    <i data-lucide="list" style="width: 32px; height: 32px; margin: 0 auto 8px auto; display: block;"></i>
+                                    My Bookings
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="@Url.Action("PaymentHistory", "Payment")" class="btn btn-customer-secondary w-100 py-3">
+                                    <i data-lucide="credit-card" style="width: 32px; height: 32px; margin: 0 auto 8px auto; display: block;"></i>
+                                    Payment History
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="@Url.Action("Profile", "Account")" class="btn btn-customer-secondary w-100 py-3">
+                                    <i data-lucide="user" style="width: 32px; height: 32px; margin: 0 auto 8px auto; display: block;"></i>
+                                    My Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="row">
+            <div class="col-12">
+                <div class="customer-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i data-lucide="history" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Recent Bookings</h5>
+                            <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-customer-secondary btn-sm">View All</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.RecentBookings != null && ((IEnumerable<dynamic>)ViewBag.RecentBookings).Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="customer-table table">
+                                    <thead>
+                                        <tr>
+                                            <th>Booking ID</th>
+                                            <th>Car</th>
+                                            <th>Pickup Date</th>
+                                            <th>Return Date</th>
+                                            <th>Status</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var booking in (IEnumerable<dynamic>)ViewBag.RecentBookings)
+                                        {
+                                            <tr>
+                                                <td><strong>#@booking.BookingID</strong></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="@(booking.CarDetails.ImageUrl ?? "/images/default-car.jpg")"
+                                                             alt="@booking.CarDetails.CarName" class="car-image me-2">
+                                                        <div>
+                                                            <div class="fw-bold">@booking.CarDetails.CarName</div>
+                                                            <small class="text-muted">@booking.CarDetails.NumberPlate</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                                <td>@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                                <td>
+                                                    <span class="badge @(booking.Status == "Pending" ? "bg-warning" :
+                                                                        booking.Status == "Approved" ? "bg-success" :
+                                                                        booking.Status == "Rejected" ? "bg-danger" :
+                                                                        booking.Status == "Rented" ? "bg-info" : "bg-secondary")">
+                                                        @booking.Status
+                                                    </span>
+                                                </td>
+                                                <td><strong>₹@booking.TotalCost</strong></td>
+                                                <td>
+                                                    <a href="@Url.Action("Details", "Booking", new { id = booking.BookingID })"
+                                                       class="btn btn-customer-secondary btn-sm">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-4x mb-3" style="color: var(--customer-primary);"></i>
+                                <h4 style="color: var(--customer-dark);">No Bookings Yet</h4>
+                                <p class="text-muted mb-4">Start your journey by browsing our premium car collection and make your first booking.</p>
+                                <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary">
+                                    <i class="fas fa-car"></i> Browse Cars
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        border-left: 4px solid #007bff;
+    }
+
+    .stats-card.success {
+        border-left-color: #28a745;
+    }
+
+    .stats-card.warning {
+        border-left-color: #ffc107;
+    }
+
+    .stats-card.danger {
+        border-left-color: #dc3545;
+    }
+
+    .car-image {
+        width: 50px;
+        height: 35px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .btn i {
+        display: block;
+    }
+
+    .text-xs {
+        font-size: 0.7rem;
+    }
+
+    .text-gray-800 {
+        color: #5a5c69;
+    }
+
+    .text-gray-300 {
+        color: #dddfeb;
+    }
+</style>

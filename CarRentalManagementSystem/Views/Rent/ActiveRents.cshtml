@@ -1,0 +1,105 @@
+@model IEnumerable<RentResponseDTO>
+@{
+    ViewData["Title"] = "Active Rents";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Active Rents</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-list"></i> All Rents
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var rent in Model)
+        {
+            <div class="col-xl-4 col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Rent #@rent.RentID</h6>
+                        <span class="badge bg-warning">Active</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+                                <img src="@(rent.BookingDetails?.CarDetails?.ImageUrl ?? "/images/default-car.jpg")" 
+                                     alt="@rent.BookingDetails?.CarDetails?.CarName" class="img-fluid rounded">
+                            </div>
+                            <div class="col-8">
+                                <h6 class="card-title">@rent.BookingDetails?.CarDetails?.CarName</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">@rent.BookingDetails?.CarDetails?.NumberPlate</small><br>
+                                    <strong>Customer:</strong> @rent.BookingDetails?.CustomerName<br>
+                                    <strong>Started:</strong> @rent.RentDate.ToString("MMM dd, HH:mm")<br>
+                                    <strong>Expected Return:</strong> @rent.BookingDetails?.ReturnDate.ToString("MMM dd")
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="border-end">
+                                    <h6 class="text-primary">@rent.OdometerStart</h6>
+                                    <small class="text-muted">Start KM</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-success">@((DateTime.Now - rent.RentDate).Days) Days</h6>
+                                <small class="text-muted">In Use</small>
+                            </div>
+                        </div>
+                        
+                        @if (rent.BookingDetails?.ReturnDate < DateTime.Now)
+                        {
+                            <div class="alert alert-warning mt-2 mb-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <small><strong>Overdue!</strong> Expected return was @rent.BookingDetails.ReturnDate.ToString("MMM dd")</small>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-grid gap-2">
+                            <a href="@Url.Action("ProcessReturn", new { rentId = rent.RentID })" 
+                               class="btn btn-success btn-sm">
+                                <i class="fas fa-undo"></i> Process Return
+                            </a>
+                            <a href="@Url.Action("Details", new { id = rent.RentID })" 
+                               class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="fas fa-car fa-4x text-muted mb-4"></i>
+        <h4>No Active Rents</h4>
+        <p class="text-muted">All cars are currently available or not rented out.</p>
+        <a href="@Url.Action("Bookings", "Admin")" class="btn btn-primary">
+            <i class="fas fa-calendar"></i> View Bookings
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Auto-refresh every 30 seconds to show real-time updates
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}

@@ -1,0 +1,131 @@
+@model StartRentRequestDTO
+@{
+    ViewData["Title"] = "Start Rent";
+    Layout = "_AdminLayout";
+    var booking = ViewBag.Booking as BookingResponseDTO;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Start Rent</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="@Url.Action("Bookings", "Admin")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Bookings
+        </a>
+    </div>
+</div>
+
+@if (booking != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> Start Rent Process</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="StartRent" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input asp-for="BookingID" type="hidden" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="OdometerStart" class="form-label">Starting Odometer Reading (KM) *</label>
+                            <input asp-for="OdometerStart" class="form-control" type="number" min="0" 
+                                   placeholder="e.g., 15000" required />
+                            <span asp-validation-for="OdometerStart" class="text-danger"></span>
+                            <div class="form-text">Record the current odometer reading before handing over the car</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RentDate" class="form-label">Rent Start Date & Time</label>
+                            <input asp-for="RentDate" class="form-control" type="datetime-local" 
+                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="RentDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Important:</strong> Make sure to:
+                            <ul class="mb-0 mt-2">
+                                <li>Verify customer's driving license</li>
+                                <li>Check car condition and note any damages</li>
+                                <li>Record accurate odometer reading</li>
+                                <li>Confirm customer contact information</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Bookings", "Admin")" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-key"></i> Start Rent
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Booking Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Booking ID:</strong> #@booking.BookingID
+                    </div>
+                    <div class="mb-3">
+                        <strong>Customer:</strong> @booking.CustomerName
+                    </div>
+                    <div class="mb-3">
+                        <strong>Car:</strong> @booking.CarDetails?.CarName
+                        <br><small class="text-muted">@booking.CarDetails?.NumberPlate</small>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Pickup Date:</strong> @booking.PickupDate.ToString("MMM dd, yyyy")
+                    </div>
+                    <div class="mb-3">
+                        <strong>Return Date:</strong> @booking.ReturnDate.ToString("MMM dd, yyyy")
+                    </div>
+                    <div class="mb-3">
+                        <strong>Total Cost:</strong> ₹@booking.TotalCost
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status:</strong> 
+                        <span class="badge bg-success">@booking.Status</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Car Information</h6>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(booking.CarDetails?.ImageUrl))
+                    {
+                        <img src="@booking.CarDetails.ImageUrl" alt="@booking.CarDetails.CarName" 
+                             class="img-fluid rounded mb-3">
+                    }
+                    <table class="table table-sm">
+                        <tr><td><strong>Type:</strong></td><td>@booking.CarDetails?.CarType</td></tr>
+                        <tr><td><strong>Fuel:</strong></td><td>@booking.CarDetails?.FuelType</td></tr>
+                        <tr><td><strong>Seating:</strong></td><td>@booking.CarDetails?.SeatingCapacity persons</td></tr>
+                        <tr><td><strong>Per KM Rate:</strong></td><td>₹@booking.CarDetails?.PerKmRate</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        Booking information not found or invalid.
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

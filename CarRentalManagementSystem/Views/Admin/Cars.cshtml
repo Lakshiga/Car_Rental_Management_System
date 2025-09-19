@@ -1,0 +1,153 @@
+@model IEnumerable<CarResponseDTO>
+@{
+    ViewData["Title"] = "Car Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Car Management</h1>
+    @if (ViewBag.UserRole == "Admin")
+    {
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="@Url.Action("AddCar")" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Car
+            </a>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="carsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Image</th>
+                        <th>Car Name</th>
+                        <th>Model</th>
+                        <th>Type</th>
+                        <th>Fuel</th>
+                        <th>Seats</th>
+                        <th>Rent/Day</th>
+                        <th>Per KM</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(car.ImageUrl ?? "/images/default-car.jpg")" 
+                                     alt="@car.CarName" class="car-image">
+                            </td>
+                            <td>@car.CarName</td>
+                            <td>@car.Brand</td>
+                            <td>@car.CarType</td>
+                            <td>@car.FuelType</td>
+                            <td>@car.SeatingCapacity</td>
+                            <td>₹@car.RentPerDay</td>
+                            <td>₹@car.PerKmRate</td>
+                            <td>
+                                <span class="badge @(car.AvailabilityStatus == "Available" ? "bg-success" : "bg-warning")">
+                                    @car.AvailabilityStatus
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button type="button" class="btn btn-sm btn-info" 
+                                            onclick="viewCarDetails(@car.CarID)" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    @if (ViewBag.UserRole == "Admin")
+                                    {
+                                        <a href="@Url.Action("EditCar", new { id = car.CarID })" 
+                                           class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="deleteCar(@car.CarID)" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Car Details Modal -->
+<div class="modal fade" id="carDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Car Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="carDetailsContent">
+                <!-- Car details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewCarDetails(carId) {
+            $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
+                const content = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="${data.imageUrl || '/images/default-car.jpg'}" class="img-fluid rounded" alt="${data.carName}">
+                        </div>
+                        <div class="col-md-6">
+                            <h4>${data.carName}</h4>
+                            <table class="table table-borderless">
+                                <tr><td><strong>Brand:</strong></td><td>${data.brand}</td></tr>
+                                <tr><td><strong>Type:</strong></td><td>${data.carType}</td></tr>
+                                <tr><td><strong>Fuel:</strong></td><td>${data.fuelType}</td></tr>
+                                <tr><td><strong>Seating:</strong></td><td>${data.seatingCapacity} persons</td></tr>
+                                <tr><td><strong>Mileage:</strong></td><td>${data.mileage} km/l</td></tr>
+                                <tr><td><strong>Number Plate:</strong></td><td>${data.numberPlate}</td></tr>
+                                <tr><td><strong>Rent per Day:</strong></td><td>₹${data.rentPerDay}</td></tr>
+                                <tr><td><strong>Per KM Rate:</strong></td><td>₹${data.perKmRate}</td></tr>
+                                <tr><td><strong>Status:</strong></td><td><span class="badge bg-success">${data.availabilityStatus}</span></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                $('#carDetailsContent').html(content);
+                $('#carDetailsModal').modal('show');
+            });
+        }
+
+        function deleteCar(carId) {
+            if (confirm('Are you sure you want to delete this car?')) {
+                $.post('@Url.Action("DeleteCar", "Admin")', { id: carId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+
+        // Initialize DataTable if available
+        $(document).ready(function() {
+            if ($.fn.DataTable) {
+                $('#carsTable').DataTable({
+                    responsive: true,
+                    pageLength: 10,
+                    order: [[1, 'asc']]
+                });
+            }
+        });
+    </script>
+}

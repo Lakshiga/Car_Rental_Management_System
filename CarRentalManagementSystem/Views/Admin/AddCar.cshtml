@@ -1,0 +1,148 @@
+@model Car
+@{
+    ViewData["Title"] = "Add New Car";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Add New Car</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="@Url.Action("Cars")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Cars
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="AddCar" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CarName" class="form-label">Car Name</label>
+                            <input asp-for="CarName" class="form-control" placeholder="e.g., Toyota Corolla" />
+                            <span asp-validation-for="CarName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CarModel" class="form-label">Car Model/Brand</label>
+                            <input asp-for="CarModel" class="form-control" placeholder="e.g., 2023" />
+                            <span asp-validation-for="CarModel" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CarType" class="form-label">Car Type</label>
+                            <select asp-for="CarType" class="form-select">
+                                <option value="">Select Car Type</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Coupe">Coupe</option>
+                                <option value="Convertible">Convertible</option>
+                                <option value="Wagon">Wagon</option>
+                            </select>
+                            <span asp-validation-for="CarType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FuelType" class="form-label">Fuel Type</label>
+                            <select asp-for="FuelType" class="form-select">
+                                <option value="">Select Fuel Type</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+                            <span asp-validation-for="FuelType" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SeatingCapacity" class="form-label">Seating Capacity</label>
+                            <select asp-for="SeatingCapacity" class="form-select">
+                                <option value="">Select Seating</option>
+                                <option value="2">2 Seater</option>
+                                <option value="4">4 Seater</option>
+                                <option value="5">5 Seater</option>
+                                <option value="7">7 Seater</option>
+                                <option value="8">8 Seater</option>
+                            </select>
+                            <span asp-validation-for="SeatingCapacity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Mileage" class="form-label">Mileage (km/l)</label>
+                            <input asp-for="Mileage" class="form-control" type="number" step="0.1" placeholder="e.g., 15.5" />
+                            <span asp-validation-for="Mileage" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RentPerDay" class="form-label">Rent Per Day (₹)</label>
+                            <input asp-for="RentPerDay" class="form-control" type="number" step="0.01" placeholder="e.g., 5000" />
+                            <span asp-validation-for="RentPerDay" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PerKmRate" class="form-label">Per KM Rate (₹)</label>
+                            <input asp-for="PerKmRate" class="form-control" type="number" step="0.01" placeholder="e.g., 50" />
+                            <span asp-validation-for="PerKmRate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumberPlate" class="form-label">Number Plate</label>
+                        <input asp-for="NumberPlate" class="form-control" placeholder="e.g., ABC-1234" />
+                        <span asp-validation-for="NumberPlate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Car Image</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                        <div class="form-text">Upload a clear image of the car (JPG, PNG, GIF)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="IsAvailable" class="form-check-label">
+                                Available for Rent
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Cars")" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Car
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Car Information Tips</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Use clear, high-quality images</li>
+                    <li><i class="fas fa-check text-success"></i> Provide accurate mileage information</li>
+                    <li><i class="fas fa-check text-success"></i> Set competitive rental rates</li>
+                    <li><i class="fas fa-check text-success"></i> Double-check number plate format</li>
+                    <li><i class="fas fa-check text-success"></i> Ensure all details are correct</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
