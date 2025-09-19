@@ -25,7 +25,10 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Profile Image</label>
-                    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" id="adminProfileImageInput" />
+                    <div class="mt-2">
+                        <img id="adminProfilePreview" src="@(Model?.ImageUrl ?? string.Empty)" alt="preview" class="avatar-preview @(string.IsNullOrEmpty(Model?.ImageUrl) ? "d-none" : string.Empty)" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -35,6 +38,21 @@
             <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
+    @section Scripts {
+        <script>
+            (function(){
+                const input = document.getElementById('adminProfileImageInput');
+                const preview = document.getElementById('adminProfilePreview');
+                if (input && preview) {
+                    input.addEventListener('change', function(e){
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) return;
+                        const url = URL.createObjectURL(file);
+                        preview.src = url;
+                        preview.classList.remove('d-none');
+                    });
+                }
+            })();
+        </script>
+    }
 </div>
-
-

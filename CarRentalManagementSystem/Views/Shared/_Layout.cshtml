@@ -11,9 +11,15 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+    @{ 
+        var sessionUserId = Context.Session.GetString("UserId");
+        var sessionUserRole = Context.Session.GetString("UserRole");
+        var isLoggedIn = !string.IsNullOrEmpty(sessionUserId);
+        var effectiveRole = sessionUserRole ?? string.Empty;
+    }
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark @(ViewBag.UserRole == "Customer" ? "customer-navbar" : "bg-primary") fixed-top modern-navbar">
-            <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top modern-navbar">
+            <div class="container-fluid px-4">
                 <a class="navbar-brand modern-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <div class="brand-icon-wrapper">
                         <i data-lucide="car" class="brand-icon"></i>
@@ -26,7 +32,7 @@
                     <span></span>
                     <span></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="collapse navbar-collapse align-items-center" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Index">
@@ -52,11 +58,12 @@
                             <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
                                 <i data-lucide="phone" class="nav-icon"></i>Contact
                             </a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
-                        @if (ViewBag.IsLoggedIn == true)
+                        @if (isLoggedIn)
                         {
-                            @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "Staff")
+                            @if (effectiveRole == "Admin" || effectiveRole == "Staff")
                             {
                                 <li class="nav-item">
                                     <a class="nav-link modern-nav-link" asp-controller="Admin" asp-action="Dashboard">
@@ -64,7 +71,7 @@
                                     </a>
                                 </li>
                             }
-                            else if (ViewBag.UserRole == "Customer")
+                            else if (effectiveRole == "Customer")
                             {
                                 <li class="nav-item">
                                     <a class="nav-link modern-nav-link" asp-controller="Customer" asp-action="Dashboard">
@@ -92,7 +99,7 @@
                                             }
                                         }
                                     </div>
-                                    <span class="user-name">@(ViewBag.CustomerName ?? Context.Session.GetString("DisplayName") ?? Context.Session.GetString("Username"))</span>
+                                    <span class="user-name">@(Context.Session.GetString("CustomerName") ?? Context.Session.GetString("DisplayName") ?? Context.Session.GetString("Username"))</span>
                                 </a>
                                 <ul class="dropdown-menu modern-dropdown">
                                     <li><a class="dropdown-item modern-dropdown-item" asp-controller="Account" asp-action="Profile">
