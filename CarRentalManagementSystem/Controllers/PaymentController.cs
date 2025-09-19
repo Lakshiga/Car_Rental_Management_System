@@ -65,10 +65,24 @@ namespace CarRentalManagementSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConfirmPayment(string paymentIntentId)
+        public async Task<IActionResult> ConfirmPayment(string paymentIntentId)
         {
-            // Temporary fix: Remove call to missing method and show error
-            TempData["ErrorMessage"] = "Payment confirmation is not implemented.";
+            if (string.IsNullOrWhiteSpace(paymentIntentId))
+            {
+                TempData["ErrorMessage"] = "Invalid payment reference.";
+                return RedirectToAction("MyBookings", "Booking");
+            }
+
+            var success = await _paymentService.ConfirmPaymentAsync(paymentIntentId);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Payment confirmed successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Unable to confirm the payment. If you were charged, please contact support.";
+            }
+
             return RedirectToAction("MyBookings", "Booking");
         }
 
@@ -79,9 +93,13 @@ namespace CarRentalManagementSystem.Controllers
                 return RedirectToAction("Login", "Account");
 
             // Get all payments for customer's bookings
-            var payments = await _paymentService.GetAllPaymentsAsync();
-            
-            // Filter by customer (this would need to be improved with proper customer filtering)
+            var customerId = int.Parse(customerIdString);
+            var bookings = await _bookingService.GetBookingsByCustomerAsync(customerId);
+            var bookingIds = bookings.Select(b => b.BookingID).ToHashSet();
+
+            var allPayments = await _paymentService.GetAllPaymentsAsync();
+            var payments = allPayments.Where(p => bookingIds.Contains(p.BookingID));
+
             return View(payments);
         }
     }

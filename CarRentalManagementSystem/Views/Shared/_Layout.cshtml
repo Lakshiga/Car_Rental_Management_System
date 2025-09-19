@@ -77,12 +77,22 @@
                                     </a>
                                 </li>
                             }
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle modern-nav-link user-dropdown" href="#" role="button" data-bs-toggle="dropdown">
-                                    <div class="user-avatar">
-                                        <i data-lucide="user" class="avatar-icon"></i>
+                            <li class="nav-item dropdown d-flex align-items-center">
+                                <a class="nav-link dropdown-toggle modern-nav-link user-dropdown d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                    <div class="user-avatar me-2">
+                                        @{
+                                            var avatarUrl = Context.Session.GetString("AvatarUrl");
+                                            if (!string.IsNullOrEmpty(avatarUrl))
+                                            {
+                                                <img src="@avatarUrl" alt="avatar" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;" />
+                                            }
+                                            else
+                                            {
+                                                <i data-lucide="user" class="avatar-icon"></i>
+                                            }
+                                        }
                                     </div>
-                                    <span class="user-name">@ViewBag.CustomerName</span>
+                                    <span class="user-name">@(ViewBag.CustomerName ?? Context.Session.GetString("DisplayName") ?? Context.Session.GetString("Username"))</span>
                                 </a>
                                 <ul class="dropdown-menu modern-dropdown">
                                     <li><a class="dropdown-item modern-dropdown-item" asp-controller="Account" asp-action="Profile">

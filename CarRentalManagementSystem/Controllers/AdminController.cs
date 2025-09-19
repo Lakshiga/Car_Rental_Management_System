@@ -183,6 +183,48 @@ namespace CarRentalManagementSystem.Controllers
             return View(bookings);
         }
 
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var model = new DTOs.CustomerResponseDTO
+            {
+                FullName = HttpContext.Session.GetString("CustomerName") ?? string.Empty,
+                Role = userRole ?? string.Empty
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Profile(DTOs.CustomerResponseDTO model, IFormFile? imageFile)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+                HttpContext.Session.SetString("AvatarUrl", "/images/profiles/" + uniqueFileName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.FullName))
+                HttpContext.Session.SetString("DisplayName", model.FullName);
+
+            TempData["SuccessMessage"] = "Profile updated.";
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> ApproveBooking(int bookingId)
         {
