@@ -123,14 +123,44 @@ namespace CarRentalManagementSystem.Services
             return totalDays * car.RentPerDay;
         }
 
-        public async Task<bool> ApproveBookingAsync(int bookingId)
+        public async Task<bool> ApproveBookingAsync(int bookingId, string approvedBy)
         {
-            return await UpdateBookingStatusAsync(bookingId, "Approved");
+            try
+            {
+                var booking = await _context.Bookings.FindAsync(bookingId);
+                if (booking == null)
+                    return false;
+
+                booking.Status = "Approved";
+                booking.ApprovedBy = approvedBy;
+                booking.ApprovedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task<bool> RejectBookingAsync(int bookingId)
+        public async Task<bool> RejectBookingAsync(int bookingId, string rejectedBy)
         {
-            return await UpdateBookingStatusAsync(bookingId, "Rejected");
+            try
+            {
+                var booking = await _context.Bookings.FindAsync(bookingId);
+                if (booking == null)
+                    return false;
+
+                booking.Status = "Rejected";
+                booking.ApprovedBy = $"Rejected by {rejectedBy}";
+                booking.ApprovedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private async Task<string?> SaveImageAsync(IFormFile? imageFile)
@@ -188,6 +218,8 @@ namespace CarRentalManagementSystem.Services
                 LicenseNumber = booking.LicenseNumber,
                 LicenseFrontImage = booking.LicenseFrontImage,
                 LicenseBackImage = booking.LicenseBackImage,
+                ApprovedBy = booking.ApprovedBy,
+                ApprovedAt = booking.ApprovedAt,
                 CreatedAt = booking.CreatedAt
             };
         }

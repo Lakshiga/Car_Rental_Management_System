@@ -13,11 +13,28 @@
     </div>
 </div>
 
+@* Display validation summary and messages *@
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <h6><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h6>
+        <div asp-validation-summary="All" class="mb-0"></div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <form asp-action="AddCar" method="post" enctype="multipart/form-data">
+                <form asp-action="AddCar" method="post" enctype="multipart/form-data" id="addCarForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     
                     <div class="row">
@@ -27,9 +44,14 @@
                             <span asp-validation-for="CarName" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="CarModel" class="form-label">Car Model/Brand</label>
+                            <label asp-for="CarModel" class="form-label">Car Model/Year</label>
                             <input asp-for="CarModel" class="form-control" placeholder="e.g., 2023" />
                             <span asp-validation-for="CarModel" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Car Brand</label>
+                            <input asp-for="CarBrand" class="form-control" placeholder="e.g., Toyota" />
+                            <span asp-validation-for="CarBrand" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -116,8 +138,10 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <a href="@Url.Action("Cars")" class="btn btn-secondary me-md-2">Cancel</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Add Car
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> 
+                            <span class="btn-text">Add Car</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
                     </div>
                 </form>
@@ -145,4 +169,34 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Form submission with loading state
+            $('#addCarForm').on('submit', function() {
+                var submitBtn = $('#submitBtn');
+                var btnText = submitBtn.find('.btn-text');
+                var spinner = submitBtn.find('.spinner-border');
+                
+                // Show loading state
+                submitBtn.prop('disabled', true);
+                btnText.text('Adding Car...');
+                spinner.removeClass('d-none');
+                
+                // Form will submit normally, but we show loading state
+                return true;
+            });
+            
+            // Reset form button state if validation fails
+            if ($('.text-danger').length > 0) {
+                var submitBtn = $('#submitBtn');
+                var btnText = submitBtn.find('.btn-text');
+                var spinner = submitBtn.find('.spinner-border');
+                
+                submitBtn.prop('disabled', false);
+                btnText.text('Add Car');
+                spinner.addClass('d-none');
+            }
+        });
+    </script>
 }

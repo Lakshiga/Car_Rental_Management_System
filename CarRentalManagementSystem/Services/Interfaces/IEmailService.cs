@@ -7,5 +7,6 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<bool> SendBookingApprovalAsync(string customerEmail, string customerName, int bookingId);
         Task<bool> SendBookingRejectionAsync(string customerEmail, string customerName, int bookingId);
         Task<bool> SendContactAcknowledgmentAsync(string customerEmail, string customerName);
+        Task<bool> SendStaffCredentialsAsync(string staffEmail, string staffName, string username, string password);
     }
 }

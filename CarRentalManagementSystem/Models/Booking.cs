@@ -43,6 +43,11 @@ namespace CarRentalManagementSystem.Models
         [StringLength(500)]
         public string? LicenseBackImage { get; set; }
         
+        [StringLength(50)]
+        public string? ApprovedBy { get; set; }
+        
+        public DateTime? ApprovedAt { get; set; }
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties

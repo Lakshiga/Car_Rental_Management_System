@@ -80,12 +80,12 @@
                         @if (ViewBag.UserRole == "Admin")
                         {
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Customers">
                                     <i class="fas fa-users"></i> Customers
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Staff">
                                     <i class="fas fa-user-tie"></i> Staff
                                 </a>
                             </li>
@@ -100,13 +100,16 @@
                                 <i class="fas fa-car"></i> Active Rents
                             </a>
                         </li>
+                        @if (ViewBag.UserRole == "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Payment" asp-action="Index">
+                                    <i class="fas fa-credit-card"></i> Payments
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-credit-card"></i> Payments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" asp-controller="Admin" asp-action="History">
                                 <i class="fas fa-history"></i> History
                             </a>
                         </li>

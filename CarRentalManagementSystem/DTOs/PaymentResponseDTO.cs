@@ -9,5 +9,11 @@ namespace CarRentalManagementSystem.DTOs
         public string PaymentStatus { get; set; } = string.Empty;
         public string PaymentType { get; set; } = string.Empty;
         public string? StripePaymentIntentId { get; set; }
+        
+        // Additional properties for admin view
+        public string CustomerName { get; set; } = string.Empty;
+        public string PaymentMethod => PaymentType;
+        public string Status => PaymentStatus;
+        public decimal Amount => AmountPaid;
     }
 }

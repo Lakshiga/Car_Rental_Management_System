@@ -143,6 +143,237 @@ namespace CarRentalManagementSystem.Services
             return await _context.Users.FindAsync(userId);
         }
 
+        public async Task<IEnumerable<CustomerResponseDTO>> GetAllCustomersAsync()
+        {
+            var customers = await _context.Customers
+                .Include(c => c.User)
+                .ToListAsync();
+
+            return customers.Select(customer => new CustomerResponseDTO
+            {
+                CustomerID = customer.CustomerID,
+                FullName = $"{customer.FirstName} {customer.LastName}",
+                Email = customer.Email,
+                Phone = customer.PhoneNo ?? string.Empty,
+                ImageUrl = customer.ImageUrl ?? string.Empty,
+                Role = customer.User.Role,
+                NIC = customer.NIC ?? string.Empty,
+                LicenseNo = customer.LicenseNo ?? string.Empty,
+                Address = customer.Address ?? string.Empty
+            });
+        }
+
+        public async Task<IEnumerable<StaffResponseDTO>> GetAllStaffAsync()
+        {
+            var staff = await _context.Staff
+                .Include(s => s.User)
+                .ToListAsync();
+
+            return staff.Select(s => new StaffResponseDTO
+            {
+                StaffID = s.StaffID,
+                UserID = s.UserID,
+                FullName = $"{s.FirstName} {s.LastName}",
+                Username = s.User.Username,
+                Email = s.Email,
+                PhoneNo = s.PhoneNumber ?? string.Empty,
+                Role = s.User.Role,
+                ImageUrl = s.ImageUrl ?? string.Empty,
+                IsProfileComplete = s.IsProfileComplete,
+                RequirePasswordReset = s.User.RequirePasswordReset,
+                CreatedAt = s.User.CreatedAt
+            });
+        }
+
+        public async Task<bool> RegisterStaffAsync(StaffRegistrationRequestDTO request)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Check if email already exists
+                var existingStaff = await _context.Staff
+                    .FirstOrDefaultAsync(s => s.Email == request.Email);
+                
+                if (existingStaff != null)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                // Generate credentials
+                var (username, password) = await GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+
+                // Create user with password reset requirement
+                var user = new User
+                {
+                    Username = username,
+                    Password = BCrypt.Net.BCrypt.HashPassword(password),
+                    Role = "Staff",
+                    RequirePasswordReset = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                // Create staff
+                var staff = new Staff
+                {
+                    UserID = user.UserID,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    NIC = "", // To be filled later
+                    Address = "", // To be filled later
+                    IsProfileComplete = false,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Staff.Add(staff);
+                await _context.SaveChangesAsync();
+
+                // Commit transaction
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log the error for debugging
+                Console.WriteLine($"Error registering staff: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<(string Username, string Password)> GenerateStaffCredentialsAsync(string email, string firstName)
+        {
+            // Generate username from email prefix and random number
+            var emailPrefix = email.Split('@')[0].ToLower();
+            var randomSuffix = new Random().Next(100, 999);
+            var username = $"{emailPrefix}{randomSuffix}";
+            
+            // Ensure username is unique
+            while (await _context.Users.AnyAsync(u => u.Username == username))
+            {
+                randomSuffix = new Random().Next(100, 999);
+                username = $"{emailPrefix}{randomSuffix}";
+            }
+            
+            // Generate temporary password
+            var password = GenerateRandomPassword();
+            
+            return (username, password);
+        }
+
+        public async Task<bool> ResetPasswordAsync(int userId, PasswordResetRequestDTO request)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                    return false;
+
+                // Verify current password
+                if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.Password))
+                    return false;
+
+                // Update password and clear reset requirement
+                user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+                user.RequirePasswordReset = false;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<StaffResponseDTO?> GetStaffByUserIdAsync(int userId)
+        {
+            var staff = await _context.Staff
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.UserID == userId);
+
+            if (staff == null)
+                return null;
+
+            return new StaffResponseDTO
+            {
+                StaffID = staff.StaffID,
+                UserID = staff.UserID,
+                FullName = $"{staff.FirstName} {staff.LastName}",
+                Username = staff.User.Username,
+                Email = staff.Email,
+                PhoneNo = staff.PhoneNumber ?? string.Empty,
+                Role = staff.User.Role,
+                ImageUrl = staff.ImageUrl ?? string.Empty,
+                IsProfileComplete = staff.IsProfileComplete,
+                RequirePasswordReset = staff.User.RequirePasswordReset,
+                CreatedAt = staff.User.CreatedAt
+            };
+        }
+
+        public async Task<bool> UpdateStaffProfileAsync(int staffId, StaffResponseDTO staffDto)
+        {
+            try
+            {
+                var staff = await _context.Staff.FindAsync(staffId);
+                if (staff == null)
+                    return false;
+
+                var names = staffDto.FullName.Split(' ', 2);
+                staff.FirstName = names[0];
+                staff.LastName = names.Length > 1 ? names[1] : "";
+                staff.Email = staffDto.Email;
+                staff.PhoneNumber = staffDto.PhoneNo;
+                staff.ImageUrl = staffDto.ImageUrl;
+                staff.IsProfileComplete = true; // Mark as complete when updated
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private string GenerateRandomPassword()
+        {
+            const string upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerChars = "abcdefghijklmnopqrstuvwxyz";
+            const string numberChars = "0123456789";
+            const string specialChars = "!@#$%^&*";
+            
+            var random = new Random();
+            var password = new char[8];
+            
+            // Ensure at least one character from each category
+            password[0] = upperChars[random.Next(upperChars.Length)];
+            password[1] = lowerChars[random.Next(lowerChars.Length)];
+            password[2] = numberChars[random.Next(numberChars.Length)];
+            password[3] = specialChars[random.Next(specialChars.Length)];
+            
+            // Fill remaining positions
+            var allChars = upperChars + lowerChars + numberChars + specialChars;
+            for (int i = 4; i < password.Length; i++)
+            {
+                password[i] = allChars[random.Next(allChars.Length)];
+            }
+            
+            // Shuffle the array
+            for (int i = password.Length - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (password[i], password[j]) = (password[j], password[i]);
+            }
+            
+            return new string(password);
+        }
+
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using CarRentalManagementSystem.Services.Interfaces;
 using CarRentalManagementSystem.Models;
 using CarRentalManagementSystem.Data;
+using CarRentalManagementSystem.DTOs;
 using System.Diagnostics;
 
 namespace CarRentalManagementSystem.Controllers
@@ -76,9 +77,19 @@ namespace CarRentalManagementSystem.Controllers
             return View();
         }
 
-        public async Task<IActionResult> BrowseCars(string searchTerm, string carType, string fuelType, string seatingCapacity, string priceRange)
+        public async Task<IActionResult> BrowseCars(string searchTerm, string carType, string fuelType, string seatingCapacity, string priceRange, DateTime? pickupDate, DateTime? returnDate)
         {
-            var cars = await _carService.SearchCarsAsync(searchTerm, carType, fuelType);
+            IEnumerable<CarResponseDTO> cars;
+            
+            // Use date filtering if dates are provided
+            if (pickupDate.HasValue && returnDate.HasValue)
+            {
+                cars = await _carService.SearchCarsWithDateAsync(searchTerm, carType, fuelType, pickupDate, returnDate);
+            }
+            else
+            {
+                cars = await _carService.SearchCarsAsync(searchTerm, carType, fuelType);
+            }
             
             // Additional filtering for seating capacity
             if (!string.IsNullOrEmpty(seatingCapacity) && int.TryParse(seatingCapacity, out int seats))
@@ -101,6 +112,8 @@ namespace CarRentalManagementSystem.Controllers
             ViewBag.FuelType = fuelType;
             ViewBag.SeatingCapacity = seatingCapacity;
             ViewBag.PriceRange = priceRange;
+            ViewBag.PickupDate = pickupDate?.ToString("yyyy-MM-dd");
+            ViewBag.ReturnDate = returnDate?.ToString("yyyy-MM-dd");
             ViewBag.IsLoggedIn = HttpContext.Session.GetString("UserId") != null;
             ViewBag.UserRole = HttpContext.Session.GetString("UserRole");
             ViewBag.CustomerName = HttpContext.Session.GetString("CustomerName");

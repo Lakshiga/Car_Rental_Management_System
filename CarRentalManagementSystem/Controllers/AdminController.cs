@@ -70,8 +70,13 @@ namespace CarRentalManagementSystem.Controllers
             if (userRole != "Admin")
                 return RedirectToAction("Dashboard");
 
+            // Set CarBrand from CarModel field (form uses CarModel for brand input)
+            model.CarBrand = model.CarModel;
+            
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
             // Handle image upload
             if (imageFile != null && imageFile.Length > 0)
@@ -90,6 +95,9 @@ namespace CarRentalManagementSystem.Controllers
                 model.ImageUrl = "/images/cars/" + uniqueFileName;
             }
 
+            // Ensure Status is set correctly
+            model.Status = model.IsAvailable ? "Available" : "Unavailable";
+            
             var result = await _carService.AddCarAsync(model);
             
             if (result)
@@ -98,7 +106,7 @@ namespace CarRentalManagementSystem.Controllers
                 return RedirectToAction("Cars");
             }
             
-            ModelState.AddModelError("", "Failed to add car.");
+            ModelState.AddModelError("", "Failed to add car. Please try again.");
             return View(model);
         }
 
@@ -118,6 +126,7 @@ namespace CarRentalManagementSystem.Controllers
                 CarID = car.CarID,
                 CarName = car.CarName,
                 CarModel = car.Brand,
+                CarBrand = car.Brand,
                 ImageUrl = car.ImageUrl,
                 IsAvailable = car.AvailabilityStatus == "Available",
                 RentPerDay = car.RentPerDay,
@@ -232,7 +241,10 @@ namespace CarRentalManagementSystem.Controllers
             if (userRole != "Admin" && userRole != "Staff")
                 return Json(new { success = false, message = "Unauthorized" });
 
-            var result = await _bookingService.ApproveBookingAsync(bookingId);
+            var username = HttpContext.Session.GetString("DisplayName") ?? "Unknown";
+            var approvedByText = $"{userRole} ({username})";
+            
+            var result = await _bookingService.ApproveBookingAsync(bookingId, approvedByText);
             
             if (result)
             {
@@ -262,7 +274,10 @@ namespace CarRentalManagementSystem.Controllers
             if (userRole != "Admin" && userRole != "Staff")
                 return Json(new { success = false, message = "Unauthorized" });
 
-            var result = await _bookingService.RejectBookingAsync(bookingId);
+            var username = HttpContext.Session.GetString("DisplayName") ?? "Unknown";
+            var rejectedByText = $"{userRole} ({username})";
+            
+            var result = await _bookingService.RejectBookingAsync(bookingId, rejectedByText);
             
             if (result)
             {
@@ -298,6 +313,101 @@ namespace CarRentalManagementSystem.Controllers
                 return Json(new { success = true, message = "Car deleted successfully!" });
             
             return Json(new { success = false, message = "Failed to delete car." });
+        }
+
+        public async Task<IActionResult> Customers()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Login", "Account");
+
+            var customers = await _userService.GetAllCustomersAsync();
+            ViewBag.UserRole = userRole;
+            return View(customers);
+        }
+
+        public async Task<IActionResult> Staff()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Login", "Account");
+
+            var staff = await _userService.GetAllStaffAsync();
+            ViewBag.UserRole = userRole;
+            return View(staff);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddStaff([FromBody] DTOs.StaffRegistrationRequestDTO request)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return Json(new { success = false, errors = errors });
+            }
+
+            try
+            {
+                // Generate credentials first
+                var (username, password) = await _userService.GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+                
+                // Register staff
+                var result = await _userService.RegisterStaffAsync(request);
+                
+                if (result)
+                {
+                    // Send email with credentials
+                    var emailResult = await _emailService.SendStaffCredentialsAsync(
+                        request.Email, 
+                        $"{request.FirstName} {request.LastName}", 
+                        username, 
+                        password
+                    );
+                    
+                    var message = emailResult 
+                        ? "Staff member added successfully! Login credentials have been sent to their email."
+                        : "Staff member added successfully, but failed to send email. Please provide credentials manually.";
+                    
+                    return Json(new { success = true, message = message, staff = new { 
+                        firstName = request.FirstName,
+                        lastName = request.LastName,
+                        email = request.Email,
+                        username = username
+                    }});
+                }
+                
+                return Json(new { success = false, message = "Failed to add staff member. Email may already be in use." });
+            }
+            catch (Exception ex)
+            {
+                // Log the actual error for debugging
+                Console.WriteLine($"Error in AddStaff: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                return Json(new { success = false, message = "An error occurred while adding the staff member." });
+            }
+        }
+
+        public async Task<IActionResult> History()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var allBookings = await _bookingService.GetAllBookingsAsync();
+            var completedBookings = allBookings.Where(b => b.Status == "Returned" || b.Status == "Completed").ToList();
+            
+            ViewBag.UserRole = userRole;
+            return View(completedBookings);
         }
     }
 }

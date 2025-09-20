@@ -16,6 +16,23 @@
     }
 </div>
 
+@* Display success/error messages *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
@@ -141,6 +158,16 @@
 
         // Initialize DataTable if available
         $(document).ready(function() {
+            // Show success alert if TempData exists
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                setTimeout(function() {
+                    alert('@Html.Raw(TempData["SuccessMessage"])');
+                }, 100);
+                </text>
+            }
+            
             if ($.fn.DataTable) {
                 $('#carsTable').DataTable({
                     responsive: true,
