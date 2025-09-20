@@ -1,17 +1,25 @@
 @model BookingResponseDTO
 @{
-    ViewData["Title"] = "Preview Booking";
-    Layout = "_AdminLayout";
+    // Check if this is being rendered as a partial view
+    bool isPartial = ViewData["IsPartial"] != null && (bool)ViewData["IsPartial"];
+    
+    if (!isPartial)
+    {
+        Layout = "_AdminLayout";
+    }
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Preview Booking #@Model.BookingID</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="@Url.Action("Bookings", "Admin")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to Bookings
-        </a>
+@if (!isPartial)
+{
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Preview Booking #@Model.BookingID</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="@Url.Action("Bookings", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+            </a>
+        </div>
     </div>
-</div>
+}
 
 <div class="row">
     <div class="col-lg-8">
@@ -59,7 +67,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold">Total Cost:</td>
-                                <td class="text-success fw-bold">₹@Model.TotalCost</td>
+                                <td class="text-success fw-bold">$@Model.TotalCost</td>
                             </tr>
                         </table>
                     </div>
@@ -103,7 +111,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold">Rent per Day:</td>
-                                <td class="text-success">₹@Model.CarDetails.RentPerDay</td>
+                                <td class="text-success">$@Model.CarDetails.RentPerDay</td>
                             </tr>
                         </table>
                     </div>
@@ -130,61 +138,64 @@
                     </span>
                 </div>
 
-                @if (Model.Status == "Pending")
+                @if (!isPartial)
                 {
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-primary" onclick="confirmBooking(@Model.BookingID)">
-                            <i class="fas fa-check-circle me-2"></i>Confirm for Customer
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
-                            <i class="fas fa-times me-2"></i>Reject Booking
-                        </button>
-                    </div>
-                    <div class="alert alert-info mt-3 small">
-                        <i class="fas fa-info-circle me-2"></i>
-                        After confirmation, the customer will be able to confirm their rent request.
-                    </div>
-                }
-                else if (Model.Status == "Confirmed")
-                {
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success" onclick="approveBooking(@Model.BookingID)">
-                            <i class="fas fa-check me-2"></i>Approve Booking
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
-                            <i class="fas fa-times me-2"></i>Reject Booking
-                        </button>
-                    </div>
-                    <div class="alert alert-success mt-3 small">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Customer has confirmed their rent request. Ready for approval.
-                    </div>
-                }
-                else if (Model.Status == "Approved")
-                {
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-primary" onclick="initializeRent(@Model.BookingID)">
-                            <i class="fas fa-key me-2"></i>Initialize Rent
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
-                            <i class="fas fa-times me-2"></i>Reject Booking
-                        </button>
-                    </div>
-                    <div class="alert alert-primary mt-3 small">
-                        <i class="fas fa-key me-2"></i>
-                        Booking approved. Ready to initialize rent with vehicle handover details.
-                    </div>
-                }
-                else if (Model.Status == "Rejected")
-                {
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        This booking has been rejected.
-                        @if (!string.IsNullOrEmpty(Model.ApprovedBy))
-                        {
-                            <br><small>Rejected by: @Model.ApprovedBy</small>
-                        }
-                    </div>
+                    @if (Model.Status == "Pending")
+                    {
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary" onclick="confirmBooking(@Model.BookingID)">
+                                <i class="fas fa-check-circle me-2"></i>Confirm for Customer
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                                <i class="fas fa-times me-2"></i>Reject Booking
+                            </button>
+                        </div>
+                        <div class="alert alert-info mt-3 small">
+                            <i class="fas fa-info-circle me-2"></i>
+                            After confirmation, the customer will be able to confirm their rent request.
+                        </div>
+                    }
+                    else if (Model.Status == "Confirmed")
+                    {
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="approveBooking(@Model.BookingID)">
+                                <i class="fas fa-check me-2"></i>Approve Booking
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                                <i class="fas fa-times me-2"></i>Reject Booking
+                            </button>
+                        </div>
+                        <div class="alert alert-success mt-3 small">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Customer has confirmed their rent request. Ready for approval.
+                        </div>
+                    }
+                    else if (Model.Status == "Approved")
+                    {
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary" onclick="initializeRent(@Model.BookingID)">
+                                <i class="fas fa-key me-2"></i>Initialize Rent
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                                <i class="fas fa-times me-2"></i>Reject Booking
+                            </button>
+                        </div>
+                        <div class="alert alert-primary mt-3 small">
+                            <i class="fas fa-key me-2"></i>
+                            Booking approved. Ready to initialize rent with vehicle handover details.
+                        </div>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            This booking has been rejected.
+                            @if (!string.IsNullOrEmpty(Model.ApprovedBy))
+                            {
+                                <br><small>Rejected by: @Model.ApprovedBy</small>
+                            }
+                        </div>
+                    }
                 }
             </div>
         </div>
@@ -226,71 +237,77 @@
     </div>
 </div>
 
-<!-- License Image Modal -->
-<div class="modal fade" id="licenseImageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">License Image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="licenseImageView" src="" class="img-fluid" alt="License Image">
+@if (!isPartial)
+{
+    <!-- License Image Modal -->
+    <div class="modal fade" id="licenseImageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">License Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="licenseImageView" src="" class="img-fluid" alt="License Image">
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 
-@section Scripts {
-    <script>
-        function showLicenseImage(imageSrc) {
-            $('#licenseImageView').attr('src', imageSrc);
-            $('#licenseImageModal').modal('show');
-        }
-
-        function confirmBooking(bookingId) {
-            if (confirm('Confirm this booking to allow customer confirmation?')) {
-                $.post('@Url.Action("ConfirmBooking", "Admin")', { bookingId: bookingId }, function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert(response.message);
-                    }
-                });
+@if (!isPartial)
+{
+    @section Scripts {
+        <script>
+            function showLicenseImage(imageSrc) {
+                $('#licenseImageView').attr('src', imageSrc);
+                $('#licenseImageModal').modal('show');
             }
-        }
 
-        function approveBooking(bookingId) {
-            if (confirm('Are you sure you want to approve this booking?')) {
-                $.post('@Url.Action("ApproveBooking", "Admin")', { bookingId: bookingId }, function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert(response.message);
-                    }
-                });
+            function confirmBooking(bookingId) {
+                if (confirm('Confirm this booking to allow customer confirmation?')) {
+                    $.post('@Url.Action("ConfirmBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
+                }
             }
-        }
 
-        function rejectBooking(bookingId) {
-            if (confirm('Are you sure you want to reject this booking?')) {
-                $.post('@Url.Action("RejectBooking", "Admin")', { bookingId: bookingId }, function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert(response.message);
-                    }
-                });
+            function approveBooking(bookingId) {
+                if (confirm('Are you sure you want to approve this booking?')) {
+                    $.post('@Url.Action("ApproveBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
+                }
             }
-        }
 
-        function initializeRent(bookingId) {
-            if (confirm('Initialize rent process for this booking? This will take you to the rent form.')) {
-                window.location.href = '@Url.Action("StartRent", "Rent")?bookingId=' + bookingId;
+            function rejectBooking(bookingId) {
+                if (confirm('Are you sure you want to reject this booking?')) {
+                    $.post('@Url.Action("RejectBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
+                }
             }
-        }
-    </script>
+
+            function initializeRent(bookingId) {
+                if (confirm('Initialize rent process for this booking? This will take you to the rent form.')) {
+                    window.location.href = '@Url.Action("StartRent", "Rent")?bookingId=' + bookingId;
+                }
+            }
+        </script>
+    }
 }
