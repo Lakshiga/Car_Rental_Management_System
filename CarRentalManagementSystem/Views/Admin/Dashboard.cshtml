@@ -7,7 +7,7 @@
     <h1 class="h2">Dashboard</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportRecentActivity()">
                 <i class="fas fa-download"></i> Export
             </button>
         </div>
@@ -119,7 +119,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" width="100%" cellspacing="0">
+                    <table class="table table-bordered" id="recentActivityTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Time</th>
@@ -197,5 +197,42 @@
                 maintainAspectRatio: false
             }
         });
+
+        // Export Recent Activity function
+        function exportRecentActivity() {
+            // Get the table data
+            const table = document.getElementById('recentActivityTable');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Create CSV content
+            let csvContent = "Time,Activity,User,Status\n";
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => {
+                    // Get text content and remove extra whitespace
+                    let text = cell.textContent.trim();
+                    // Remove badge styling text if present
+                    text = text.replace(/Pending|Completed|System/g, '').trim();
+                    // Add back the status text
+                    if (cell.querySelector('.badge.bg-warning')) text += 'Pending';
+                    if (cell.querySelector('.badge.bg-success')) text += 'Completed';
+                    if (cell.querySelector('.badge.bg-info')) text += 'System';
+                    return `"${text}"`;
+                }).join(',');
+                csvContent += rowData + '\n';
+            });
+            
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'recent_activity_export.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 }

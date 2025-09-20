@@ -140,6 +140,51 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Payments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateFrom" class="form-label">Date From</label>
+                        <input type="date" class="form-control" id="dateFrom">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateTo" class="form-label">Date To</label>
+                        <input type="date" class="form-control" id="dateTo">
+                    </div>
+                    <div class="mb-3">
+                        <label for="amountMin" class="form-label">Minimum Amount</label>
+                        <input type="number" class="form-control" id="amountMin" placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label for="amountMax" class="form-label">Maximum Amount</label>
+                        <input type="number" class="form-control" id="amountMax" placeholder="0.00">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function viewPaymentDetails(paymentId) {
         $.get('/Payment/PaymentDetails/' + paymentId, function(data) {
@@ -155,11 +200,98 @@
     }
     
     function exportPayments() {
-        alert('Export payments functionality to be implemented');
+        // Get the table data
+        const table = document.getElementById('paymentsTable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        // Create CSV content
+        let csvContent = "Payment ID,Booking ID,Customer,Amount,Payment Method,Status,Date\n";
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowData = [];
+            
+            cells.forEach((cell, index) => {
+                // Skip the actions column (index 7)
+                if (index === 7) return;
+                
+                let text = cell.textContent.trim();
+                // Remove special characters and formatting
+                text = text.replace(/[#\$\*]/g, '').trim();
+                // Add quotes to handle commas in data
+                rowData.push(`"${text}"`);
+            });
+            
+            csvContent += rowData.join(',') + '\n';
+        });
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'payments_export.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     
     function filterPayments() {
-        alert('Filter payments functionality to be implemented');
+        // Show the filter modal
+        const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+        filterModal.show();
+    }
+    
+    function applyFilters() {
+        // Get filter values
+        const status = document.getElementById('statusFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        const amountMin = document.getElementById('amountMin').value;
+        const amountMax = document.getElementById('amountMax').value;
+        
+        // Get all table rows
+        const table = document.getElementById('paymentsTable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        // Apply filters
+        rows.forEach(row => {
+            let showRow = true;
+            
+            // Status filter
+            if (status) {
+                const statusCell = row.cells[5]; // Status column
+                const statusText = statusCell.textContent.trim();
+                if (statusText !== status) {
+                    showRow = false;
+                }
+            }
+            
+            // Amount filter
+            if (showRow && (amountMin || amountMax)) {
+                const amountCell = row.cells[3]; // Amount column
+                const amountText = amountCell.textContent.replace('$', '').trim();
+                const amount = parseFloat(amountText);
+                
+                if (amountMin && amount < parseFloat(amountMin)) {
+                    showRow = false;
+                }
+                
+                if (amountMax && amount > parseFloat(amountMax)) {
+                    showRow = false;
+                }
+            }
+            
+            // Date filter would require more complex parsing
+            
+            // Show or hide row
+            row.style.display = showRow ? '' : 'none';
+        });
+        
+        // Close the modal
+        const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+        filterModal.hide();
     }
 </script>
 
