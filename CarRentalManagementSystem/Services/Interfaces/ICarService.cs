@@ -13,5 +13,6 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<bool> DeleteCarAsync(int carId);
         Task<bool> IsCarAvailableAsync(int carId, DateTime pickupDate, DateTime returnDate);
         Task<IEnumerable<CarResponseDTO>> SearchCarsAsync(string? searchTerm, string? carType, string? fuelType);
+        Task<IEnumerable<CarResponseDTO>> SearchCarsWithDateAsync(string? searchTerm, string? carType, string? fuelType, DateTime? pickupDate, DateTime? returnDate);
     }
 }

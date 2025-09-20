@@ -11,7 +11,7 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<BookingResponseDTO?> GetBookingByIdAsync(int bookingId);
         Task<bool> UpdateBookingStatusAsync(int bookingId, string status);
         Task<decimal> CalculateRentalCostAsync(int carId, DateTime pickupDate, DateTime returnDate);
-        Task<bool> ApproveBookingAsync(int bookingId);
-        Task<bool> RejectBookingAsync(int bookingId);
+        Task<bool> ApproveBookingAsync(int bookingId, string approvedBy);
+        Task<bool> RejectBookingAsync(int bookingId, string rejectedBy);
     }
 }

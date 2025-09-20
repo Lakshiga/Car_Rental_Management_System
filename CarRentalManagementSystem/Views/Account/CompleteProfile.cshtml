@@ -1,0 +1,115 @@
+@model CarRentalManagementSystem.DTOs.StaffResponseDTO
+@{
+    ViewData["Title"] = "Complete Your Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-5">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>Complete Your Profile
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Profile Completion Required:</strong> Please complete your profile to access all system features.
+                    </div>
+                    
+                    <form asp-action="CompleteProfile" asp-controller="Account" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Full Name *
+                                    </label>
+                                    <input asp-for="FullName" class="form-control" placeholder="Enter your full name">
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope me-1"></i>Email Address *
+                                    </label>
+                                    <input asp-for="Email" class="form-control" readonly>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PhoneNo" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Phone Number *
+                                    </label>
+                                    <input asp-for="PhoneNo" class="form-control" placeholder="Enter your phone number">
+                                    <span asp-validation-for="PhoneNo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Username" class="form-label">
+                                        <i class="fas fa-user-tag me-1"></i>Username
+                                    </label>
+                                    <input asp-for="Username" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">
+                                <i class="fas fa-image me-1"></i>Profile Picture (Optional)
+                            </label>
+                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                            <div class="form-text">Upload a profile picture (JPG, PNG, GIF)</div>
+                        </div>
+                        
+                        <div class="mb-3" id="imagePreview" style="display: none;">
+                            <label class="form-label">Preview:</label>
+                            <div>
+                                <img id="previewImg" src="#" alt="Preview" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Note:</strong> Once you complete your profile, you'll gain full access to the system features.
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check me-1"></i>Complete Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Image preview functionality
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+    </script>
+}

@@ -20,6 +20,17 @@ namespace CarRentalManagementSystem.Controllers
             _configuration = configuration;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var payments = await _paymentService.GetAllPaymentsAsync();
+            ViewBag.UserRole = userRole;
+            return View(payments);
+        }
+
         [HttpGet]
         public async Task<IActionResult> ProcessPayment(int bookingId)
         {

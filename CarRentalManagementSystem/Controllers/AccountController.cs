@@ -78,11 +78,40 @@ namespace CarRentalManagementSystem.Controllers
                         }
                     }
                 }
+                else if (result.Role == "Staff")
+                {
+                    var staff = await _userService.GetStaffByUserIdAsync(result.UserId);
+                    if (staff != null)
+                    {
+                        HttpContext.Session.SetString("StaffId", staff.StaffID.ToString());
+                        HttpContext.Session.SetString("StaffName", staff.FullName);
+                        if (!string.IsNullOrWhiteSpace(staff.ImageUrl))
+                        {
+                            HttpContext.Session.SetString("AvatarUrl", staff.ImageUrl);
+                        }
+                        
+                        // Check if password reset is required
+                        if (staff.RequirePasswordReset)
+                        {
+                            return RedirectToAction("ResetPassword");
+                        }
+                        
+                        // Check if profile is complete
+                        if (!staff.IsProfileComplete)
+                        {
+                            TempData["WarningMessage"] = "Please complete your profile before accessing system features.";
+                            return RedirectToAction("CompleteProfile");
+                        }
+                    }
+                }
 
                 // Default display name for non-customer
                 if (result.Role != "Customer")
                 {
-                    HttpContext.Session.SetString("DisplayName", model.Username);
+                    var displayName = result.Role == "Staff" ? 
+                        HttpContext.Session.GetString("StaffName") ?? model.Username :
+                        model.Username;
+                    HttpContext.Session.SetString("DisplayName", displayName);
                 }
 
                 // Redirect based on role
@@ -211,6 +240,118 @@ namespace CarRentalManagementSystem.Controllers
                 TempData["ErrorMessage"] = "Failed to update profile.";
             }
 
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword()
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            
+            if (string.IsNullOrEmpty(userIdString) || userRole != "Staff")
+                return RedirectToAction("Login");
+                
+            var userId = int.Parse(userIdString);
+            var staff = await _userService.GetStaffByUserIdAsync(userId);
+            
+            if (staff == null || !staff.RequirePasswordReset)
+                return RedirectToAction("Dashboard", "Admin");
+                
+            return View(new PasswordResetRequestDTO());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(PasswordResetRequestDTO model)
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            
+            if (string.IsNullOrEmpty(userIdString) || userRole != "Staff")
+                return RedirectToAction("Login");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userId = int.Parse(userIdString);
+            var result = await _userService.ResetPasswordAsync(userId, model);
+            
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Password reset successfully! Please complete your profile.";
+                return RedirectToAction("CompleteProfile");
+            }
+            
+            ModelState.AddModelError("", "Failed to reset password. Please check your current password.");
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CompleteProfile()
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            
+            if (string.IsNullOrEmpty(userIdString) || userRole != "Staff")
+                return RedirectToAction("Login");
+                
+            var userId = int.Parse(userIdString);
+            var staff = await _userService.GetStaffByUserIdAsync(userId);
+            
+            if (staff == null)
+                return RedirectToAction("Login");
+                
+            if (staff.IsProfileComplete)
+                return RedirectToAction("Dashboard", "Admin");
+                
+            return View(staff);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CompleteProfile(StaffResponseDTO model, IFormFile? imageFile)
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var staffIdString = HttpContext.Session.GetString("StaffId");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            
+            if (string.IsNullOrEmpty(userIdString) || string.IsNullOrEmpty(staffIdString) || userRole != "Staff")
+                return RedirectToAction("Login");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var staffId = int.Parse(staffIdString);
+            
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+                model.ImageUrl = "/images/profiles/" + uniqueFileName;
+            }
+
+            var result = await _userService.UpdateStaffProfileAsync(staffId, model);
+            
+            if (result)
+            {
+                HttpContext.Session.SetString("StaffName", model.FullName);
+                HttpContext.Session.SetString("DisplayName", model.FullName);
+                if (!string.IsNullOrEmpty(model.ImageUrl))
+                {
+                    HttpContext.Session.SetString("AvatarUrl", model.ImageUrl);
+                }
+                
+                TempData["SuccessMessage"] = "Profile completed successfully! Welcome to the system.";
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            
+            ModelState.AddModelError("", "Failed to update profile.");
             return View(model);
         }
     }

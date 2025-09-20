@@ -13,6 +13,8 @@ namespace CarRentalManagementSystem.DTOs
         public string LicenseNumber { get; set; } = string.Empty;
         public string? LicenseFrontImage { get; set; }
         public string? LicenseBackImage { get; set; }
+        public string? ApprovedBy { get; set; }
+        public DateTime? ApprovedAt { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

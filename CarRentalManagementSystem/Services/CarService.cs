@@ -40,12 +40,24 @@ namespace CarRentalManagementSystem.Services
         {
             try
             {
+                // Ensure all required fields are set
+                car.CreatedAt = DateTime.Now;
+                car.Status = car.IsAvailable ? "Available" : "Unavailable";
+                
+                // If CarBrand is empty, use CarModel as fallback
+                if (string.IsNullOrEmpty(car.CarBrand) && !string.IsNullOrEmpty(car.CarModel))
+                {
+                    car.CarBrand = car.CarModel;
+                }
+                
                 _context.Cars.Add(car);
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception)
             {
+                // Log the exception if you have a logger
+                // _logger?.LogError(ex, "Failed to add car: {CarName}", car.CarName);
                 return false;
             }
         }
@@ -123,6 +135,48 @@ namespace CarRentalManagementSystem.Services
             }
 
             var cars = await query.ToListAsync();
+            return cars.Select(MapToResponseDTO);
+        }
+
+        public async Task<IEnumerable<CarResponseDTO>> SearchCarsWithDateAsync(string? searchTerm, string? carType, string? fuelType, DateTime? pickupDate, DateTime? returnDate)
+        {
+            var query = _context.Cars.Where(c => c.IsAvailable && c.Status == "Available");
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(c => c.CarName.Contains(searchTerm) || 
+                                        c.CarModel.Contains(searchTerm) ||
+                                        c.NumberPlate.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrEmpty(carType))
+            {
+                query = query.Where(c => c.CarType == carType);
+            }
+
+            if (!string.IsNullOrEmpty(fuelType))
+            {
+                query = query.Where(c => c.FuelType == fuelType);
+            }
+
+            var cars = await query.ToListAsync();
+            
+            // If date filtering is requested, check availability for each car
+            if (pickupDate.HasValue && returnDate.HasValue)
+            {
+                var availableCars = new List<Car>();
+                
+                foreach (var car in cars)
+                {
+                    if (await IsCarAvailableAsync(car.CarID, pickupDate.Value, returnDate.Value))
+                    {
+                        availableCars.Add(car);
+                    }
+                }
+                
+                return availableCars.Select(MapToResponseDTO);
+            }
+            
             return cars.Select(MapToResponseDTO);
         }
 

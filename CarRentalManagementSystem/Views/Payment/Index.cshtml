@@ -1,0 +1,150 @@
+@model IEnumerable<CarRentalManagementSystem.DTOs.PaymentResponseDTO>
+@{
+    ViewData["Title"] = "Payments Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-credit-card me-2"></i>Payments Management</h2>
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-secondary" onclick="exportPayments()">
+                    <i class="fas fa-download me-1"></i>Export
+                </button>
+                <button class="btn btn-outline-secondary" onclick="filterPayments()">
+                    <i class="fas fa-filter me-1"></i>Filter
+                </button>
+            </div>
+        </div>
+        
+        @if (Model.Any())
+        {
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center bg-success text-white">
+                        <div class="card-body">
+                            <h4>$@Model.Where(p => p.PaymentStatus == "Completed").Sum(p => p.AmountPaid).ToString("F2")</h4>
+                            <p class="mb-0">Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-primary text-white">
+                        <div class="card-body">
+                            <h4>@Model.Count(p => p.PaymentStatus == "Completed")</h4>
+                            <p class="mb-0">Completed Payments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-warning text-white">
+                        <div class="card-body">
+                            <h4>@Model.Count(p => p.PaymentStatus == "Pending")</h4>
+                            <p class="mb-0">Pending Payments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-info text-white">
+                        <div class="card-body">
+                            <h4>@Model.Count()</h4>
+                            <p class="mb-0">Total Transactions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payment in Model.OrderByDescending(p => p.PaymentDate))
+                                {
+                                    <tr>
+                                        <td><strong>#@payment.PaymentID</strong></td>
+                                        <td><a href="@Url.Action("Details", "Booking", new { id = payment.BookingID })" class="text-decoration-none">#@payment.BookingID</a></td>
+                                        <td>@payment.CustomerName</td>
+                                        <td><strong>$@payment.Amount.ToString("F2")</strong></td>
+                                        <td>@payment.PaymentMethod</td>
+                                        <td>
+                                            @if (payment.Status == "Completed")
+                                            {
+                                                <span class="badge bg-success">@payment.Status</span>
+                                            }
+                                            else if (payment.Status == "Failed")
+                                            {
+                                                <span class="badge bg-danger">@payment.Status</span>
+                                            }
+                                            else if (payment.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning">@payment.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@payment.Status</span>
+                                            }
+                                        </td>
+                                        <td>@payment.PaymentDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="viewPaymentDetails(@payment.PaymentID)">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                                @if (payment.Status == "Completed")
+                                                {
+                                                    <button class="btn btn-sm btn-outline-secondary" onclick="downloadReceipt(@payment.PaymentID)">
+                                                        <i class="fas fa-receipt"></i> Receipt
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No payments found</h4>
+                <p class="text-muted">No payment transactions to display yet.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function viewPaymentDetails(paymentId) {
+        alert('Payment details view functionality to be implemented for payment: ' + paymentId);
+    }
+    
+    function downloadReceipt(paymentId) {
+        alert('Download receipt functionality to be implemented for payment: ' + paymentId);
+    }
+    
+    function exportPayments() {
+        alert('Export payments functionality to be implemented');
+    }
+    
+    function filterPayments() {
+        alert('Filter payments functionality to be implemented');
+    }
+</script>

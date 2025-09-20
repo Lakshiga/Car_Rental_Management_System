@@ -4,6 +4,7 @@ using CarRentalManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920013705_AddStaffManagementFields")]
+    partial class AddStaffManagementFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,6 +161,44 @@ namespace CarRentalManagementSystem.Migrations
                     b.HasKey("CarID");
 
                     b.ToTable("Cars");
+
+                    b.HasData(
+                        new
+                        {
+                            CarID = 1,
+                            CarBrand = "Toyota",
+                            CarModel = "2023",
+                            CarName = "Toyota Corolla",
+                            CarType = "Sedan",
+                            CreatedAt = new DateTime(2025, 9, 20, 10, 37, 4, 794, DateTimeKind.Local).AddTicks(2816),
+                            FuelType = "Petrol",
+                            ImageUrl = "/images/cars/corolla.jpg",
+                            IsAvailable = true,
+                            Mileage = 15.5,
+                            NumberPlate = "ABC-1234",
+                            PerKmRate = 50m,
+                            RentPerDay = 5000m,
+                            SeatingCapacity = 5,
+                            Status = "Available"
+                        },
+                        new
+                        {
+                            CarID = 2,
+                            CarBrand = "Honda",
+                            CarModel = "2023",
+                            CarName = "Honda Civic",
+                            CarType = "Sedan",
+                            CreatedAt = new DateTime(2025, 9, 20, 10, 37, 4, 794, DateTimeKind.Local).AddTicks(2822),
+                            FuelType = "Petrol",
+                            ImageUrl = "/images/cars/civic.jpg",
+                            IsAvailable = true,
+                            Mileage = 14.800000000000001,
+                            NumberPlate = "XYZ-5678",
+                            PerKmRate = 55m,
+                            RentPerDay = 6000m,
+                            SeatingCapacity = 5,
+                            Status = "Available"
+                        });
                 });
 
             modelBuilder.Entity("CarRentalManagementSystem.Models.Contact", b =>
@@ -472,8 +513,8 @@ namespace CarRentalManagementSystem.Migrations
                         new
                         {
                             UserID = 1,
-                            CreatedAt = new DateTime(2025, 9, 20, 12, 16, 22, 925, DateTimeKind.Local).AddTicks(1335),
-                            Password = "$2a$11$K9E0AB0AL1qvjCRQfKlH5OwpnhI3AoGFmDGiTPvjw1pFyjHIvKHQ2",
+                            CreatedAt = new DateTime(2025, 9, 20, 10, 37, 4, 794, DateTimeKind.Local).AddTicks(1975),
+                            Password = "$2a$11$DijlXlG2lYifu2TdoboB9ul8haVTXiRrCRFsfNgNzPGVLxF0Ax5bC",
                             RequirePasswordReset = false,
                             Role = "Admin",
                             Username = "admin"

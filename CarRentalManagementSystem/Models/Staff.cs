@@ -39,6 +39,8 @@ namespace CarRentalManagementSystem.Models
         [StringLength(200)]
         public string? ImageUrl { get; set; }
         
+        public bool IsProfileComplete { get; set; } = false;
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties

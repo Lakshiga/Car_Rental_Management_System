@@ -107,45 +107,8 @@ namespace CarRentalManagementSystem.Data
                 }
             );
 
-            // Seed Sample Cars
-            modelBuilder.Entity<Car>().HasData(
-                new Car
-                {
-                    CarID = 1,
-                    CarName = "Toyota Corolla",
-                    CarModel = "2023",
-                    CarBrand = "Toyota",
-                    ImageUrl = "/images/cars/corolla.jpg",
-                    IsAvailable = true,
-                    RentPerDay = 5000,
-                    PerKmRate = 50,
-                    CarType = "Sedan",
-                    FuelType = "Petrol",
-                    SeatingCapacity = 5,
-                    Mileage = 15.5,
-                    NumberPlate = "ABC-1234",
-                    Status = "Available",
-                    CreatedAt = DateTime.Now
-                },
-                new Car
-                {
-                    CarID = 2,
-                    CarName = "Honda Civic",
-                    CarModel = "2023",
-                    CarBrand = "Honda",
-                    ImageUrl = "/images/cars/civic.jpg",
-                    IsAvailable = true,
-                    RentPerDay = 6000,
-                    PerKmRate = 55,
-                    CarType = "Sedan",
-                    FuelType = "Petrol",
-                    SeatingCapacity = 5,
-                    Mileage = 14.8,
-                    NumberPlate = "XYZ-5678",
-                    Status = "Available",
-                    CreatedAt = DateTime.Now
-                }
-            );
+            // Note: Cars should only be added by Admin through the dashboard
+            // No hardcoded cars in seed data
         }
     }
 }

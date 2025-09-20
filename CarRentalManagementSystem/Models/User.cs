@@ -20,6 +20,8 @@ namespace CarRentalManagementSystem.Models
         [StringLength(20)]
         public string Role { get; set; } = string.Empty;
         
+        public bool RequirePasswordReset { get; set; } = false;
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties

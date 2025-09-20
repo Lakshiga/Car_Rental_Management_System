@@ -287,6 +287,207 @@ footer .container { max-width: 1140px; }
   transition: all 0.3s ease;
 }
 
+/* Compact table layout for better fit */
+.table-sm {
+    font-size: 0.875rem;
+}
+
+.table-sm th,
+.table-sm td {
+    padding: 8px 6px;
+    vertical-align: middle;
+}
+
+/* Ensure tables fit within viewport */
+.table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Compact button styles */
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    border-radius: 0.2rem;
+}
+
+/* Ensure content doesn't overflow */
+.card-body.p-3 {
+    padding: 1rem !important;
+}
+
+/* Text truncation for long content */
+.text-truncate-table {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Fix avatar sizing in compact tables */
+.table-sm .rounded-circle {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.table-sm .bg-gradient-primary {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+/* Enhanced Table Styling */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.1) !important;
+    transition: all 0.3s ease;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.table thead th {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.table tbody td {
+    font-size: 0.9rem;
+    padding: 16px 12px;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Enhanced badges */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Button group improvements */
+.btn-group .btn {
+    border-radius: 20px;
+    margin: 0 2px;
+    font-size: 0.8rem;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card improvements */
+.card.shadow-sm {
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.12) !important;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card.shadow-sm:hover {
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2) !important;
+    transform: translateY(-2px);
+}
+
+/* Avatar enhancements */
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #2196F3, #21CBF3) !important;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Text color improvements */
+.text-primary {
+    color: #667eea !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.fw-medium {
+    font-weight: 500 !important;
+}
+
+/* Responsive table improvements */
+@media (max-width: 768px) {
+    .table-responsive {
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table thead th {
+        font-size: 0.75rem;
+        padding: 12px 8px;
+    }
+    
+    .table tbody td {
+        font-size: 0.8rem;
+        padding: 12px 8px;
+    }
+    
+    .btn-group .btn {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Action buttons layout */
+.table-actions {
+    white-space: nowrap;
+}
+
+.table-actions .btn {
+    margin: 2px;
+}
+
+/* Status badges specific styling */
+.booking-status {
+    display: inline-block;
+    min-width: 90px;
+    text-align: center;
+}
+
+/* Car image in table */
+.car-image {
+    transition: all 0.3s ease;
+    border: 2px solid #f8f9fa;
+}
+
+.car-image:hover {
+    transform: scale(1.1);
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
 /* Table styling */
 .table {
   border-radius: 8px;
@@ -297,16 +498,68 @@ footer .container { max-width: 1140px; }
 .admin-cars-table td,
 .admin-cars-table th {
   vertical-align: middle;
+  text-align: center;
+}
+
+.admin-cars-table th {
+  color: #ffffff;
+  font-weight: 600;
+  background-color: #343a40 !important;
+  border-color: #495057;
+}
+
+.admin-cars-table td {
+  color: #495057;
+  font-weight: 500;
+  padding: 12px 8px;
 }
 
 .admin-cars-table td:first-child {
   width: 140px;
 }
 
+.admin-cars-table td:nth-child(2),
+.admin-cars-table td:nth-child(3) {
+  text-align: left;
+  font-weight: 600;
+  color: #2c5aa0;
+}
+
+.admin-cars-table td:nth-child(7),
+.admin-cars-table td:nth-child(8) {
+  color: #28a745;
+  font-weight: 700;
+}
+
 .admin-cars-table img.car-image {
   display: block;
   margin: 0 auto;
   max-width: 100%;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.admin-cars-table img.car-image:hover {
+  border-color: #2c5aa0;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(44, 90, 160, 0.2);
+}
+
+.admin-cars-table .badge {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.admin-cars-table .table-actions {
+  white-space: nowrap;
+}
+
+.admin-cars-table .table-actions .btn {
+  margin: 0 2px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  padding: 6px 10px;
 }
 
 /* Customer Profile Dropdown */

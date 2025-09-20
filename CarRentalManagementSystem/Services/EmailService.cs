@@ -110,5 +110,38 @@ namespace CarRentalManagementSystem.Services
 
             return await SendEmailAsync(customerEmail, subject, body);
         }
+
+        public async Task<bool> SendStaffCredentialsAsync(string staffEmail, string staffName, string username, string password)
+        {
+            var subject = "Welcome to Car Rental Management System - Your Login Credentials";
+            var body = $@"
+                <h2>Welcome to Our Team!</h2>
+                <p>Dear {staffName},</p>
+                <p>Welcome to the Car Rental Management System! Your staff account has been created successfully.</p>
+                
+                <div style=""background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #007bff;"">
+                    <h3>Your Login Credentials:</h3>
+                    <p><strong>Username:</strong> {username}</p>
+                    <p><strong>Temporary Password:</strong> {password}</p>
+                </div>
+                
+                <div style=""background-color: #fff3cd; padding: 15px; margin: 20px 0; border-left: 4px solid #ffc107;"">
+                    <h4>⚠️ Important Security Notice:</h4>
+                    <ul>
+                        <li>You will be required to reset your password on first login</li>
+                        <li>You must complete your profile before accessing any system features</li>
+                        <li>Please keep your credentials secure and do not share them</li>
+                    </ul>
+                </div>
+                
+                <p><strong>Login URL:</strong> <a href=""#"">Car Rental Admin Portal</a></p>
+                
+                <p>If you have any questions or need assistance, please contact the administrator.</p>
+                
+                <p>Best regards,<br>Car Rental Management Team</p>
+            ";
+
+            return await SendEmailAsync(staffEmail, subject, body);
+        }
     }
 }
