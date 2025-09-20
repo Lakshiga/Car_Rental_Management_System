@@ -48,13 +48,59 @@
                     <div class="row">
                         <div class="col-12">
                             <h5>Payment Information</h5>
+                            
+                            <!-- Demo Payment Notice -->
+                            <div class="alert alert-warning mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Demo Mode:</strong> Use test card number <code>4242 4242 4242 4242</code> with any future expiry date and CVV for testing.
+                            </div>
+                            
                             <form id="payment-form">
                                 <div class="mb-3">
-                                    <label class="form-label">Card Information</label>
-                                    <div id="card-element" class="form-control" style="height: 40px; padding: 10px;">
-                                        <!-- Stripe Elements will create form elements here -->
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" id="card-holder-name" placeholder="John Doe" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Expiry Month</label>
+                                        <select class="form-select" id="expiry-month" required>
+                                            <option value="">Month</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
                                     </div>
-                                    <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Expiry Year</label>
+                                        <select class="form-select" id="expiry-year" required>
+                                            <option value="">Year</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2029">2029</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -95,35 +141,12 @@
 </div>
 
 @section Scripts {
-    <script src="https://js.stripe.com/v3/"></script>
     <script>
-        // Initialize Stripe
-        const stripe = Stripe('@ViewBag.StripePublishableKey');
-        const elements = stripe.elements();
-
-        // Create card element
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                        color: '#aab7c4',
-                    },
-                },
-            },
-        });
-
-        cardElement.mount('#card-element');
-
-        // Handle real-time validation errors from the card Element
-        cardElement.on('change', function(event) {
-            const displayError = document.getElementById('card-errors');
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = '';
-            }
+        // Format card number input
+        document.getElementById('card-number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
         });
 
         // Handle form submission
@@ -136,50 +159,83 @@
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
             try {
+                // Get form data
+                const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+                const cardHolderName = document.getElementById('card-holder-name').value;
+                const expiryMonth = document.getElementById('expiry-month').value;
+                const expiryYear = document.getElementById('expiry-year').value;
+                const cvv = document.getElementById('cvv').value;
+
+                // Validate form
+                if (!cardNumber || !cardHolderName || !expiryMonth || !expiryYear || !cvv) {
+                    alert('Please fill in all payment information.');
+                    resetButton();
+                    return;
+                }
+
                 // Create payment intent
                 const response = await fetch('@Url.Action("CreatePaymentIntent")', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
                     },
                     body: JSON.stringify({
                         BookingID: @ViewBag.BookingId,
                         Amount: @ViewBag.Amount,
-                        PaymentType: 'Advance'
+                        PaymentType: 'Advance',
+                        CardNumber: cardNumber,
+                        CardHolderName: cardHolderName,
+                        ExpiryMonth: expiryMonth,
+                        ExpiryYear: expiryYear,
+                        CVV: cvv
                     })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    // Confirm payment with Stripe
-                    const {error} = await stripe.confirmCardPayment(result.clientSecret, {
-                        payment_method: {
-                            card: cardElement,
-                        }
-                    });
-
-                    if (error) {
-                        // Show error to customer
-                        document.getElementById('card-errors').textContent = error.message;
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+                    // Check if this is a demo payment
+                    if (result.clientSecret.startsWith('pi_demo_')) {
+                        // Demo payment - automatically confirm
+                        showSuccessAndRedirect(result.clientSecret);
                     } else {
-                        // Payment succeeded
+                        // Real Stripe payment - redirect to confirmation
                         window.location.href = '@Url.Action("ConfirmPayment")' + '?paymentIntentId=' + result.clientSecret;
                     }
                 } else {
-                    alert(result.message);
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+                    alert(result.message || 'Payment failed. Please try again.');
+                    resetButton();
                 }
             } catch (error) {
                 console.error('Payment error:', error);
                 alert('An error occurred during payment processing.');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+                resetButton();
             }
+        });
+
+        function resetButton() {
+            const submitButton = document.getElementById('submit-payment');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay ₹@ViewBag.Amount Securely';
+        }
+
+        function showSuccessAndRedirect(paymentIntentId) {
+            // Show success message
+            alert('Payment successful! Your booking has been confirmed.');
+            
+            // Redirect to customer dashboard instead of booking confirmation
+            window.location.href = '@Url.Action("Dashboard", "Customer")';
+        }
+
+        // Auto-fill demo card for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-fill demo data for easier testing
+            document.getElementById('card-number').value = '4242 4242 4242 4242';
+            document.getElementById('card-holder-name').value = 'John Doe';
+            document.getElementById('expiry-month').value = '12';
+            document.getElementById('expiry-year').value = '2025';
+            document.getElementById('cvv').value = '123';
         });
     </script>
 }

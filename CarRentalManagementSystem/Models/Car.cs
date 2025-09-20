@@ -34,6 +34,10 @@ namespace CarRentalManagementSystem.Models
         public decimal PerKmRate { get; set; }
         
         [Required]
+        [Range(1, 1000)]
+        public int AllowedKmPerDay { get; set; } = 100;
+        
+        [Required]
         [StringLength(50)]
         public string CarType { get; set; } = string.Empty;
         
@@ -55,6 +59,9 @@ namespace CarRentalManagementSystem.Models
         
         [StringLength(20)]
         public string Status { get; set; } = "Available";
+        
+        [StringLength(50)]
+        public string? LastOdometerReading { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         

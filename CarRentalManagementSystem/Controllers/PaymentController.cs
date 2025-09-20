@@ -75,7 +75,7 @@ namespace CarRentalManagementSystem.Controllers
             return Json(new { success = false, message = "Failed to create payment intent." });
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> ConfirmPayment(string paymentIntentId)
         {
             if (string.IsNullOrWhiteSpace(paymentIntentId))
@@ -87,14 +87,14 @@ namespace CarRentalManagementSystem.Controllers
             var success = await _paymentService.ConfirmPaymentAsync(paymentIntentId);
             if (success)
             {
-                TempData["SuccessMessage"] = "Payment confirmed successfully.";
+                TempData["SuccessMessage"] = "Payment confirmed successfully! Your booking is confirmed.";
+                return RedirectToAction("Dashboard", "Customer");
             }
             else
             {
                 TempData["ErrorMessage"] = "Unable to confirm the payment. If you were charged, please contact support.";
+                return RedirectToAction("MyBookings", "Booking");
             }
-
-            return RedirectToAction("MyBookings", "Booking");
         }
 
         public async Task<IActionResult> PaymentHistory()

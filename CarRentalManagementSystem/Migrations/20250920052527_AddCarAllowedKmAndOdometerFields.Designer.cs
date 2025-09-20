@@ -4,6 +4,7 @@ using CarRentalManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920052527_AddCarAllowedKmAndOdometerFields")]
+    partial class AddCarAllowedKmAndOdometerFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -352,9 +355,6 @@ namespace CarRentalManagementSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReturnID"));
 
-                    b.Property<decimal>("AdvancePaid")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -365,19 +365,8 @@ namespace CarRentalManagementSystem.Migrations
                     b.Property<int>("ExtraKM")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("FinalPaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("FinalPaymentDue")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("OdometerEnd")
                         .HasColumnType("int");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("RentID")
                         .HasColumnType("int");
@@ -493,8 +482,8 @@ namespace CarRentalManagementSystem.Migrations
                         new
                         {
                             UserID = 1,
-                            CreatedAt = new DateTime(2025, 9, 20, 14, 35, 1, 704, DateTimeKind.Local).AddTicks(6256),
-                            Password = "$2a$11$0KsdCn273CWVtSwB.LtX0uPVphZBrDgPe4hNUN03OYYi5ccjf2a2.",
+                            CreatedAt = new DateTime(2025, 9, 20, 14, 25, 26, 683, DateTimeKind.Local).AddTicks(8617),
+                            Password = "$2a$11$y/e6bIAj//F8.kStjYE86usbpuw.BtYvhWGvyjzuWX9VPxJHPpVgy",
                             RequirePasswordReset = false,
                             Role = "Admin",
                             Username = "admin"

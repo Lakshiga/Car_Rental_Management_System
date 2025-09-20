@@ -131,6 +131,7 @@ namespace CarRentalManagementSystem.Controllers
                 IsAvailable = car.AvailabilityStatus == "Available",
                 RentPerDay = car.RentPerDay,
                 PerKmRate = car.PerKmRate,
+                AllowedKmPerDay = car.AllowedKmPerDay,
                 CarType = car.CarType,
                 FuelType = car.FuelType,
                 SeatingCapacity = car.SeatingCapacity,
@@ -190,6 +191,21 @@ namespace CarRentalManagementSystem.Controllers
             var bookings = await _bookingService.GetAllBookingsAsync();
             ViewBag.UserRole = userRole;
             return View(bookings);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PreviewBooking(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+                return NotFound();
+
+            ViewBag.UserRole = userRole;
+            return View(booking);
         }
 
         [HttpGet]
@@ -265,6 +281,23 @@ namespace CarRentalManagementSystem.Controllers
             }
             
             return Json(new { success = false, message = "Failed to approve booking." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmBooking(int bookingId)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            var result = await _bookingService.ConfirmBookingAsync(bookingId);
+            
+            if (result)
+            {
+                return Json(new { success = true, message = "Booking confirmed successfully! Customer can now confirm rent." });
+            }
+            
+            return Json(new { success = false, message = "Failed to confirm booking. Booking must be in Pending status." });
         }
 
         [HttpPost]
@@ -395,6 +428,29 @@ namespace CarRentalManagementSystem.Controllers
                 
                 return Json(new { success = false, message = "An error occurred while adding the staff member." });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmRental(int bookingId, int odometerStart)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            // Get booking details
+            var booking = await _bookingService.GetBookingByIdAsync(bookingId);
+            if (booking == null || booking.Status != "Approved")
+                return Json(new { success = false, message = "Invalid booking or booking not approved." });
+
+            // Start the rental process
+            var result = await _bookingService.StartRentAsync(bookingId, odometerStart);
+            
+            if (result.Success)
+            {
+                return Json(new { success = true, message = "Rental confirmed successfully! Booking status changed to Rented." });
+            }
+            
+            return Json(new { success = false, message = "Failed to confirm rental. Please try again." });
         }
 
         public async Task<IActionResult> History()

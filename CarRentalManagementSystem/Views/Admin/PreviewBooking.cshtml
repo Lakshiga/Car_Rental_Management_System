@@ -1,0 +1,296 @@
+@model BookingResponseDTO
+@{
+    ViewData["Title"] = "Preview Booking";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Preview Booking #@Model.BookingID</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="@Url.Action("Bookings", "Admin")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Booking Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Customer Details</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold">Customer Name:</td>
+                                <td>@Model.CustomerName</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">NIC Number:</td>
+                                <td>@Model.NICNumber</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">License Number:</td>
+                                <td>@Model.LicenseNumber</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Booking Date:</td>
+                                <td>@Model.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Rental Period</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold">Pickup Date:</td>
+                                <td>@Model.PickupDate.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Return Date:</td>
+                                <td>@Model.ReturnDate.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Total Days:</td>
+                                <td>@((Model.ReturnDate - Model.PickupDate).Days) days</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Total Cost:</td>
+                                <td class="text-success fw-bold">₹@Model.TotalCost</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-car me-2"></i>Vehicle Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="@(Model.CarDetails.ImageUrl ?? "/images/default-car.jpg")" 
+                             alt="@Model.CarDetails.CarName" 
+                             class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 class="text-primary">@Model.CarDetails.CarName</h4>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold">Brand:</td>
+                                <td>@Model.CarDetails.Brand</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Type:</td>
+                                <td>@Model.CarDetails.CarType</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Number Plate:</td>
+                                <td>@Model.CarDetails.NumberPlate</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Fuel Type:</td>
+                                <td>@Model.CarDetails.FuelType</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Seating Capacity:</td>
+                                <td>@Model.CarDetails.SeatingCapacity persons</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Rent per Day:</td>
+                                <td class="text-success">₹@Model.CarDetails.RentPerDay</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Status & Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <span class="badge badge-lg 
+                          @(Model.Status == "Pending" ? "bg-warning text-dark" : 
+                            Model.Status == "Confirmed" ? "bg-info text-white" :
+                            Model.Status == "Approved" ? "bg-success text-white" : 
+                            Model.Status == "Rejected" ? "bg-danger text-white" : 
+                            Model.Status == "Rented" ? "bg-primary text-white" : "bg-secondary text-white")"
+                          style="font-size: 1.1rem; padding: 8px 16px;">
+                        @Model.Status
+                    </span>
+                </div>
+
+                @if (Model.Status == "Pending")
+                {
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="confirmBooking(@Model.BookingID)">
+                            <i class="fas fa-check-circle me-2"></i>Confirm for Customer
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                            <i class="fas fa-times me-2"></i>Reject Booking
+                        </button>
+                    </div>
+                    <div class="alert alert-info mt-3 small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        After confirmation, the customer will be able to confirm their rent request.
+                    </div>
+                }
+                else if (Model.Status == "Confirmed")
+                {
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success" onclick="approveBooking(@Model.BookingID)">
+                            <i class="fas fa-check me-2"></i>Approve Booking
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                            <i class="fas fa-times me-2"></i>Reject Booking
+                        </button>
+                    </div>
+                    <div class="alert alert-success mt-3 small">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Customer has confirmed their rent request. Ready for approval.
+                    </div>
+                }
+                else if (Model.Status == "Approved")
+                {
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="initializeRent(@Model.BookingID)">
+                            <i class="fas fa-key me-2"></i>Initialize Rent
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="rejectBooking(@Model.BookingID)">
+                            <i class="fas fa-times me-2"></i>Reject Booking
+                        </button>
+                    </div>
+                    <div class="alert alert-primary mt-3 small">
+                        <i class="fas fa-key me-2"></i>
+                        Booking approved. Ready to initialize rent with vehicle handover details.
+                    </div>
+                }
+                else if (Model.Status == "Rejected")
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        This booking has been rejected.
+                        @if (!string.IsNullOrEmpty(Model.ApprovedBy))
+                        {
+                            <br><small>Rejected by: @Model.ApprovedBy</small>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.LicenseFrontImage) || !string.IsNullOrEmpty(Model.LicenseBackImage))
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>License Documents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @if (!string.IsNullOrEmpty(Model.LicenseFrontImage))
+                        {
+                            <div class="col-6">
+                                <p class="fw-bold small">Front:</p>
+                                <img src="@Model.LicenseFrontImage" 
+                                     class="img-thumbnail license-image" 
+                                     onclick="showLicenseImage('@Model.LicenseFrontImage')" 
+                                     alt="License Front"
+                                     style="cursor: pointer; width: 100%;">
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.LicenseBackImage))
+                        {
+                            <div class="col-6">
+                                <p class="fw-bold small">Back:</p>
+                                <img src="@Model.LicenseBackImage" 
+                                     class="img-thumbnail license-image" 
+                                     onclick="showLicenseImage('@Model.LicenseBackImage')" 
+                                     alt="License Back"
+                                     style="cursor: pointer; width: 100%;">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- License Image Modal -->
+<div class="modal fade" id="licenseImageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">License Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="licenseImageView" src="" class="img-fluid" alt="License Image">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showLicenseImage(imageSrc) {
+            $('#licenseImageView').attr('src', imageSrc);
+            $('#licenseImageModal').modal('show');
+        }
+
+        function confirmBooking(bookingId) {
+            if (confirm('Confirm this booking to allow customer confirmation?')) {
+                $.post('@Url.Action("ConfirmBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+
+        function approveBooking(bookingId) {
+            if (confirm('Are you sure you want to approve this booking?')) {
+                $.post('@Url.Action("ApproveBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+
+        function rejectBooking(bookingId) {
+            if (confirm('Are you sure you want to reject this booking?')) {
+                $.post('@Url.Action("RejectBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+
+        function initializeRent(bookingId) {
+            if (confirm('Initialize rent process for this booking? This will take you to the rent form.')) {
+                window.location.href = '@Url.Action("StartRent", "Rent")?bookingId=' + bookingId;
+            }
+        }
+    </script>
+}

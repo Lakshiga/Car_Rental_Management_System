@@ -14,5 +14,6 @@ namespace CarRentalManagementSystem.DTOs
         public double Mileage { get; set; }
         public string NumberPlate { get; set; } = string.Empty;
         public decimal PerKmRate { get; set; }
+        public int AllowedKmPerDay { get; set; }
     }
 }

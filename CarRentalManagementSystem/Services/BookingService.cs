@@ -123,12 +123,30 @@ namespace CarRentalManagementSystem.Services
             return totalDays * car.RentPerDay;
         }
 
+        public async Task<bool> ConfirmBookingAsync(int bookingId)
+        {
+            try
+            {
+                var booking = await _context.Bookings.FindAsync(bookingId);
+                if (booking == null || booking.Status != "Pending")
+                    return false;
+
+                booking.Status = "Confirmed";
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> ApproveBookingAsync(int bookingId, string approvedBy)
         {
             try
             {
                 var booking = await _context.Bookings.FindAsync(bookingId);
-                if (booking == null)
+                if (booking == null || booking.Status != "Confirmed")
                     return false;
 
                 booking.Status = "Approved";
@@ -160,6 +178,53 @@ namespace CarRentalManagementSystem.Services
             catch
             {
                 return false;
+            }
+        }
+
+        public async Task<(bool Success, int RentId)> StartRentAsync(int bookingId, int odometerStart)
+        {
+            try
+            {
+                // Verify booking exists and is approved
+                var booking = await _context.Bookings
+                    .Include(b => b.Car)
+                    .Include(b => b.Customer)
+                    .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+
+                if (booking == null || booking.Status != "Approved")
+                    return (false, 0);
+
+                // Check if rent already exists for this booking
+                var existingRent = await _context.Rents
+                    .FirstOrDefaultAsync(r => r.BookingID == bookingId);
+
+                if (existingRent != null)
+                    return (false, existingRent.RentID); // Already rented
+
+                // Create rent record
+                var rent = new Rent
+                {
+                    BookingID = bookingId,
+                    OdometerStart = odometerStart,
+                    RentDate = DateTime.Now
+                };
+
+                _context.Rents.Add(rent);
+
+                // Update booking status to "Rented"
+                booking.Status = "Rented";
+
+                // Update car status to "Rented"
+                booking.Car.Status = "Rented";
+                booking.Car.IsAvailable = false;
+
+                await _context.SaveChangesAsync();
+
+                return (true, rent.RentID);
+            }
+            catch
+            {
+                return (false, 0);
             }
         }
 
@@ -207,7 +272,8 @@ namespace CarRentalManagementSystem.Services
                     SeatingCapacity = booking.Car.SeatingCapacity,
                     Mileage = booking.Car.Mileage,
                     NumberPlate = booking.Car.NumberPlate,
-                    PerKmRate = booking.Car.PerKmRate
+                    PerKmRate = booking.Car.PerKmRate,
+                    AllowedKmPerDay = booking.Car.AllowedKmPerDay
                 },
                 PickupDate = booking.PickupDate,
                 ReturnDate = booking.ReturnDate,

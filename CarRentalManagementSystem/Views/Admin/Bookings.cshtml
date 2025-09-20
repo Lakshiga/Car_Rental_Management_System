@@ -59,9 +59,11 @@
                             <td class="text-center">
                                 <span class="badge px-2 py-1 booking-status @booking.Status.ToLower() 
                                       @(booking.Status == "Pending" ? "bg-warning text-dark" : 
+                                        booking.Status == "Confirmed" ? "bg-info text-white" :
                                         booking.Status == "Approved" ? "bg-success text-white" : 
                                         booking.Status == "Rejected" ? "bg-danger text-white" : 
-                                        booking.Status == "Rented" ? "bg-info text-white" : "bg-secondary text-white")"
+                                        booking.Status == "Rented" ? "bg-primary text-white" :
+                                        booking.Status == "Pending Return" ? "bg-secondary text-white" : "bg-secondary text-white")"
                                       style="border-radius: 15px; font-size: 0.7rem; min-width: 70px;">
                                     @booking.Status
                                 </span>
@@ -69,11 +71,24 @@
                             <td class="text-center">
                                 <div class="table-actions d-flex justify-content-center gap-1">
                                     <button type="button" class="btn btn-xs btn-outline-info" 
-                                            onclick="viewBookingDetails(@booking.BookingID)" title="View Details"
+                                            onclick="previewBooking(@booking.BookingID)" title="Preview"
                                             style="border-radius: 15px; padding: 4px 8px; font-size: 0.7rem;">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if (booking.Status == "Pending")
+                                    {
+                                        <button type="button" class="btn btn-xs btn-outline-primary" 
+                                                onclick="confirmBooking(@booking.BookingID)" title="Confirm for Customer"
+                                                style="border-radius: 15px; padding: 4px 8px; font-size: 0.7rem;">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-danger" 
+                                                onclick="rejectBooking(@booking.BookingID)" title="Reject"
+                                                style="border-radius: 15px; padding: 4px 8px; font-size: 0.7rem;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    }
+                                    @if (booking.Status == "Confirmed")
                                     {
                                         <button type="button" class="btn btn-xs btn-outline-success" 
                                                 onclick="approveBooking(@booking.BookingID)" title="Approve"
@@ -89,9 +104,14 @@
                                     @if (booking.Status == "Approved")
                                     {
                                         <button type="button" class="btn btn-xs btn-outline-primary" 
-                                                onclick="markAsRented(@booking.BookingID)" title="Mark as Rented"
+                                                onclick="showRentalConfirmation(@booking.BookingID)" title="Rental"
                                                 style="border-radius: 15px; padding: 4px 8px; font-size: 0.7rem;">
                                             <i class="fas fa-key"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-danger" 
+                                                onclick="rejectBooking(@booking.BookingID)" title="Reject"
+                                                style="border-radius: 15px; padding: 4px 8px; font-size: 0.7rem;">
+                                            <i class="fas fa-times"></i>
                                         </button>
                                     }
                                 </div>
@@ -129,6 +149,42 @@
             </div>
             <div class="modal-body text-center">
                 <img id="licenseImageView" src="" class="img-fluid" alt="License Image">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rental Confirmation Modal -->
+<div class="modal fade" id="rentalConfirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rental Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rentalConfirmationForm">
+                    <input type="hidden" id="bookingId" name="bookingId" />
+                    
+                    <div class="mb-3">
+                        <label for="pickupDate" class="form-label">Pickup Date</label>
+                        <input type="date" class="form-control" id="pickupDate" name="pickupDate" required readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="odometerStart" class="form-label">Odometer Start Reading</label>
+                        <input type="number" class="form-control" id="odometerStart" name="odometerStart" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="balancePayment" class="form-label">Balance Payment</label>
+                        <input type="number" class="form-control" id="balancePayment" name="balancePayment" min="0" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmRentalBtn">Confirm</button>
             </div>
         </div>
     </div>
@@ -207,6 +263,23 @@
             $('#licenseImageModal').modal('show');
         }
 
+        function previewBooking(bookingId) {
+            window.location.href = '@Url.Action("PreviewBooking", "Admin")?id=' + bookingId;
+        }
+
+        function confirmBooking(bookingId) {
+            if (confirm('Confirm this booking to allow customer confirmation?')) {
+                $.post('@Url.Action("ConfirmBooking", "Admin")', { bookingId: bookingId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+
         function approveBooking(bookingId) {
             if (confirm('Are you sure you want to approve this booking?')) {
                 $.post('@Url.Action("ApproveBooking", "Admin")', { bookingId: bookingId }, function(response) {
@@ -233,11 +306,54 @@
             }
         }
 
-        function markAsRented(bookingId) {
-            if (confirm('Start rent process for this booking? This will take you to the rent form.')) {
+        function initializeRent(bookingId) {
+            if (confirm('Initialize rent process for this booking? This will take you to the rent form.')) {
                 window.location.href = '@Url.Action("StartRent", "Rent")?bookingId=' + bookingId;
             }
         }
+
+        function showRentalConfirmation(bookingId) {
+            // Get booking details from the serialized model
+            const bookings = @Html.Raw(Json.Serialize(Model));
+            const booking = bookings.find(b => b.bookingID === bookingId);
+            
+            if (booking) {
+                // Set form values
+                $('#bookingId').val(bookingId);
+                $('#pickupDate').val(new Date(booking.pickupDate).toISOString().split('T')[0]);
+                $('#balancePayment').val((booking.totalCost * 0.5).toFixed(2)); // 50% balance
+                
+                // Show the modal
+                $('#rentalConfirmationModal').modal('show');
+            }
+        }
+
+        // Handle rental confirmation
+        $('#confirmRentalBtn').click(function() {
+            const bookingId = $('#bookingId').val();
+            const odometerStart = $('#odometerStart').val();
+            const balancePayment = $('#balancePayment').val();
+            
+            if (!odometerStart || !balancePayment) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to confirm this rental?')) {
+                $.post('@Url.Action("ConfirmRental", "Admin")', { 
+                    bookingId: bookingId, 
+                    odometerStart: odometerStart 
+                }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#rentalConfirmationModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        });
 
         // Initialize DataTable
         $(document).ready(function() {

@@ -170,18 +170,26 @@
                                                 <td>@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
                                                 <td>
                                                     <span class="badge @(booking.Status == "Pending" ? "bg-warning" :
+                                                                        booking.Status == "Confirmed" ? "bg-info" :
                                                                         booking.Status == "Approved" ? "bg-success" :
                                                                         booking.Status == "Rejected" ? "bg-danger" :
-                                                                        booking.Status == "Rented" ? "bg-info" : "bg-secondary")">
+                                                                        booking.Status == "Rented" ? "bg-primary" : "bg-secondary")">
                                                         @booking.Status
                                                     </span>
                                                 </td>
                                                 <td><strong>₹@booking.TotalCost</strong></td>
                                                 <td>
                                                     <a href="@Url.Action("Details", "Booking", new { id = booking.BookingID })"
-                                                       class="btn btn-customer-secondary btn-sm">
+                                                       class="btn btn-customer-secondary btn-sm me-1">
                                                         <i class="fas fa-eye"></i> View
                                                     </a>
+                                                    @if (booking.Status == "Pending")
+                                                    {
+                                                        <button type="button" class="btn btn-primary btn-sm" 
+                                                                onclick="confirmRent(@booking.BookingID)" title="Confirm Rent">
+                                                            <i class="fas fa-check"></i> Confirm
+                                                        </button>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
@@ -247,3 +255,20 @@
         color: #dddfeb;
     }
 </style>
+
+@section Scripts {
+    <script>
+        function confirmRent(bookingId) {
+            if (confirm('Are you sure you want to confirm this rent? This will notify the admin for approval.')) {
+                $.post('@Url.Action("ConfirmRent", "Customer")', { bookingId: bookingId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

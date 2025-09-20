@@ -27,10 +27,56 @@ namespace CarRentalManagementSystem.Controllers
         public async Task<IActionResult> CreateBooking(CarBookingRequestDTO model)
         {
             var customerIdString = HttpContext.Session.GetString("CustomerId");
-            if (string.IsNullOrEmpty(customerIdString))
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(customerIdString) || string.IsNullOrEmpty(userIdString))
                 return Json(new { success = false, message = "Please login to make a booking." });
 
             var customerId = int.Parse(customerIdString);
+            var userId = int.Parse(userIdString);
+
+            // Check if customer profile is complete - if not, require additional details
+            var customer = await _userService.GetCustomerByUserIdAsync(userId);
+            if (customer == null)
+                return Json(new { success = false, message = "Customer profile not found." });
+
+            // If customer profile is incomplete and additional details are provided, update profile first
+            var profileIncomplete = string.IsNullOrEmpty(customer.NIC) || 
+                                  string.IsNullOrEmpty(customer.LicenseNo) || 
+                                  string.IsNullOrEmpty(customer.Phone) || 
+                                  string.IsNullOrEmpty(customer.Address);
+
+            if (profileIncomplete)
+            {
+                // Additional fields should be provided in the request
+                if (string.IsNullOrEmpty(model.CustomerNIC) || 
+                    string.IsNullOrEmpty(model.CustomerPhone) || 
+                    string.IsNullOrEmpty(model.CustomerAddress))
+                {
+                    return Json(new { success = false, message = "Please provide all required personal details to complete your booking." });
+                }
+
+                // Update customer profile with the provided details
+                var updateResult = await _userService.UpdateCustomerProfileAsync(customerId, new DTOs.CustomerProfileUpdateDTO
+                {
+                    NIC = model.CustomerNIC,
+                    Phone = model.CustomerPhone,
+                    Address = model.CustomerAddress,
+                    LicenseNo = model.LicenseNumber // Use from booking form
+                });
+
+                if (!updateResult)
+                {
+                    return Json(new { success = false, message = "Failed to update customer profile." });
+                }
+            }
+            else
+            {
+                // If profile is complete, use existing license number unless a new one is provided
+                if (string.IsNullOrEmpty(model.LicenseNumber))
+                {
+                    model.LicenseNumber = customer.LicenseNo;
+                }
+            }
 
             if (!ModelState.IsValid)
                 return Json(new { success = false, message = "Invalid booking data." });
@@ -47,7 +93,60 @@ namespace CarRentalManagementSystem.Controllers
             if (result.Success)
             {
                 // Send confirmation email
-                var customer = await _userService.GetCustomerByUserIdAsync(int.Parse(HttpContext.Session.GetString("UserId")!));
+                var customerInfo = await _userService.GetCustomerByUserIdAsync(int.Parse(HttpContext.Session.GetString("UserId")!));
+                if (customerInfo != null)
+                {
+                    await _emailService.SendBookingConfirmationAsync(customerInfo.Email, customerInfo.FullName, result.BookingId);
+                }
+
+                return Json(new { 
+                    success = true, 
+                    message = "Booking successful! Redirecting to payment...", 
+                    bookingId = result.BookingId,
+                    redirectUrl = Url.Action("ProcessPayment", "Payment", new { bookingId = result.BookingId })
+                });
+            }
+            
+            return Json(new { success = false, message = "Booking failed. Car might not be available for selected dates." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStreamlinedBooking([FromBody] StreamlinedBookingRequestDTO model)
+        {
+            var customerIdString = HttpContext.Session.GetString("CustomerId");
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(customerIdString) || string.IsNullOrEmpty(userIdString))
+                return Json(new { success = false, message = "Please login to make a booking." });
+
+            var customerId = int.Parse(customerIdString);
+            var userId = int.Parse(userIdString);
+
+            // Validate dates
+            if (model.PickupDate <= DateTime.Now)
+                return Json(new { success = false, message = "Pickup date must be in the future." });
+
+            if (model.ReturnDate <= model.PickupDate)
+                return Json(new { success = false, message = "Return date must be after pickup date." });
+
+            // Get customer details to use existing license info
+            var customer = await _userService.GetCustomerByUserIdAsync(userId);
+            if (customer == null)
+                return Json(new { success = false, message = "Customer profile not found." });
+
+            // Create booking request with existing customer data
+            var bookingRequest = new CarBookingRequestDTO
+            {
+                CarID = model.CarID,
+                PickupDate = model.PickupDate,
+                ReturnDate = model.ReturnDate,
+                LicenseNumber = customer.LicenseNo // Use existing license number
+            };
+
+            var result = await _bookingService.CreateBookingAsync(bookingRequest, customerId);
+            
+            if (result.Success)
+            {
+                // Send confirmation email
                 if (customer != null)
                 {
                     await _emailService.SendBookingConfirmationAsync(customer.Email, customer.FullName, result.BookingId);
@@ -87,6 +186,43 @@ namespace CarRentalManagementSystem.Controllers
         {
             var isAvailable = await _carService.IsCarAvailableAsync(carId, pickupDate, returnDate);
             return Json(new { available = isAvailable });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckCustomerProfileStatus()
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString))
+                return Json(new { success = false, message = "Not logged in" });
+
+            var userId = int.Parse(userIdString);
+            var customerProfile = await _userService.GetCustomerByUserIdAsync(userId);
+            
+            if (customerProfile == null)
+                return Json(new { success = false, message = "Customer not found" });
+
+            // Check if customer profile is complete
+            var isComplete = !string.IsNullOrEmpty(customerProfile.NIC) && 
+                           !string.IsNullOrEmpty(customerProfile.LicenseNo) && 
+                           !string.IsNullOrEmpty(customerProfile.Phone) && 
+                           !string.IsNullOrEmpty(customerProfile.Address);
+
+            return Json(new { 
+                success = true, 
+                isProfileComplete = isComplete,
+                missingFields = new {
+                    nic = string.IsNullOrEmpty(customerProfile.NIC),
+                    licenseNumber = string.IsNullOrEmpty(customerProfile.LicenseNo),
+                    phone = string.IsNullOrEmpty(customerProfile.Phone),
+                    address = string.IsNullOrEmpty(customerProfile.Address)
+                },
+                existingData = new {
+                    nic = customerProfile.NIC ?? "",
+                    licenseNumber = customerProfile.LicenseNo ?? "",
+                    phone = customerProfile.Phone ?? "",
+                    address = customerProfile.Address ?? ""
+                }
+            });
         }
 
         public async Task<IActionResult> MyBookings()

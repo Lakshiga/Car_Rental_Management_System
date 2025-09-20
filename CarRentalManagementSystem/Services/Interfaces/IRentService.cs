@@ -13,5 +13,7 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<RentResponseDTO?> GetRentByBookingIdAsync(int bookingId);
         Task<decimal> CalculateExtraChargesAsync(int rentId, int odometerEnd);
         Task<bool> UpdateRentStatusAsync(int rentId, DateTime actualReturnDate, int odometerEnd);
+        Task<bool> ProcessFinalPaymentAsync(int returnId);
+        Task<IEnumerable<Return>> GetPendingPaymentsAsync();
     }
 }

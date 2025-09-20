@@ -1,11 +1,11 @@
 @model Car
 @{
-    ViewData["Title"] = "Add New Car";
+    ViewData["Title"] = "Edit Car";
     Layout = "_AdminLayout";
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Add New Car</h1>
+    <h1 class="h2">Edit Car</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="@Url.Action("Cars")" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Cars
@@ -34,8 +34,10 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <form asp-action="AddCar" method="post" enctype="multipart/form-data" id="addCarForm">
+                <form asp-action="EditCar" method="post" enctype="multipart/form-data" id="editCarForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <input asp-for="CarID" type="hidden" />
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -118,7 +120,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="AllowedKmPerDay" class="form-label">Allowed KM Per Day</label>
-                            <input asp-for="AllowedKmPerDay" class="form-control" type="number" min="1" value="100" placeholder="e.g., 100" />
+                            <input asp-for="AllowedKmPerDay" class="form-control" type="number" min="1" placeholder="e.g., 100" />
                             <span asp-validation-for="AllowedKmPerDay" class="text-danger"></span>
                             <div class="form-text">Maximum kilometers allowed per rental day (default: 100 km)</div>
                         </div>
@@ -129,15 +131,25 @@
                         </div>
                     </div>
 
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Current Car Image</label>
+                            <div class="mb-2">
+                                <img src="@Model.ImageUrl" alt="@Model.CarName" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                            </div>
+                        </div>
+                    }
+
                     <div class="mb-3">
-                        <label class="form-label">Car Image</label>
+                        <label class="form-label">@(string.IsNullOrEmpty(Model.ImageUrl) ? "Car Image" : "Update Car Image")</label>
                         <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                        <div class="form-text">Upload a clear image of the car (JPG, PNG, GIF)</div>
+                        <div class="form-text">@(string.IsNullOrEmpty(Model.ImageUrl) ? "Upload a clear image of the car (JPG, PNG, GIF)" : "Leave empty to keep current image, or upload new image to replace")</div>
                     </div>
 
                     <div class="mb-3">
                         <div class="form-check">
-                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" checked />
+                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" />
                             <label asp-for="IsAvailable" class="form-check-label">
                                 Available for Rent
                             </label>
@@ -148,7 +160,7 @@
                         <a href="@Url.Action("Cars")" class="btn btn-secondary me-md-2">Cancel</a>
                         <button type="submit" class="btn btn-primary" id="submitBtn">
                             <i class="fas fa-save"></i> 
-                            <span class="btn-text">Add Car</span>
+                            <span class="btn-text">Update Car</span>
                             <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
                     </div>
@@ -172,6 +184,20 @@
                 </ul>
             </div>
         </div>
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Current Car</h6>
+                </div>
+                <div class="card-body text-center">
+                    <img src="@Model.ImageUrl" alt="@Model.CarName" class="img-fluid rounded">
+                    <h6 class="mt-2">@Model.CarName</h6>
+                    <small class="text-muted">@Model.NumberPlate</small>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -181,14 +207,14 @@
     <script>
         $(document).ready(function() {
             // Form submission with loading state
-            $('#addCarForm').on('submit', function() {
+            $('#editCarForm').on('submit', function() {
                 var submitBtn = $('#submitBtn');
                 var btnText = submitBtn.find('.btn-text');
                 var spinner = submitBtn.find('.spinner-border');
                 
                 // Show loading state
                 submitBtn.prop('disabled', true);
-                btnText.text('Adding Car...');
+                btnText.text('Updating Car...');
                 spinner.removeClass('d-none');
                 
                 // Form will submit normally, but we show loading state
@@ -202,7 +228,7 @@
                 var spinner = submitBtn.find('.spinner-border');
                 
                 submitBtn.prop('disabled', false);
-                btnText.text('Add Car');
+                btnText.text('Update Car');
                 spinner.addClass('d-none');
             }
         });

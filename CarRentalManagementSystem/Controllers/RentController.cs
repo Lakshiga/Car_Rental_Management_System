@@ -149,5 +149,34 @@ namespace CarRentalManagementSystem.Controllers
             var extraCharges = await _rentService.CalculateExtraChargesAsync(rentId, odometerEnd);
             return Json(new { success = true, extraCharges = extraCharges });
         }
+
+        public async Task<IActionResult> PendingPayments()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var pendingPayments = await _rentService.GetPendingPaymentsAsync();
+            ViewBag.UserRole = userRole;
+            return View(pendingPayments);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessFinalPayment(int returnId)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            var result = await _rentService.ProcessFinalPaymentAsync(returnId);
+            
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Final payment processed successfully! Rental completed.";
+                return Json(new { success = true, message = "Final payment processed successfully!" });
+            }
+            
+            return Json(new { success = false, message = "Failed to process final payment." });
+        }
     }
 }
