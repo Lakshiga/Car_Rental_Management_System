@@ -4,6 +4,7 @@ using CarRentalManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920001412_RemoveRequiredFieldsFromRegistration")]
+    partial class RemoveRequiredFieldsFromRegistration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,7 +163,7 @@ namespace CarRentalManagementSystem.Migrations
                             CarModel = "2023",
                             CarName = "Toyota Corolla",
                             CarType = "Sedan",
-                            CreatedAt = new DateTime(2025, 9, 20, 9, 28, 7, 196, DateTimeKind.Local).AddTicks(7802),
+                            CreatedAt = new DateTime(2025, 9, 20, 9, 14, 10, 186, DateTimeKind.Local).AddTicks(9473),
                             FuelType = "Petrol",
                             ImageUrl = "/images/cars/corolla.jpg",
                             IsAvailable = true,
@@ -178,7 +181,7 @@ namespace CarRentalManagementSystem.Migrations
                             CarModel = "2023",
                             CarName = "Honda Civic",
                             CarType = "Sedan",
-                            CreatedAt = new DateTime(2025, 9, 20, 9, 28, 7, 196, DateTimeKind.Local).AddTicks(7808),
+                            CreatedAt = new DateTime(2025, 9, 20, 9, 14, 10, 186, DateTimeKind.Local).AddTicks(9480),
                             FuelType = "Petrol",
                             ImageUrl = "/images/cars/civic.jpg",
                             IsAvailable = true,
@@ -498,8 +501,8 @@ namespace CarRentalManagementSystem.Migrations
                         new
                         {
                             UserID = 1,
-                            CreatedAt = new DateTime(2025, 9, 20, 9, 28, 7, 196, DateTimeKind.Local).AddTicks(6369),
-                            Password = "$2a$11$CmUveD0NHFRiOGpGC6gvUex3H7PaSWu3HIGvjXiA8mH2mVWgQ8a.S",
+                            CreatedAt = new DateTime(2025, 9, 20, 9, 14, 10, 186, DateTimeKind.Local).AddTicks(8671),
+                            Password = "$2a$11$JEiEgadtct40rD5Ognws1utCb.ukfUGHQlkatbDmCVu7LAmE8TpoC",
                             Role = "Admin",
                             Username = "admin"
                         });
