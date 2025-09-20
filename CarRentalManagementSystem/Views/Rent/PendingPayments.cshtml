@@ -1,0 +1,288 @@
+@model IEnumerable<Return>
+@{
+    ViewData["Title"] = "Pending Payments";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Pending Final Payments</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Rent Management
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card warning h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card danger h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Amount Due</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">₹@Model.Sum(r => r.FinalPaymentDue)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-rupee-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card info h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Extra Charges</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">₹@Model.Sum(r => r.ExtraCharge)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-plus fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card success h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Base Revenue</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">₹@Model.Sum(r => r.TotalDue - r.ExtraCharge)</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Payments Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Customers with Pending Final Payments</h6>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered" id="pendingPaymentsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Return ID</th>
+                            <th>Customer</th>
+                            <th>Car</th>
+                            <th>Return Date</th>
+                            <th>Base Amount</th>
+                            <th>Advance Paid</th>
+                            <th>Extra Charges</th>
+                            <th>Final Payment Due</th>
+                            <th>Days Overdue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var returnRecord in Model)
+                        {
+                            var daysOverdue = (DateTime.Now - returnRecord.ReturnDate).Days;
+                            <tr class="@(daysOverdue > 7 ? "table-danger" : daysOverdue > 3 ? "table-warning" : "")">
+                                <td>#@returnRecord.ReturnID</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="fw-bold">@($"{returnRecord.Rent.Booking.Customer.FirstName} {returnRecord.Rent.Booking.Customer.LastName}")</div>
+                                            <small class="text-muted">@returnRecord.Rent.Booking.Customer.PhoneNo</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(returnRecord.Rent.Booking.Car.ImageUrl ?? "/images/default-car.jpg")" 
+                                             alt="@returnRecord.Rent.Booking.Car.CarName" class="car-image me-2" style="width: 40px; height: 30px; object-fit: cover; border-radius: 4px;">
+                                        <div>
+                                            <div class="fw-bold">@returnRecord.Rent.Booking.Car.CarName</div>
+                                            <small class="text-muted">@returnRecord.Rent.Booking.Car.NumberPlate</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@returnRecord.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                <td>₹@(returnRecord.TotalDue - returnRecord.ExtraCharge)</td>
+                                <td>₹@returnRecord.AdvancePaid</td>
+                                <td>
+                                    @if (returnRecord.ExtraCharge > 0)
+                                    {
+                                        <span class="badge bg-warning">₹@returnRecord.ExtraCharge</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">₹0</span>
+                                    }
+                                </td>
+                                <td>
+                                    <strong class="text-danger">₹@returnRecord.FinalPaymentDue</strong>
+                                </td>
+                                <td>
+                                    @if (daysOverdue > 7)
+                                    {
+                                        <span class="badge bg-danger">@daysOverdue days</span>
+                                    }
+                                    else if (daysOverdue > 3)
+                                    {
+                                        <span class="badge bg-warning">@daysOverdue days</span>
+                                    }
+                                    else if (daysOverdue > 0)
+                                    {
+                                        <span class="badge bg-info">@daysOverdue days</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">Due today</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                onclick="viewPaymentDetails(@returnRecord.ReturnID)" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-success" 
+                                                onclick="processFinalPayment(@returnRecord.ReturnID)" title="Mark as Paid">
+                                            <i class="fas fa-check"></i> Collect Payment
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h5>No Pending Payments</h5>
+                <p class="text-muted">All customers have completed their final payments.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Final Payment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="paymentDetailsContent">
+                <!-- Payment details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#pendingPaymentsTable').DataTable({
+                "pageLength": 25,
+                "order": [[8, "desc"]], // Sort by days overdue
+                "columnDefs": [
+                    { "orderable": false, "targets": [9] }
+                ]
+            });
+        });
+
+        function viewPaymentDetails(returnId) {
+            // Find the return record from the model
+            const returns = @Html.Raw(Json.Serialize(Model));
+            const returnRecord = returns.find(r => r.returnID === returnId);
+            
+            if (returnRecord) {
+                const extraKm = returnRecord.extraKM;
+                const baseAmount = returnRecord.totalDue - returnRecord.extraCharge;
+                
+                const content = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <table class="table table-borderless">
+                                <tr><td><strong>Name:</strong></td><td>${returnRecord.rent.booking.customer.firstName} ${returnRecord.rent.booking.customer.lastName}</td></tr>
+                                <tr><td><strong>Phone:</strong></td><td>${returnRecord.rent.booking.customer.phoneNo}</td></tr>
+                                <tr><td><strong>Return Date:</strong></td><td>${new Date(returnRecord.returnDate).toLocaleDateString()}</td></tr>
+                            </table>
+                            
+                            <h6>Vehicle Information</h6>
+                            <table class="table table-borderless">
+                                <tr><td><strong>Car:</strong></td><td>${returnRecord.rent.booking.car.carName}</td></tr>
+                                <tr><td><strong>Number Plate:</strong></td><td>${returnRecord.rent.booking.car.numberPlate}</td></tr>
+                                <tr><td><strong>Odometer Start:</strong></td><td>${returnRecord.rent.odometerStart} km</td></tr>
+                                <tr><td><strong>Odometer End:</strong></td><td>${returnRecord.odometerEnd} km</td></tr>
+                                <tr><td><strong>Distance Driven:</strong></td><td>${returnRecord.odometerEnd - returnRecord.rent.odometerStart} km</td></tr>
+                                <tr><td><strong>Extra KM:</strong></td><td>${extraKm} km</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Payment Breakdown</h6>
+                            <table class="table table-borderless">
+                                <tr><td><strong>Base Rental:</strong></td><td>₹${baseAmount}</td></tr>
+                                <tr><td><strong>Extra KM Charges:</strong></td><td>₹${returnRecord.extraCharge}</td></tr>
+                                <tr><td><strong>Total Due:</strong></td><td>₹${returnRecord.totalDue}</td></tr>
+                                <tr><td><strong>Advance Paid:</strong></td><td>₹${returnRecord.advancePaid}</td></tr>
+                                <tr class="table-warning"><td><strong>Final Payment Due:</strong></td><td>₹${returnRecord.finalPaymentDue}</td></tr>
+                            </table>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Payment Status:</strong> ${returnRecord.paymentStatus}<br>
+                                Customer must pay ₹${returnRecord.finalPaymentDue} to complete the rental.
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#paymentDetailsContent').html(content);
+                $('#paymentDetailsModal').modal('show');
+            }
+        }
+
+        function processFinalPayment(returnId) {
+            if (confirm('Confirm that the final payment has been collected from the customer?')) {
+                $.post('@Url.Action("ProcessFinalPayment", "Rent")', { returnId: returnId }, function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

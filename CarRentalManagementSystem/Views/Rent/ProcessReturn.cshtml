@@ -68,13 +68,23 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6><strong>Base Amount:</strong> ₹@rent.BookingDetails?.TotalCost</h6>
+                                        <p><strong>Advance Paid (50%):</strong> ₹<span id="advancePaid">@((rent.BookingDetails?.TotalCost ?? 0) * 0.5m)</span></p>
                                     </div>
                                     <div class="col-md-6">
                                         <h6><strong>Extra Charges:</strong> ₹<span id="extraCharges">0.00</span></h6>
+                                        <p><strong>Final Payment Due:</strong> ₹<span id="finalPaymentDue">@((rent.BookingDetails?.TotalCost ?? 0) * 0.5m)</span></p>
                                     </div>
                                 </div>
                                 <hr>
                                 <h5 class="text-primary"><strong>Total Due:</strong> ₹<span id="totalDue">@rent.BookingDetails?.TotalCost</span></h5>
+                                
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Payment Breakdown:</strong><br>
+                                    • Customer has already paid 50% advance payment<br>
+                                    • Remaining balance + extra charges = Final payment due<br>
+                                    • Final payment must be collected before completing return
+                                </div>
                             </div>
                         </div>
 
@@ -155,7 +165,8 @@ else
         const perKmRate = @(rent?.BookingDetails?.CarDetails?.PerKmRate ?? 0);
         const baseAmount = @(rent?.BookingDetails?.TotalCost ?? 0);
         const startingKM = @(rent?.OdometerStart ?? 0);
-        const expectedDistance = @((rent?.BookingDetails?.ReturnDate - rent?.BookingDetails?.PickupDate)?.Days * 100 ?? 0);
+        const expectedDistance = @((rent?.BookingDetails?.ReturnDate - rent?.BookingDetails?.PickupDate)?.Days * (rent?.BookingDetails?.CarDetails?.AllowedKmPerDay ?? 100) ?? 0);
+        const advancePaid = baseAmount * 0.5;
 
         function calculateExtraCharges() {
             const endingKM = parseInt(document.getElementById('OdometerEnd').value) || 0;
@@ -170,12 +181,14 @@ else
             const extraDistance = Math.max(0, totalDistance - expectedDistance);
             const extraCharges = extraDistance * perKmRate;
             const totalDue = baseAmount + extraCharges;
+            const finalPaymentDue = totalDue - advancePaid;
 
             document.getElementById('endingKM').textContent = endingKM;
             document.getElementById('totalDistance').textContent = totalDistance;
             document.getElementById('extraDistance').textContent = extraDistance;
             document.getElementById('extraCharges').textContent = extraCharges.toFixed(2);
             document.getElementById('totalDue').textContent = totalDue.toFixed(2);
+            document.getElementById('finalPaymentDue').textContent = finalPaymentDue.toFixed(2);
         }
     </script>
 }

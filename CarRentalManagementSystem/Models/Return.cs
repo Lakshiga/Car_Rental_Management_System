@@ -28,6 +28,19 @@ namespace CarRentalManagementSystem.Models
         [Range(0, double.MaxValue)]
         public decimal TotalDue { get; set; }
         
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal AdvancePaid { get; set; }
+        
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal FinalPaymentDue { get; set; }
+        
+        [StringLength(20)]
+        public string PaymentStatus { get; set; } = "Pending"; // Pending, Completed
+        
+        public DateTime? FinalPaymentDate { get; set; }
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties

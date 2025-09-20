@@ -140,21 +140,82 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
+                <!-- Loading state -->
+                <div id="bookingLoadingState" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Checking your profile...</p>
+                </div>
+                
+                <!-- Streamlined booking form for complete profiles -->
+                <div id="streamlinedBookingForm" class="row" style="display: none;">
                     <div class="col-md-6">
-                        <form id="bookingForm">
-                            <input type="hidden" id="selectedCarId" name="CarID" />
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Your profile is complete! Quick booking enabled.
+                        </div>
+                        <form id="quickBookingForm">
+                            <input type="hidden" id="quickSelectedCarId" name="CarID" />
                             <div class="mb-3">
                                 <label class="form-label">Pickup Date</label>
-                                <input type="date" class="form-control" id="pickupDate" name="PickupDate" required>
+                                <input type="date" class="form-control" id="quickPickupDate" name="PickupDate" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Return Date</label>
-                                <input type="date" class="form-control" id="returnDate" name="ReturnDate" required>
+                                <input type="date" class="form-control" id="quickReturnDate" name="ReturnDate" required>
+                            </div>
+                            <div class="rental-calculation mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Rental Calculation</h6>
+                                        <div id="quickCalculationDetails">
+                                            <p>Total Days: <span id="quickTotalDays">0</span></p>
+                                            <p>Total Rent: ₹<span id="quickTotalRent">0</span></p>
+                                            <p><strong>Advance Payment (50%): ₹<span id="quickAdvancePayment">0</span></strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="quickSelectedCarDetails">
+                            <!-- Selected car details will be shown here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed booking form for incomplete profiles -->
+                <div id="detailedBookingForm" class="row" style="display: none;">
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i> Please complete your profile information to enable quick booking in the future.
+                        </div>
+                        <form id="fullBookingForm">
+                            <input type="hidden" id="fullSelectedCarId" name="CarID" />
+                            <div class="mb-3">
+                                <label class="form-label">Pickup Date</label>
+                                <input type="date" class="form-control" id="fullPickupDate" name="PickupDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Return Date</label>
+                                <input type="date" class="form-control" id="fullReturnDate" name="ReturnDate" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">License Number</label>
-                                <input type="text" class="form-control" id="licenseNumber" name="LicenseNumber" required>
+                                <input type="text" class="form-control" id="fullLicenseNumber" name="LicenseNumber" required>
+                            </div>
+                            <div class="mb-3" id="nicField">
+                                <label class="form-label">NIC Number</label>
+                                <input type="text" class="form-control" id="customerNIC" name="CustomerNIC" required>
+                            </div>
+                            <div class="mb-3" id="phoneField">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="customerPhone" name="CustomerPhone" required>
+                            </div>
+                            <div class="mb-3" id="addressField">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" id="customerAddress" name="CustomerAddress" rows="2" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">License Front Image</label>
@@ -168,10 +229,10 @@
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h6>Rental Calculation</h6>
-                                        <div id="calculationDetails">
-                                            <p>Total Days: <span id="totalDays">0</span></p>
-                                            <p>Total Rent: ₹<span id="totalRent">0</span></p>
-                                            <p><strong>Advance Payment (50%): ₹<span id="advancePayment">0</span></strong></p>
+                                        <div id="fullCalculationDetails">
+                                            <p>Total Days: <span id="fullTotalDays">0</span></p>
+                                            <p>Total Rent: ₹<span id="fullTotalRent">0</span></p>
+                                            <p><strong>Advance Payment (50%): ₹<span id="fullAdvancePayment">0</span></strong></p>
                                         </div>
                                     </div>
                                 </div>
@@ -179,7 +240,7 @@
                         </form>
                     </div>
                     <div class="col-md-6">
-                        <div id="selectedCarDetails">
+                        <div id="fullSelectedCarDetails">
                             <!-- Selected car details will be shown here -->
                         </div>
                     </div>
@@ -187,7 +248,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+                <button type="button" class="btn btn-primary" id="confirmBookingBtn" onclick="confirmBooking()">Confirm Booking</button>
             </div>
         </div>
     </div>
@@ -196,6 +257,7 @@
 @section Scripts {
     <script>
         let selectedCarData = null;
+        let isProfileComplete = false;
 
         function viewCarDetails(carId) {
             $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
@@ -232,84 +294,249 @@
                 </text>
             }
 
+            // Show loading state
+            $('#bookingLoadingState').show();
+            $('#streamlinedBookingForm, #detailedBookingForm').hide();
+            $('#bookingModal').modal('show');
+
+            // Get car details
             $.get('@Url.Action("GetCarDetails", "Home")', { id: carId }, function(data) {
                 selectedCarData = data;
-                $('#selectedCarId').val(carId);
                 
-                const carDetails = `
-                    <div class="card">
-                        <img src="${data.imageUrl || '/images/default-car.jpg'}" class="card-img-top" alt="${data.carName}" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">${data.carName}</h5>
-                            <p><strong>Brand:</strong> ${data.brand}</p>
-                            <p><strong>Type:</strong> ${data.carType}</p>
-                            <p><strong>Rent per Day:</strong> ₹${data.rentPerDay}</p>
-                            <p><strong>Per KM Rate:</strong> ₹${data.perKmRate}</p>
-                        </div>
-                    </div>
-                `;
-                $('#selectedCarDetails').html(carDetails);
-                $('#bookingModal').modal('show');
+                // Check customer profile status
+                $.get('@Url.Action("CheckCustomerProfileStatus", "Booking")', function(profileData) {
+                    $('#bookingLoadingState').hide();
+                    
+                    if (profileData.success && profileData.isProfileComplete) {
+                        // Show streamlined form
+                        setupStreamlinedBooking(carId, data);
+                    } else {
+                        // Show detailed form with missing fields
+                        setupDetailedBooking(carId, data, profileData);
+                    }
+                }).fail(function() {
+                    $('#bookingLoadingState').hide();
+                    alert('Error checking profile status. Please try again.');
+                    $('#bookingModal').modal('hide');
+                });
             });
         }
 
-        $('#pickupDate, #returnDate').on('change', function() {
-            calculateRent();
-        });
+        function setupStreamlinedBooking(carId, carData) {
+            isProfileComplete = true;
+            $('#quickSelectedCarId').val(carId);
+            
+            const carDetails = `
+                <div class="card">
+                    <img src="${carData.imageUrl || '/images/default-car.jpg'}" class="card-img-top" alt="${carData.carName}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">${carData.carName}</h5>
+                        <p><strong>Brand:</strong> ${carData.brand}</p>
+                        <p><strong>Type:</strong> ${carData.carType}</p>
+                        <p><strong>Rent per Day:</strong> ₹${carData.rentPerDay}</p>
+                        <p><strong>Per KM Rate:</strong> ₹${carData.perKmRate}</p>
+                    </div>
+                </div>
+            `;
+            $('#quickSelectedCarDetails').html(carDetails);
+            $('#streamlinedBookingForm').show();
+            
+            // Setup date change handlers for quick form with immediate calculation
+            $('#quickPickupDate, #quickReturnDate').off('change input').on('change input', function() {
+                setTimeout(() => calculateRentForForm('quick'), 100); // Small delay to ensure value is set
+            });
+            
+            // Set minimum dates
+            const today = new Date().toISOString().split('T')[0];
+            $('#quickPickupDate').attr('min', today);
+            $('#quickReturnDate').attr('min', today);
+            
+            // Auto-calculate if dates are already selected
+            setTimeout(() => {
+                if ($('#quickPickupDate').val() && $('#quickReturnDate').val()) {
+                    calculateRentForForm('quick');
+                }
+            }, 200);
+        }
 
-        function calculateRent() {
-            const pickupDate = $('#pickupDate').val();
-            const returnDate = $('#returnDate').val();
-            const carId = $('#selectedCarId').val();
+        function setupDetailedBooking(carId, carData, profileData) {
+            isProfileComplete = false;
+            $('#fullSelectedCarId').val(carId);
+            
+            const carDetails = `
+                <div class="card">
+                    <img src="${carData.imageUrl || '/images/default-car.jpg'}" class="card-img-top" alt="${carData.carName}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">${carData.carName}</h5>
+                        <p><strong>Brand:</strong> ${carData.brand}</p>
+                        <p><strong>Type:</strong> ${carData.carType}</p>
+                        <p><strong>Rent per Day:</strong> ₹${carData.rentPerDay}</p>
+                        <p><strong>Per KM Rate:</strong> ₹${carData.perKmRate}</p>
+                    </div>
+                </div>
+            `;
+            $('#fullSelectedCarDetails').html(carDetails);
+            
+            // Pre-fill existing data if available
+            if (profileData.existingData) {
+                $('#customerNIC').val(profileData.existingData.nic);
+                $('#customerPhone').val(profileData.existingData.phone);
+                $('#customerAddress').val(profileData.existingData.address);
+                $('#fullLicenseNumber').val(profileData.existingData.licenseNumber);
+                
+                // Hide fields that are already complete
+                if (!profileData.missingFields.nic) $('#nicField').hide();
+                if (!profileData.missingFields.phone) $('#phoneField').hide();
+                if (!profileData.missingFields.address) $('#addressField').hide();
+            }
+            
+            $('#detailedBookingForm').show();
+            
+            // Setup date change handlers for full form with immediate calculation
+            $('#fullPickupDate, #fullReturnDate').off('change input').on('change input', function() {
+                setTimeout(() => calculateRentForForm('full'), 100); // Small delay to ensure value is set
+            });
+            
+            // Set minimum dates
+            const today = new Date().toISOString().split('T')[0];
+            $('#fullPickupDate').attr('min', today);
+            $('#fullReturnDate').attr('min', today);
+            
+            // Auto-calculate if dates are already selected
+            setTimeout(() => {
+                if ($('#fullPickupDate').val() && $('#fullReturnDate').val()) {
+                    calculateRentForForm('full');
+                }
+            }, 200);
+        }
 
-            if (pickupDate && returnDate && carId) {
-                $.get('@Url.Action("CalculateRent", "Booking")', {
-                    carId: carId,
-                    pickupDate: pickupDate,
-                    returnDate: returnDate
-                }, function(data) {
-                    if (data.success) {
-                        $('#totalDays').text(data.totalDays);
-                        $('#totalRent').text(data.totalCost);
-                        $('#advancePayment').text(data.advancePayment);
+        function calculateRentForForm(formType) {
+            const prefix = formType === 'quick' ? 'quick' : 'full';
+            const pickupDate = $(`#${prefix}PickupDate`).val();
+            const returnDate = $(`#${prefix}ReturnDate`).val();
+            const carId = $(`#${prefix}SelectedCarId`).val();
+
+            console.log(`Calculating rent for ${formType}:`, { pickupDate, returnDate, carId });
+
+            if (!pickupDate || !returnDate || !carId) {
+                console.log('Missing required fields for calculation');
+                return;
+            }
+
+            // Validate dates on client side first
+            const pickup = new Date(pickupDate);
+            const returnD = new Date(returnDate);
+            
+            if (pickup >= returnD) {
+                console.log('Invalid date range: pickup >= return');
+                $(`#${prefix}TotalDays`).text('0');
+                $(`#${prefix}TotalRent`).text('0');
+                $(`#${prefix}AdvancePayment`).text('0');
+                return;
+            }
+            
+            // Calculate days manually for immediate display
+            const timeDiff = returnD.getTime() - pickup.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            console.log(`Calculated days: ${daysDiff}`);
+            
+            // Immediate client-side calculation
+            if (selectedCarData && selectedCarData.rentPerDay) {
+                const totalCost = daysDiff * selectedCarData.rentPerDay;
+                const advancePayment = totalCost * 0.5;
+                $(`#${prefix}TotalDays`).text(daysDiff);
+                $(`#${prefix}TotalRent`).text(totalCost.toFixed(2));
+                $(`#${prefix}AdvancePayment`).text(advancePayment.toFixed(2));
+            }
+            
+            // Get server calculation for accuracy
+            $.get('@Url.Action("CalculateRent", "Booking")', {
+                carId: carId,
+                pickupDate: pickupDate,
+                returnDate: returnDate
+            }, function(data) {
+                console.log('Server calculation response:', data);
+                if (data.success) {
+                    $(`#${prefix}TotalDays`).text(data.totalDays);
+                    $(`#${prefix}TotalRent`).text(data.totalCost.toFixed(2));
+                    $(`#${prefix}AdvancePayment`).text(data.advancePayment.toFixed(2));
+                } else {
+                    console.log('Server calculation failed:', data.message);
+                }
+            }).fail(function(xhr, status, error) {
+                console.error('Server calculation request failed:', { xhr, status, error });
+                // Keep client-side calculation if server fails
+            });
+        }
+
+        function confirmBooking() {
+            if (isProfileComplete) {
+                // Use streamlined booking for complete profiles
+                const bookingData = {
+                    CarID: $('#quickSelectedCarId').val(),
+                    PickupDate: $('#quickPickupDate').val(),
+                    ReturnDate: $('#quickReturnDate').val()
+                };
+                
+                $.ajax({
+                    url: '@Url.Action("CreateStreamlinedBooking", "Booking")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(bookingData),
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#bookingModal').modal('hide');
+                            if (response.redirectUrl) {
+                                window.location.href = response.redirectUrl;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while processing your booking.');
+                    }
+                });
+            } else {
+                // Use detailed booking for incomplete profiles
+                const formData = new FormData($('#fullBookingForm')[0]);
+                
+                $.ajax({
+                    url: '@Url.Action("CreateBooking", "Booking")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#bookingModal').modal('hide');
+                            if (response.redirectUrl) {
+                                window.location.href = response.redirectUrl;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while processing your booking.');
                     }
                 });
             }
         }
 
-        function confirmBooking() {
-            const formData = new FormData($('#bookingForm')[0]);
-            
-            $.ajax({
-                url: '@Url.Action("CreateBooking", "Booking")',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        $('#bookingModal').modal('hide');
-                        if (response.redirectUrl) {
-                            window.location.href = response.redirectUrl;
-                        } else {
-                            location.reload();
-                        }
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function() {
-                    alert('An error occurred while processing your booking.');
-                }
-            });
-        }
-
         // Set minimum date to today
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('pickupDate').setAttribute('min', today);
-            document.getElementById('returnDate').setAttribute('min', today);
+            document.getElementById('quickPickupDate')?.setAttribute('min', today);
+            document.getElementById('quickReturnDate')?.setAttribute('min', today);
+            document.getElementById('fullPickupDate')?.setAttribute('min', today);
+            document.getElementById('fullReturnDate')?.setAttribute('min', today);
         });
     </script>
 }

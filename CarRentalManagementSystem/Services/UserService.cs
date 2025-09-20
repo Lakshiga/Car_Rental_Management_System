@@ -127,7 +127,39 @@ namespace CarRentalManagementSystem.Services
                 customer.Email = customerDto.Email;
                 customer.PhoneNo = customerDto.Phone;
                 customer.Address = customerDto.Address;
+                customer.NIC = customerDto.NIC;
+                customer.LicenseNo = customerDto.LicenseNo;
                 customer.ImageUrl = customerDto.ImageUrl;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCustomerProfileAsync(int customerId, CustomerProfileUpdateDTO profileData)
+        {
+            try
+            {
+                var customer = await _context.Customers.FindAsync(customerId);
+                if (customer == null)
+                    return false;
+
+                // Update only the provided fields
+                if (!string.IsNullOrEmpty(profileData.NIC))
+                    customer.NIC = profileData.NIC;
+                    
+                if (!string.IsNullOrEmpty(profileData.Phone))
+                    customer.PhoneNo = profileData.Phone;
+                    
+                if (!string.IsNullOrEmpty(profileData.Address))
+                    customer.Address = profileData.Address;
+                    
+                if (!string.IsNullOrEmpty(profileData.LicenseNo))
+                    customer.LicenseNo = profileData.LicenseNo;
 
                 await _context.SaveChangesAsync();
                 return true;

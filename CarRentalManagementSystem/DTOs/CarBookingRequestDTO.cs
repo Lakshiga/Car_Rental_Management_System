@@ -23,5 +23,15 @@ namespace CarRentalManagementSystem.DTOs
         public IFormFile? LicenseFrontImage { get; set; }
         
         public IFormFile? LicenseBackImage { get; set; }
+        
+        // Additional fields for profile completion if needed
+        [StringLength(20)]
+        public string? CustomerNIC { get; set; }
+        
+        [StringLength(15)]
+        public string? CustomerPhone { get; set; }
+        
+        [StringLength(500)]
+        public string? CustomerAddress { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<(bool Success, string Token, string Role, int UserId)> LoginAsync(LoginRequestDTO request);
         Task<CustomerResponseDTO?> GetCustomerByUserIdAsync(int userId);
         Task<bool> UpdateCustomerAsync(int customerId, CustomerResponseDTO customer);
+        Task<bool> UpdateCustomerProfileAsync(int customerId, CustomerProfileUpdateDTO profileData);
         Task<User?> GetUserByIdAsync(int userId);
         Task<IEnumerable<CustomerResponseDTO>> GetAllCustomersAsync();
         Task<IEnumerable<StaffResponseDTO>> GetAllStaffAsync();

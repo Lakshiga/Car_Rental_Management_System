@@ -30,21 +30,35 @@ namespace CarRentalManagementSystem.Services
                 if (booking == null)
                     return (false, null);
 
-                // Create Stripe Payment Intent
-                var options = new PaymentIntentCreateOptions
+                // Check if this is a demo/test payment
+                var isDemoPayment = IsDemoPayment(request);
+                
+                string paymentIntentId;
+                
+                if (isDemoPayment)
                 {
-                    Amount = (long)(request.Amount * 100), // Convert to cents
-                    Currency = "inr",
-                    Description = $"Car Rental Payment - Booking #{request.BookingID}",
-                    Metadata = new Dictionary<string, string>
+                    // Handle demo payments without real Stripe integration
+                    paymentIntentId = GenerateDemoPaymentIntent();
+                }
+                else
+                {
+                    // Create real Stripe Payment Intent
+                    var options = new PaymentIntentCreateOptions
                     {
-                        { "booking_id", request.BookingID.ToString() },
-                        { "payment_type", request.PaymentType }
-                    }
-                };
+                        Amount = (long)(request.Amount * 100), // Convert to cents
+                        Currency = "inr",
+                        Description = $"Car Rental Payment - Booking #{request.BookingID}",
+                        Metadata = new Dictionary<string, string>
+                        {
+                            { "booking_id", request.BookingID.ToString() },
+                            { "payment_type", request.PaymentType }
+                        }
+                    };
 
-                var service = new PaymentIntentService();
-                var paymentIntent = await service.CreateAsync(options);
+                    var service = new PaymentIntentService();
+                    var paymentIntent = await service.CreateAsync(options);
+                    paymentIntentId = paymentIntent.Id;
+                }
 
                 // Save payment record
                 var payment = new Payment
@@ -53,20 +67,41 @@ namespace CarRentalManagementSystem.Services
                     AmountPaid = request.Amount,
                     PaymentDate = DateTime.Now,
                     PaymentType = request.PaymentType,
-                    PaymentStatus = "Pending",
-                    StripePaymentIntentId = paymentIntent.Id
+                    PaymentStatus = isDemoPayment ? "Paid" : "Pending",
+                    StripePaymentIntentId = paymentIntentId
                 };
 
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
+                
+                // For demo payments, automatically update booking status
+                if (isDemoPayment)
+                {
+                    booking.Status = "Confirmed";
+                    await _context.SaveChangesAsync();
+                }
 
-                return (true, paymentIntent.Id);
+                return (true, paymentIntentId);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Payment Error: {ex.Message}");
                 return (false, null);
             }
+        }
+        
+        private bool IsDemoPayment(PaymentRequestDTO request)
+        {
+            // Check if using demo card numbers or test environment
+            var demoCardNumbers = new[] { "4242424242424242", "4000000000000002", "5555555555554444" };
+            return demoCardNumbers.Contains(request.CardNumber?.Replace(" ", "")) || 
+                   request.CardNumber?.StartsWith("4242") == true ||
+                   string.IsNullOrEmpty(request.CardNumber); // Assume demo if no card provided
+        }
+        
+        private string GenerateDemoPaymentIntent()
+        {
+            return $"pi_demo_{Guid.NewGuid():N}";
         }
 
         public async Task<IEnumerable<PaymentResponseDTO>> GetPaymentsByBookingAsync(int bookingId)
@@ -101,20 +136,34 @@ namespace CarRentalManagementSystem.Services
             try
             {
                 var payment = await _context.Payments
+                    .Include(p => p.Booking)
                     .FirstOrDefaultAsync(p => p.StripePaymentIntentId == paymentIntentId);
 
                 if (payment == null)
                     return false;
 
-                // Verify payment with Stripe
-                var service = new PaymentIntentService();
-                var paymentIntent = await service.GetAsync(paymentIntentId);
-
-                if (paymentIntent.Status == "succeeded")
+                // Check if this is a demo payment
+                if (paymentIntentId.StartsWith("pi_demo_"))
                 {
+                    // For demo payments, automatically confirm
                     payment.PaymentStatus = "Paid";
+                    payment.Booking.Status = "Confirmed";
                     await _context.SaveChangesAsync();
                     return true;
+                }
+                else
+                {
+                    // Verify payment with Stripe for real payments
+                    var service = new PaymentIntentService();
+                    var paymentIntent = await service.GetAsync(paymentIntentId);
+
+                    if (paymentIntent.Status == "succeeded")
+                    {
+                        payment.PaymentStatus = "Paid";
+                        payment.Booking.Status = "Confirmed";
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
                 }
 
                 return false;
