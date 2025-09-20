@@ -1,0 +1,68 @@
+@model CarRentalManagementSystem.DTOs.PaymentResponseDTO
+
+<div class="modal-header">
+    <h4 class="modal-title">Payment Details</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Payment ID:</strong></div>
+                        <div class="col-sm-8">#@Model.PaymentID</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Booking ID:</strong></div>
+                        <div class="col-sm-8">#@Model.BookingID</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Customer:</strong></div>
+                        <div class="col-sm-8">@Model.CustomerName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Amount Paid:</strong></div>
+                        <div class="col-sm-8">$@Model.Amount.ToString("F2")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Payment Method:</strong></div>
+                        <div class="col-sm-8">@Model.PaymentMethod</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Status:</strong></div>
+                        <div class="col-sm-8">
+                            @if (Model.Status == "Completed")
+                            {
+                                <span class="badge bg-success">@Model.Status</span>
+                            }
+                            else if (Model.Status == "Failed")
+                            {
+                                <span class="badge bg-danger">@Model.Status</span>
+                            }
+                            else if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning">@Model.Status</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@Model.Status</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Payment Date:</strong></div>
+                        <div class="col-sm-8">@Model.PaymentDate.ToString("MMM dd, yyyy hh:mm tt")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Stripe Payment ID:</strong></div>
+                        <div class="col-sm-8">@Model.StripePaymentIntentId</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

@@ -127,7 +127,10 @@ namespace CarRentalManagementSystem.Services
 
         public async Task<PaymentResponseDTO?> GetPaymentByIdAsync(int paymentId)
         {
-            var payment = await _context.Payments.FindAsync(paymentId);
+            var payment = await _context.Payments
+                .Include(p => p.Booking)
+                .ThenInclude(b => b.Customer)
+                .FirstOrDefaultAsync(p => p.PaymentID == paymentId);
             return payment != null ? MapToResponseDTO(payment) : null;
         }
 
@@ -184,7 +187,9 @@ namespace CarRentalManagementSystem.Services
                 PaymentDate = payment.PaymentDate,
                 PaymentStatus = payment.PaymentStatus,
                 PaymentType = payment.PaymentType,
-                StripePaymentIntentId = payment.StripePaymentIntentId
+                StripePaymentIntentId = payment.StripePaymentIntentId,
+                CustomerName = payment.Booking?.Customer != null ? 
+                    $"{payment.Booking.Customer.FirstName} {payment.Booking.Customer.LastName}" : string.Empty
             };
         }
     }

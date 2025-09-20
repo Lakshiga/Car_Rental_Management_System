@@ -8,6 +8,7 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<bool> RegisterCustomerAsync(CustomerRegistrationRequestDTO request);
         Task<(bool Success, string Token, string Role, int UserId)> LoginAsync(LoginRequestDTO request);
         Task<CustomerResponseDTO?> GetCustomerByUserIdAsync(int userId);
+        Task<CustomerResponseDTO?> GetCustomerByIdAsync(int customerId);
         Task<bool> UpdateCustomerAsync(int customerId, CustomerResponseDTO customer);
         Task<bool> UpdateCustomerProfileAsync(int customerId, CustomerProfileUpdateDTO profileData);
         Task<User?> GetUserByIdAsync(int userId);

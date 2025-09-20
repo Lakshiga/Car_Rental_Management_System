@@ -104,9 +104,31 @@
     </div>
 </div>
 
+<!-- Customer Details Modal -->
+<div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="customerDetailsContent">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function viewCustomerDetails(customerId) {
-        // Implementation for viewing customer details
-        alert('Customer details view functionality to be implemented for customer: ' + customerId);
+        $.get('@Url.Action("CustomerDetails", "Admin")/' + customerId, function(data) {
+            $('#customerDetailsContent').html(data);
+            $('#customerDetailsModal').modal('show');
+        }).fail(function() {
+            alert('Failed to load customer details.');
+        });
     }
 </script>

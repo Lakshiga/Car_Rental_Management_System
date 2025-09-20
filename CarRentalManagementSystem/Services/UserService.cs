@@ -113,6 +113,29 @@ namespace CarRentalManagementSystem.Services
             };
         }
 
+        public async Task<CustomerResponseDTO?> GetCustomerByIdAsync(int customerId)
+        {
+            var customer = await _context.Customers
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.CustomerID == customerId);
+
+            if (customer == null)
+                return null;
+
+            return new CustomerResponseDTO
+            {
+                CustomerID = customer.CustomerID,
+                FullName = $"{customer.FirstName} {customer.LastName}",
+                Email = customer.Email,
+                Phone = customer.PhoneNo,
+                ImageUrl = customer.ImageUrl,
+                Role = customer.User.Role,
+                NIC = customer.NIC,
+                LicenseNo = customer.LicenseNo,
+                Address = customer.Address
+            };
+        }
+
         public async Task<bool> UpdateCustomerAsync(int customerId, CustomerResponseDTO customerDto)
         {
             try

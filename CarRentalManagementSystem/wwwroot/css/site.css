@@ -21,6 +21,7 @@ body {
   margin: 0;
   background-color: var(--customer-secondary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-top: 56px; /* Account for fixed navbar */
 }
 
 .hero-section {
@@ -161,8 +162,15 @@ footer .container { max-width: 1140px; }
 }
 
 .admin-sidebar {
+  position: fixed;
+  top: 56px;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
   min-height: calc(100vh - 56px);
   background-color: #343a40;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
 .admin-sidebar .nav-link {
@@ -179,6 +187,15 @@ footer .container { max-width: 1140px; }
 
 .admin-sidebar .nav-link i {
   margin-right: 0.5rem;
+}
+
+/* Main content area */
+main.col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
+  margin-top: 56px;
+  margin-left: auto !important;
+  padding-top: 1rem;
+  overflow-y: auto;
+  height: calc(100vh - 56px);
 }
 
 .stats-card {
