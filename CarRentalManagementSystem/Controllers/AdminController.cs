@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using CarRentalManagementSystem.Services.Interfaces;
 using CarRentalManagementSystem.Models;
 using CarRentalManagementSystem.Enums;
+using CarRentalManagementSystem.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalManagementSystem.Controllers
 {
@@ -11,17 +13,20 @@ namespace CarRentalManagementSystem.Controllers
         private readonly IBookingService _bookingService;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly ApplicationDbContext _context;
 
         public AdminController(
             ICarService carService,
             IBookingService bookingService,
             IUserService userService,
-            IEmailService emailService)
+            IEmailService emailService,
+            ApplicationDbContext context)
         {
             _carService = carService;
             _bookingService = bookingService;
             _userService = userService;
             _emailService = emailService;
+            _context = context;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -376,7 +381,7 @@ namespace CarRentalManagementSystem.Controllers
         public async Task<IActionResult> Staff()
         {
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (userRole != "Admin" && userRole != "Staff")
                 return RedirectToAction("Login", "Account");
 
             var staff = await _userService.GetAllStaffAsync();
@@ -492,6 +497,114 @@ namespace CarRentalManagementSystem.Controllers
                 return NotFound();
 
             return PartialView("~/Views/Admin/PreviewBooking.cshtml", booking);
+        }
+
+        // Add the missing staff management methods here
+        [HttpGet]
+        public async Task<IActionResult> GetStaff(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                // Get staff by staff ID, not user ID
+                var staff = await _context.Staff
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.StaffID == id);
+                    
+                if (staff == null)
+                    return Json(new { success = false, message = "Staff member not found." });
+
+                return Json(new { 
+                    success = true, 
+                    staff = new {
+                        staffID = staff.StaffID,
+                        firstName = staff.FirstName,
+                        lastName = staff.LastName,
+                        email = staff.Email,
+                        phoneNo = staff.PhoneNumber ?? ""
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Failed to retrieve staff details." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStaff([FromBody] DTOs.StaffResponseDTO request)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data provided." });
+            }
+
+            try
+            {
+                var result = await _userService.UpdateStaffProfileAsync(request.StaffID, request);
+                
+                if (result)
+                {
+                    return Json(new { success = true, message = "Staff member updated successfully!" });
+                }
+                
+                return Json(new { success = false, message = "Failed to update staff member." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while updating the staff member." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteStaff(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                // First get the staff member to ensure they exist
+                var staff = await _context.Staff
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.StaffID == id);
+
+                if (staff == null)
+                    return Json(new { success = false, message = "Staff member not found." });
+
+                // Prevent deletion of admin users
+                if (staff.User.Role == "Admin")
+                    return Json(new { success = false, message = "Cannot delete admin users." });
+
+                // Delete the user and staff records
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.Users.Remove(staff.User);
+                    _context.Staff.Remove(staff);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return Json(new { success = true, message = "Staff member deleted successfully!" });
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    return Json(new { success = false, message = "Failed to delete staff member." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while deleting the staff member." });
+            }
         }
     }
 }

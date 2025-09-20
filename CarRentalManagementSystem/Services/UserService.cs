@@ -297,6 +297,7 @@ namespace CarRentalManagementSystem.Services
                 await transaction.RollbackAsync();
                 // Log the error for debugging
                 Console.WriteLine($"Error registering staff: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
             }
         }
