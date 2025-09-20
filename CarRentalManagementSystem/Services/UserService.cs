@@ -34,7 +34,7 @@ namespace CarRentalManagementSystem.Services
                     return false;
 
                 var existingCustomer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.Email == request.Email || c.NIC == request.NIC);
+                    .FirstOrDefaultAsync(c => c.Email == request.Email);
                 
                 if (existingCustomer != null)
                     return false;
@@ -56,11 +56,8 @@ namespace CarRentalManagementSystem.Services
                     UserID = user.UserID,
                     FirstName = request.FirstName,
                     LastName = request.LastName,
-                    Email = request.Email,
-                    NIC = request.NIC,
-                    LicenseNo = request.LicenseNo,
-                    PhoneNo = request.Phone,
-                    Address = request.Address
+                    Email = request.Email
+                    // NIC, LicenseNo, PhoneNo, and Address will be collected later through profile update
                 };
 
                 _context.Customers.Add(customer);
