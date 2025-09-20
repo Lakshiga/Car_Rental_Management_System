@@ -91,8 +91,8 @@
         @if (Model.Any())
         {
             <div class="table-responsive">
-                <table class="table table-bordered" id="rentsTable" width="100%" cellspacing="0">
-                    <thead>
+                <table class="table table-bordered table-hover" id="rentsTable" width="100%" cellspacing="0">
+                    <thead class="table-dark">
                         <tr>
                             <th>Rent ID</th>
                             <th>Customer</th>
@@ -110,21 +110,21 @@
                         @foreach (var rent in Model)
                         {
                             <tr>
-                                <td>#@rent.RentID</td>
-                                <td>@rent.BookingDetails?.CustomerName</td>
-                                <td>
+                                <td class="align-middle">#@rent.RentID</td>
+                                <td class="align-middle">@rent.BookingDetails?.CustomerName</td>
+                                <td class="align-middle">
                                     <div class="d-flex align-items-center">
                                         <img src="@(rent.BookingDetails?.CarDetails?.ImageUrl ?? "/images/default-car.jpg")" 
-                                             alt="@rent.BookingDetails?.CarDetails?.CarName" class="car-image me-2">
+                                             alt="@rent.BookingDetails?.CarDetails?.CarName" class="car-image me-2" style="width: 50px; height: 40px; object-fit: cover; border-radius: 4px;">
                                         <div>
                                             <div class="fw-bold">@rent.BookingDetails?.CarDetails?.CarName</div>
                                             <small class="text-muted">@rent.BookingDetails?.CarDetails?.NumberPlate</small>
                                         </div>
                                     </div>
                                 </td>
-                                <td>@rent.RentDate.ToString("MMM dd, yyyy")</td>
-                                <td>@rent.OdometerStart km</td>
-                                <td>
+                                <td class="align-middle">@rent.RentDate.ToString("MMM dd, yyyy")</td>
+                                <td class="align-middle">@rent.OdometerStart km</td>
+                                <td class="align-middle">
                                     @if (rent.ActualReturnDate.HasValue)
                                     {
                                         @rent.ActualReturnDate.Value.ToString("MMM dd, yyyy")
@@ -134,7 +134,7 @@
                                         <span class="text-muted">Not returned</span>
                                     }
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     @if (rent.OdometerEnd.HasValue)
                                     {
                                         @($"{rent.OdometerEnd.Value} km")
@@ -144,7 +144,7 @@
                                         <span class="text-muted">-</span>
                                     }
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     @if (rent.IsReturned)
                                     {
                                         <span class="badge bg-success">Returned</span>
@@ -154,7 +154,7 @@
                                         <span class="badge bg-warning">Active</span>
                                     }
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     @if (rent.ExtraCharges.HasValue)
                                     {
                                         @($"₹{rent.ExtraCharges.Value}")
@@ -164,7 +164,7 @@
                                         <span class="text-muted">-</span>
                                     }
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     <div class="btn-group" role="group">
                                         <a href="@Url.Action("Details", new { id = rent.RentID })" 
                                            class="btn btn-sm btn-outline-info">

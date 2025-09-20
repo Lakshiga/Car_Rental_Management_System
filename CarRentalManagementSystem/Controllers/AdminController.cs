@@ -223,6 +223,20 @@ namespace CarRentalManagementSystem.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CustomerDetails(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var customer = await _userService.GetCustomerByIdAsync(id);
+            if (customer == null)
+                return NotFound();
+
+            return PartialView("~/Views/Admin/_CustomerDetailsPartial.cshtml", customer);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Profile(DTOs.CustomerResponseDTO model, IFormFile? imageFile)
         {

@@ -1,0 +1,65 @@
+@model CarRentalManagementSystem.DTOs.CustomerResponseDTO
+
+<div class="row">
+    <div class="col-md-4 text-center">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="@Model.FullName" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #e3f2fd;">
+        }
+        else
+        {
+            <div class="bg-gradient-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px; background: linear-gradient(45deg, #2196F3, #21CBF3);">
+                <i class="fas fa-user text-white" style="font-size: 4rem;"></i>
+            </div>
+        }
+        <h4>@Model.FullName</h4>
+        <p class="text-muted">@Model.Role</p>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Customer ID:</label>
+                            <p class="form-control-plaintext">#@Model.CustomerID</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Full Name:</label>
+                            <p class="form-control-plaintext">@Model.FullName</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email:</label>
+                            <p class="form-control-plaintext">@Model.Email</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone:</label>
+                            <p class="form-control-plaintext">@(string.IsNullOrEmpty(Model.Phone) ? "Not provided" : Model.Phone)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">NIC:</label>
+                            <p class="form-control-plaintext">@(string.IsNullOrEmpty(Model.NIC) ? "Not provided" : Model.NIC)</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">License Number:</label>
+                            <p class="form-control-plaintext">@(string.IsNullOrEmpty(Model.LicenseNo) ? "Not provided" : Model.LicenseNo)</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Address:</label>
+                            <p class="form-control-plaintext">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Role:</label>
+                            <p class="form-control-plaintext">@Model.Role</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

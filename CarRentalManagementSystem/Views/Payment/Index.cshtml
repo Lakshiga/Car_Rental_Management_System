@@ -24,7 +24,7 @@
                 <div class="col-md-3">
                     <div class="card text-center bg-success text-white">
                         <div class="card-body">
-                            <h4>$@Model.Where(p => p.PaymentStatus == "Completed").Sum(p => p.AmountPaid).ToString("F2")</h4>
+                            <h4>$@Model.Where(p => p.PaymentStatus == "Paid").Sum(p => p.AmountPaid).ToString("F2")</h4>
                             <p class="mb-0">Total Revenue</p>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
                 <div class="col-md-3">
                     <div class="card text-center bg-primary text-white">
                         <div class="card-body">
-                            <h4>@Model.Count(p => p.PaymentStatus == "Completed")</h4>
+                            <h4>@Model.Count(p => p.PaymentStatus == "Paid")</h4>
                             <p class="mb-0">Completed Payments</p>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle" id="paymentsTable">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Payment ID</th>
@@ -131,9 +131,23 @@
     </div>
 </div>
 
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="paymentDetailsContent">
+            <!-- Content will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
 <script>
     function viewPaymentDetails(paymentId) {
-        alert('Payment details view functionality to be implemented for payment: ' + paymentId);
+        $.get('/Payment/PaymentDetails/' + paymentId, function(data) {
+            $('#paymentDetailsContent').html(data);
+            $('#paymentDetailsModal').modal('show');
+        }).fail(function() {
+            alert('Error loading payment details.');
+        });
     }
     
     function downloadReceipt(paymentId) {
@@ -148,3 +162,20 @@
         alert('Filter payments functionality to be implemented');
     }
 </script>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <script>
+        $(document).ready(function() {
+            $('#paymentsTable').DataTable({
+                "pageLength": 5,
+                "order": [[0, "desc"]],
+                "columnDefs": [
+                    { "orderable": false, "targets": [7] }
+                ]
+            });
+        });
+    </script>
+}

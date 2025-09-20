@@ -113,5 +113,19 @@ namespace CarRentalManagementSystem.Controllers
 
             return View(payments);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> PaymentDetails(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return RedirectToAction("Login", "Account");
+
+            var payment = await _paymentService.GetPaymentByIdAsync(id);
+            if (payment == null)
+                return NotFound();
+
+            return PartialView("~/Views/Payment/_PaymentDetailsPartial.cshtml", payment);
+        }
     }
 }
