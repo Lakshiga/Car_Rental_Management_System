@@ -259,5 +259,28 @@ namespace CarRentalManagementSystem.Controllers
 
             return View(booking);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> Receipt(int id)
+        {
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+                return NotFound();
+
+            // Check if user owns this booking or is admin/staff
+            var userRole = HttpContext.Session.GetString("UserRole");
+            var customerIdString = HttpContext.Session.GetString("CustomerId");
+            
+            if (userRole != "Admin" && userRole != "Staff")
+            {
+                if (string.IsNullOrEmpty(customerIdString) || 
+                    booking.CustomerName != HttpContext.Session.GetString("CustomerName"))
+                {
+                    return Forbid();
+                }
+            }
+
+            return View(booking);
+        }
     }
 }

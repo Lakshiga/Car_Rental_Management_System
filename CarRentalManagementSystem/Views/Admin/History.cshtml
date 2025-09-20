@@ -12,7 +12,7 @@
                 <button class="btn btn-outline-secondary" onclick="exportHistory()">
                     <i class="fas fa-download me-1"></i>Export
                 </button>
-                <button class="btn btn-outline-secondary" onclick="filterHistory()">
+                <button class="btn btn-outline-secondary" onclick="showFilterModal()">
                     <i class="fas fa-filter me-1"></i>Filter
                 </button>
             </div>
@@ -23,7 +23,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle" id="bookingHistoryTable">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Booking ID</th>
@@ -36,10 +36,14 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="bookingTableBody">
                                 @foreach (var booking in Model)
                                 {
-                                    <tr>
+                                    <tr data-booking-id="@booking.BookingID" 
+                                        data-customer-name="@booking.CustomerName" 
+                                        data-car-name="@booking.CarDetails.CarName" 
+                                        data-booking-date="@booking.CreatedAt.ToString("yyyy-MM-dd")"
+                                        data-status="@booking.Status">
                                         <td><strong>#@booking.BookingID</strong></td>
                                         <td>@booking.CustomerName</td>
                                         <td>@booking.CarDetails.CarName</td>
@@ -70,7 +74,7 @@
                                                 <button class="btn btn-sm btn-outline-primary" onclick="viewBookingDetails(@booking.BookingID)">
                                                     <i class="fas fa-eye"></i> View
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="downloadReceipt(@booking.BookingID)">
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="printReceipt(@booking.BookingID)">
                                                     <i class="fas fa-receipt"></i> Receipt
                                                 </button>
                                             </div>
@@ -94,20 +98,166 @@
     </div>
 </div>
 
+<!-- Booking Details Modal -->
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bookingDetailsContent">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Bookings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label for="customerNameFilter" class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" id="customerNameFilter" placeholder="Enter customer name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateFilter" class="form-label">Booking Date</label>
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="Returned">Returned</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="carNameFilter" class="form-label">Car Name</label>
+                        <input type="text" class="form-control" id="carNameFilter" placeholder="Enter car name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    // View booking details in modal
     function viewBookingDetails(bookingId) {
-        window.location.href = '@Url.Action("Details", "Booking")/' + bookingId;
+        $.get('@Url.Action("PreviewBookingPartial", "Admin")/' + bookingId, function(data) {
+            $('#bookingDetailsContent').html(data);
+            $('#bookingDetailsModal').modal('show');
+        }).fail(function() {
+            alert('Failed to load booking details.');
+        });
     }
     
-    function downloadReceipt(bookingId) {
-        alert('Download receipt functionality to be implemented for booking: ' + bookingId);
+    // Print receipt for booking
+    function printReceipt(bookingId) {
+        // Open the receipt view in a new window for printing
+        var receiptUrl = '@Url.Action("Receipt", "Booking")/' + bookingId;
+        var printWindow = window.open(receiptUrl, '_blank');
+        printWindow.focus();
     }
     
+    // Export/Explore functionality
     function exportHistory() {
-        alert('Export history functionality to be implemented');
+        // Get visible rows (filtered data)
+        var visibleRows = $('#bookingTableBody tr:visible');
+        if (visibleRows.length === 0) {
+            alert('No data to export.');
+            return;
+        }
+        
+        // Create CSV content
+        var csvContent = "Booking ID,Customer,Car,Booking Date,Rental Period,Status,Total Cost\n";
+        visibleRows.each(function() {
+            var row = $(this);
+            var bookingId = row.find('td:eq(0)').text().replace('#', '');
+            var customer = row.find('td:eq(1)').text();
+            var car = row.find('td:eq(2)').text();
+            var bookingDate = row.find('td:eq(3)').text();
+            var rentalPeriod = row.find('td:eq(4)').text().replace(/\s+/g, ' ').trim();
+            var status = row.find('.badge').text();
+            var totalCost = row.find('td:eq(6)').text().replace('$', '');
+            
+            csvContent += `"${bookingId}","${customer}","${car}","${bookingDate}","${rentalPeriod}","${status}","${totalCost}"\n`;
+        });
+        
+        // Create blob and download
+        var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "booking_history.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     
-    function filterHistory() {
-        alert('Filter history functionality to be implemented');
+    // Show filter modal
+    function showFilterModal() {
+        $('#filterModal').modal('show');
+    }
+    
+    // Apply filters
+    function applyFilters() {
+        var customerName = $('#customerNameFilter').val().toLowerCase();
+        var date = $('#dateFilter').val();
+        var status = $('#statusFilter').val();
+        var carName = $('#carNameFilter').val().toLowerCase();
+        
+        $('#bookingTableBody tr').each(function() {
+            var row = $(this);
+            var rowCustomerName = row.data('customer-name').toLowerCase();
+            var rowDate = row.data('booking-date');
+            var rowStatus = row.data('status');
+            var rowCarName = row.data('car-name').toLowerCase();
+            
+            var showRow = true;
+            
+            if (customerName && !rowCustomerName.includes(customerName)) {
+                showRow = false;
+            }
+            
+            if (date && rowDate !== date) {
+                showRow = false;
+            }
+            
+            if (status && rowStatus !== status) {
+                showRow = false;
+            }
+            
+            if (carName && !rowCarName.includes(carName)) {
+                showRow = false;
+            }
+            
+            row.toggle(showRow);
+        });
+        
+        $('#filterModal').modal('hide');
+    }
+    
+    // Clear filters
+    function clearFilters() {
+        $('#filterForm')[0].reset();
+        $('#bookingTableBody tr').show();
     }
 </script>

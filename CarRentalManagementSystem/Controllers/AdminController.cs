@@ -465,5 +465,19 @@ namespace CarRentalManagementSystem.Controllers
             ViewBag.UserRole = userRole;
             return View(completedBookings);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> PreviewBookingPartial(int id)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Unauthorized();
+
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+                return NotFound();
+
+            return PartialView("~/Views/Admin/PreviewBooking.cshtml", booking);
+        }
     }
 }

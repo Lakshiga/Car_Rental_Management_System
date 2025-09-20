@@ -1,0 +1,185 @@
+@model CarRentalManagementSystem.DTOs.BookingResponseDTO
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Booking Receipt - #@Model.BookingID</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .receipt-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .header p {
+            color: #6c757d;
+            margin: 5px 0 0;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #007bff;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 200px;
+            color: #495057;
+        }
+        .info-value {
+            flex: 1;
+            color: #212529;
+        }
+        .total-section {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        @@media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .receipt-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="receipt-container">
+        <div class="header">
+            <h1>Car Rental Receipt</h1>
+            <p>Booking ID: #@Model.BookingID</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Customer Information</div>
+            <div class="info-row">
+                <div class="info-label">Customer Name:</div>
+                <div class="info-value">@Model.CustomerName</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">NIC Number:</div>
+                <div class="info-value">@Model.NICNumber</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">License Number:</div>
+                <div class="info-value">@Model.LicenseNumber</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Booking Details</div>
+            <div class="info-row">
+                <div class="info-label">Booking Date:</div>
+                <div class="info-value">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Pickup Date:</div>
+                <div class="info-value">@Model.PickupDate.ToString("MMMM dd, yyyy")</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Return Date:</div>
+                <div class="info-value">@Model.ReturnDate.ToString("MMMM dd, yyyy")</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Rental Period:</div>
+                <div class="info-value">@((Model.ReturnDate - Model.PickupDate).Days) days</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Status:</div>
+                <div class="info-value">@Model.Status</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Vehicle Information</div>
+            <div class="info-row">
+                <div class="info-label">Car:</div>
+                <div class="info-value">@Model.CarDetails.CarName</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Brand:</div>
+                <div class="info-value">@Model.CarDetails.Brand</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Type:</div>
+                <div class="info-value">@Model.CarDetails.CarType</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Number Plate:</div>
+                <div class="info-value">@Model.CarDetails.NumberPlate</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Payment Summary</div>
+            <div class="info-row">
+                <div class="info-label">Rent Per Day:</div>
+                <div class="info-value">$@Model.CarDetails.RentPerDay.ToString("F2")</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Total Days:</div>
+                <div class="info-value">@((Model.ReturnDate - Model.PickupDate).Days) days</div>
+            </div>
+            <div class="total-section">
+                Total Amount: $@Model.TotalCost.ToString("F2")
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for choosing our car rental service!</p>
+            <p>This is an official receipt. Please keep it for your records.</p>
+        </div>
+    </div>
+
+    <script>
+        // Close window after printing
+        window.onafterprint = function(){
+            window.close();
+        };
+    </script>
+</body>
+</html>
