@@ -118,7 +118,7 @@
 
 <script>
     function viewPaymentDetails(paymentId) {
-        $.get('/Payment/PaymentDetails/' + paymentId, function(data) {
+        $.get('/Payment/CustomerPaymentDetails/' + paymentId, function(data) {
             $('#paymentDetailsContent').html(data);
             $('#paymentDetailsModal').modal('show');
         }).fail(function() {
