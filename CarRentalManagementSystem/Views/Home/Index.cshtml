@@ -3,105 +3,163 @@
     ViewData["Title"] = "Home";
 }
 
-<!-- Hero Section -->
-<div class="hero-section py-5 mb-5">
-    <div class="container">
-        <div class="row align-items-center">
+<!-- Enhanced Hero Section -->
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-accent) 100%); position: relative; overflow: hidden;">
+    <div class="hero-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); z-index: 1;"></div>
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="row align-items-center min-vh-50">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Premium Car Rental Experience</h1>
-                <p class="lead mb-4">Discover luxury and comfort with our premium fleet. Experience seamless booking, exceptional service, and unmatched reliability.</p>
-                <div class="mt-4">
-                    <a href="@Url.Action("BrowseCars")" class="btn btn-light btn-lg me-3 shadow-lg">
-                        <i data-lucide="car" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Explore Our Fleet
-                    </a>
-                    @if (ViewBag.IsLoggedIn != true)
-                    {
-                        <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg shadow">
-                            <i data-lucide="user-plus" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Join Today
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Premium Car Rental Experience
+                    </h1>
+                    <p class="lead mb-4 text-white-50" style="font-size: 1.2rem; line-height: 1.6;">
+                        Discover luxury and comfort with our premium fleet. Experience seamless booking, exceptional service, and unmatched reliability for your next journey.
+                    </p>
+                    <div class="hero-stats mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">500+</h3>
+                                    <p class="text-white-50 mb-0 small">Happy Customers</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">50+</h3>
+                                    <p class="text-white-50 mb-0 small">Premium Cars</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">24/7</h3>
+                                    <p class="text-white-50 mb-0 small">Support</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="@Url.Action("BrowseCars")" class="btn btn-light btn-lg me-3 shadow-lg" style="border-radius: 12px; padding: 12px 30px; font-weight: 600;">
+                            <i data-lucide="car" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Explore Our Fleet
                         </a>
-                    }
+                        @if (ViewBag.IsLoggedIn != true)
+                        {
+                            <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg shadow" style="border-radius: 12px; padding: 12px 30px; font-weight: 600; border-width: 2px;">
+                                <i data-lucide="user-plus" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Join Today
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <img src="~/images/hero-car.jpg" alt="Premium Car Rental" class="img-fluid rounded shadow-lg" style="max-height: 400px; object-fit: cover; border-radius: 16px !important;">
+                <div class="hero-image-container" style="position: relative;">
+                    <img src="~/images/hero-car.jpg" alt="Premium Car Rental" class="img-fluid rounded shadow-lg" 
+                         style="max-height: 500px; object-fit: cover; border-radius: 20px !important; width: 100%;"
+                         onerror="this.src='https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'">
+                    <div class="floating-badge" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <span class="text-primary fw-bold">Premium Fleet</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Features Section -->
+<!-- Enhanced Features Section -->
 <div class="container mb-5">
     <div class="row text-center mb-5">
         <div class="col-12">
-            <h2 class="display-5 fw-bold">Why Choose Us?</h2>
+            <h2 class="display-5 fw-bold" style="color: var(--customer-dark);">Why Choose Us?</h2>
             <p class="lead text-muted">Experience the best car rental service with these amazing features</p>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4 mb-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">Safe & Secure</h5>
-                    <p class="card-text">All our vehicles are regularly maintained and insured for your safety.</p>
+            <div class="card h-100 border-0 shadow-sm customer-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon-wrapper mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--customer-primary), var(--customer-accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-shield-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--customer-dark);">Safe & Secure</h5>
+                    <p class="card-text text-muted">All our vehicles are regularly maintained and insured for your safety and peace of mind.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">Best Prices</h5>
-                    <p class="card-text">Competitive pricing with no hidden fees. Get the best value for your money.</p>
+            <div class="card h-100 border-0 shadow-sm customer-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon-wrapper mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--customer-success), #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-dollar-sign fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--customer-dark);">Best Prices</h5>
+                    <p class="card-text text-muted">Competitive pricing with no hidden fees. Get the best value for your money with transparent rates.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
-                    <h5 class="card-title">24/7 Support</h5>
-                    <p class="card-text">Round-the-clock customer support to assist you whenever you need help.</p>
+            <div class="card h-100 border-0 shadow-sm customer-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon-wrapper mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--customer-info), #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-clock fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--customer-dark);">24/7 Support</h5>
+                    <p class="card-text text-muted">Round-the-clock customer support to assist you whenever you need help, anywhere, anytime.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Available Cars Section -->
+<!-- Enhanced Available Cars Section -->
 <div class="container mb-5">
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="display-6 fw-bold text-center">Available Cars</h2>
-            <p class="text-center text-muted">Choose from our wide range of vehicles</p>
+        <div class="col-12 text-center">
+            <h2 class="display-6 fw-bold" style="color: var(--customer-dark);">Available Cars</h2>
+            <p class="text-muted">Choose from our wide range of premium vehicles</p>
         </div>
     </div>
     <div class="row">
         @foreach (var car in Model.Take(6))
         {
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@(car.ImageUrl ?? "/images/default-car.jpg")" class="card-img-top" alt="@car.CarName" style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">@car.CarName</h5>
-                        <p class="card-text">
-                            <small class="text-muted">@car.Brand • @car.FuelType • @car.SeatingCapacity seats</small>
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="h5 text-primary">₹@car.RentPerDay</span>
-                                <small class="text-muted">/day</small>
-                            </div>
-                            <span class="badge bg-success">@car.AvailabilityStatus</span>
+                <div class="card h-100 shadow-sm customer-card">
+                    <div class="position-relative">
+                        <img src="@(car.ImageUrl ?? "/images/default-car.jpg")" 
+                             class="card-img-top" 
+                             alt="@car.CarName" 
+                             style="height: 220px; object-fit: cover;"
+                             onerror="this.src='https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge @(car.AvailabilityStatus == "Available" ? "bg-success" : "bg-warning text-dark") px-3 py-2" style="border-radius: 20px; font-weight: 600;">
+                                @car.AvailabilityStatus
+                            </span>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="btn-group w-100" role="group">
-                            <button type="button" class="btn btn-outline-primary" onclick="viewCarDetails(@car.CarID)">
-                                <i class="fas fa-eye"></i> View
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-2" style="color: var(--customer-dark);">@car.CarName</h5>
+                        <p class="card-text text-muted mb-3">
+                            <i class="fas fa-tag me-1"></i>@car.Brand • 
+                            <i class="fas fa-gas-pump me-1"></i>@car.FuelType • 
+                            <i class="fas fa-users me-1"></i>@car.SeatingCapacity seats
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="h4 fw-bold" style="color: var(--customer-primary);">₹@car.RentPerDay</span>
+                                <small class="text-muted">/day</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Per KM</small>
+                                <span class="fw-bold" style="color: var(--customer-accent);">₹@car.PerKmRate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-admin-secondary" onclick="viewCarDetails(@car.CarID)">
+                                <i class="fas fa-eye me-2"></i>View Details
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="bookCar(@car.CarID)">
-                                <i class="fas fa-calendar-plus"></i> Book Now
+                            <button type="button" class="btn btn-admin-primary" onclick="bookCar(@car.CarID)" @(car.AvailabilityStatus != "Available" ? "disabled" : "")>
+                                <i class="fas fa-calendar-plus me-2"></i>Book Now
                             </button>
                         </div>
                     </div>
@@ -109,9 +167,9 @@
             </div>
         }
     </div>
-    <div class="text-center">
-        <a href="@Url.Action("BrowseCars")" class="btn btn-primary btn-lg">
-            <i class="fas fa-car"></i> View All Cars
+    <div class="text-center mt-4">
+        <a href="@Url.Action("BrowseCars")" class="btn btn-admin-primary btn-lg px-5 py-3" style="border-radius: 12px;">
+            <i class="fas fa-car me-2"></i>View All Cars
         </a>
     </div>
 </div>

@@ -3,12 +3,15 @@
     Layout = "_AdminLayout";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
+    <div>
+        <h1 class="h2 mb-1" style="color: var(--admin-text); font-weight: 700;">Dashboard Overview</h1>
+        <p class="text-muted mb-0">Welcome back! Here's what's happening with your car rental business.</p>
+    </div>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportRecentActivity()">
-                <i class="fas fa-download"></i> Export
+            <button type="button" class="btn btn-admin-primary" onclick="exportRecentActivity()">
+                <i class="fas fa-download me-2"></i> Export Data
             </button>
         </div>
     </div>
@@ -82,11 +85,13 @@
 </div>
 
 <!-- Charts Row -->
-<div class="row">
+<div class="row mb-4">
     <div class="col-xl-8 col-lg-7">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Bookings Overview</h6>
+        <div class="card admin-card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-line me-2"></i>Bookings Overview
+                </h6>
             </div>
             <div class="card-body">
                 <div class="chart-area">
@@ -97,9 +102,11 @@
     </div>
 
     <div class="col-xl-4 col-lg-5">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Car Status</h6>
+        <div class="card admin-card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-pie me-2"></i>Car Status Distribution
+                </h6>
             </div>
             <div class="card-body">
                 <div class="chart-pie pt-4 pb-2">
@@ -113,43 +120,45 @@
 <!-- Recent Activity -->
 <div class="row">
     <div class="col-12">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
+        <div class="card admin-card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-history me-2"></i>Recent Activity
+                </h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="recentActivityTable" width="100%" cellspacing="0">
+                    <table class="table admin-table" id="recentActivityTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th>Time</th>
-                                <th>Activity</th>
-                                <th>User</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th><i class="fas fa-clock me-1"></i>Time</th>
+                                <th><i class="fas fa-tasks me-1"></i>Activity</th>
+                                <th><i class="fas fa-user me-1"></i>User</th>
+                                <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>2 hours ago</td>
-                                <td>New booking request</td>
+                                <td><span class="text-muted">2 hours ago</span></td>
+                                <td><strong>New booking request</strong></td>
                                 <td>John Doe</td>
-                                <td><span class="badge bg-warning">Pending</span></td>
-                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(1)">View</button></td>
+                                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(1)">View</button></td>
                             </tr>
                             <tr>
-                                <td>4 hours ago</td>
-                                <td>Car returned</td>
+                                <td><span class="text-muted">4 hours ago</span></td>
+                                <td><strong>Car returned</strong></td>
                                 <td>Jane Smith</td>
                                 <td><span class="badge bg-success">Completed</span></td>
-                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(2)">View</button></td>
+                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(2)">View</button></td>
                             </tr>
                             <tr>
-                                <td>1 day ago</td>
-                                <td>New car added</td>
+                                <td><span class="text-muted">1 day ago</span></td>
+                                <td><strong>New car added</strong></td>
                                 <td>Admin</td>
                                 <td><span class="badge bg-info">System</span></td>
-                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(3)">View</button></td>
+                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(3)">View</button></td>
                             </tr>
                         </tbody>
                     </table>
