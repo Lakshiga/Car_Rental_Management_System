@@ -53,6 +53,43 @@
     </div>
 </div>
 
+<!-- Quick Filters -->
+<div class="quick-filters-section">
+    <div class="container">
+        <div class="quick-filters-card">
+            <div class="filters-header">
+                <h6 class="filters-title">
+                    <i data-lucide="zap" class="filters-icon"></i>
+                    Quick Filters
+                </h6>
+                <p class="filters-subtitle">Popular search options</p>
+            </div>
+            <div class="filters-grid">
+                <button class="quick-filter-btn sedan" onclick="quickFilter('carType', 'Sedan')">
+                    <i data-lucide="car" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Sedans Only</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn electric" onclick="quickFilter('fuelType', 'Electric')">
+                    <i data-lucide="zap" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Electric Cars</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn budget" onclick="quickFilter('priceRange', '0-3000')">
+                    <i data-lucide="indian-rupee" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Budget Friendly</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+                <button class="quick-filter-btn family" onclick="quickFilter('seatingCapacity', '7')">
+                    <i data-lucide="users" class="filter-btn-icon"></i>
+                    <span class="filter-btn-text">Family Cars</span>
+                    <div class="filter-btn-bg"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Search and Filter Section -->
 <div class="search-filter-section">
     <div class="container">
@@ -303,43 +340,6 @@
                     </div>
                 </div>
             }
-        </div>
-    </div>
-</div>
-
-<!-- Quick Filters -->
-<div class="quick-filters-section">
-    <div class="container">
-        <div class="quick-filters-card">
-            <div class="filters-header">
-                <h6 class="filters-title">
-                    <i data-lucide="zap" class="filters-icon"></i>
-                    Quick Filters
-                </h6>
-                <p class="filters-subtitle">Popular search options</p>
-            </div>
-            <div class="filters-grid">
-                <button class="quick-filter-btn sedan" onclick="quickFilter('carType', 'Sedan')">
-                    <i data-lucide="car" class="filter-btn-icon"></i>
-                    <span class="filter-btn-text">Sedans Only</span>
-                    <div class="filter-btn-bg"></div>
-                </button>
-                <button class="quick-filter-btn electric" onclick="quickFilter('fuelType', 'Electric')">
-                    <i data-lucide="zap" class="filter-btn-icon"></i>
-                    <span class="filter-btn-text">Electric Cars</span>
-                    <div class="filter-btn-bg"></div>
-                </button>
-                <button class="quick-filter-btn budget" onclick="quickFilter('priceRange', '0-3000')">
-                    <i data-lucide="indian-rupee" class="filter-btn-icon"></i>
-                    <span class="filter-btn-text">Budget Friendly</span>
-                    <div class="filter-btn-bg"></div>
-                </button>
-                <button class="quick-filter-btn family" onclick="quickFilter('seatingCapacity', '7')">
-                    <i data-lucide="users" class="filter-btn-icon"></i>
-                    <span class="filter-btn-text">Family Cars</span>
-                    <div class="filter-btn-bg"></div>
-                </button>
-            </div>
         </div>
     </div>
 </div>

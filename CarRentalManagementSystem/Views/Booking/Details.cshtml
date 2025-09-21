@@ -1,0 +1,247 @@
+@model BookingResponseDTO
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="customer-dashboard">
+    <!-- Page Header -->
+    <div class="customer-page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1><i data-lucide="calendar" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 12px;"></i> Booking Details</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Customer")">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="@Url.Action("MyBookings", "Booking")">My Bookings</a></li>
+                                    <li class="breadcrumb-item active">Details</li>
+                                </ol>
+                            </nav>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-customer-secondary">
+                                <i data-lucide="arrow-left" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Back to Bookings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="customer-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i data-lucide="info" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Booking Information</h5>
+                            <span class="badge @(Model.Status == "Pending" ? "bg-warning" :
+                                                Model.Status == "Confirmed" ? "bg-info" :
+                                                Model.Status == "Approved" ? "bg-success" :
+                                                Model.Status == "Rejected" ? "bg-danger" :
+                                                Model.Status == "Rented" ? "bg-primary" : "bg-secondary")">
+                                @Model.Status
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <h5 class="mb-4">Booking Details</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Booking ID:</strong></div>
+                                    <div class="col-md-8">#@Model.BookingID</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Booking Date:</strong></div>
+                                    <div class="col-md-8">@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Pickup Date:</strong></div>
+                                    <div class="col-md-8">@Model.PickupDate.ToString("MMM dd, yyyy")</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Return Date:</strong></div>
+                                    <div class="col-md-8">@Model.ReturnDate.ToString("MMM dd, yyyy")</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Total Days:</strong></div>
+                                    <div class="col-md-8">@((Model.ReturnDate - Model.PickupDate).Days) days</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Total Cost:</strong></div>
+                                    <div class="col-md-8"><strong class="text-success">₹@Model.TotalCost.ToString("F2")</strong></div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Advance Payment:</strong></div>
+                                    <div class="col-md-8">₹@(Model.TotalCost * 0.5m) (50%)</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Remaining Balance:</strong></div>
+                                    <div class="col-md-8">₹@(Model.TotalCost * 0.5m) (50%)</div>
+                                </div>
+                                
+                                <hr class="my-4">
+                                
+                                <h5 class="mb-4">Customer Information</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Name:</strong></div>
+                                    <div class="col-md-8">@Model.CustomerName</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>NIC Number:</strong></div>
+                                    <div class="col-md-8">@Model.NICNumber</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>License Number:</strong></div>
+                                    <div class="col-md-8">@Model.LicenseNumber</div>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.LicenseFrontImage) || !string.IsNullOrEmpty(Model.LicenseBackImage))
+                                {
+                                    <hr class="my-4">
+                                    
+                                    <h5 class="mb-4">License Images</h5>
+                                    
+                                    <div class="row">
+                                        @if (!string.IsNullOrEmpty(Model.LicenseFrontImage))
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <p class="mb-2"><strong>Front:</strong></p>
+                                                <img src="@Model.LicenseFrontImage" class="img-fluid rounded" alt="License Front" style="max-height: 200px;">
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.LicenseBackImage))
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <p class="mb-2"><strong>Back:</strong></p>
+                                                <img src="@Model.LicenseBackImage" class="img-fluid rounded" alt="License Back" style="max-height: 200px;">
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <h5 class="mb-4">Car Information</h5>
+                                
+                                <div class="text-center mb-4">
+                                    <img src="@(Model.CarDetails.ImageUrl ?? "/images/default-car.jpg")" 
+                                         class="img-fluid rounded" 
+                                         alt="@Model.CarDetails.CarName" 
+                                         style="height: 200px; object-fit: cover;">
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Car Name:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.CarName</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Brand:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.Brand</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Number Plate:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.NumberPlate</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Type:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.CarType</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Fuel Type:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.FuelType</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Seating:</strong></div>
+                                    <div class="col-md-7">@Model.CarDetails.SeatingCapacity persons</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Rent/Day:</strong></div>
+                                    <div class="col-md-7">₹@Model.CarDetails.RentPerDay</div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-5"><strong>Per KM Rate:</strong></div>
+                                    <div class="col-md-7">₹@Model.CarDetails.PerKmRate</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            @if (Model.Status == "Pending")
+                            {
+                                <button type="button" class="btn btn-customer-primary" onclick="confirmRent(@Model.BookingID)">
+                                    <i class="fas fa-check"></i> Confirm Booking
+                                </button>
+                            }
+                            else if (Model.Status == "Confirmed")
+                            {
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Your booking is confirmed and awaiting admin approval.
+                                </div>
+                            }
+                            else if (Model.Status == "Approved")
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i> Your booking is approved! You can now make the payment.
+                                    <a href="@Url.Action("ProcessPayment", "Payment", new { bookingId = Model.BookingID })" class="btn btn-customer-primary btn-sm ms-2">
+                                        <i class="fas fa-credit-card"></i> Pay Now
+                                    </a>
+                                </div>
+                            }
+                            else if (Model.Status == "Rented")
+                            {
+                                <div class="alert alert-primary">
+                                    <i class="fas fa-key"></i> Your car is currently rented. Enjoy your journey!
+                                </div>
+                            }
+                            else if (Model.Status == "Rejected")
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-times-circle"></i> Your booking has been rejected. Please contact support for more information.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmRent(bookingId) {
+        if (confirm('Are you sure you want to confirm this rent? This will notify the admin for approval.')) {
+            $.post('@Url.Action("ConfirmRent", "Customer")', { bookingId: bookingId }, function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+        }
+    }
+</script>

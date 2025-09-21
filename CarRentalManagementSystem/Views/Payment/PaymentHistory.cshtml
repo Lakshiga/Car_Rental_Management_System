@@ -1,0 +1,128 @@
+@model IEnumerable<CarRentalManagementSystem.DTOs.PaymentResponseDTO>
+@{
+    ViewData["Title"] = "Payment History";
+}
+
+<div class="customer-dashboard">
+    <!-- Page Header -->
+    <div class="customer-page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1><i data-lucide="credit-card" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 12px;"></i> Payment History</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Customer")">Dashboard</a></li>
+                                    <li class="breadcrumb-item active">Payment History</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                @if (Model.Any())
+                {
+                    <div class="customer-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i data-lucide="list" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Payment Transactions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="customer-table table">
+                                    <thead>
+                                        <tr>
+                                            <th>Payment ID</th>
+                                            <th>Booking ID</th>
+                                            <th>Amount</th>
+                                            <th>Payment Method</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var payment in Model.OrderByDescending(p => p.PaymentDate))
+                                        {
+                                            <tr>
+                                                <td><strong>#@payment.PaymentID</strong></td>
+                                                <td><a href="@Url.Action("Details", "Booking", new { id = payment.BookingID })" class="text-decoration-none">#@payment.BookingID</a></td>
+                                                <td><strong>₹@payment.Amount.ToString("F2")</strong></td>
+                                                <td>@payment.PaymentMethod</td>
+                                                <td>
+                                                    @if (payment.Status == "Completed")
+                                                    {
+                                                        <span class="badge bg-success">@payment.Status</span>
+                                                    }
+                                                    else if (payment.Status == "Failed")
+                                                    {
+                                                        <span class="badge bg-danger">@payment.Status</span>
+                                                    }
+                                                    else if (payment.Status == "Pending")
+                                                    {
+                                                        <span class="badge bg-warning">@payment.Status</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">@payment.Status</span>
+                                                    }
+                                                </td>
+                                                <td>@payment.PaymentDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                                <td>
+                                                    <button class="btn btn-customer-secondary btn-sm" onclick="viewPaymentDetails(@payment.PaymentID)">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="customer-card">
+                        <div class="card-body text-center py-5">
+                            <i data-lucide="credit-card" style="width: 64px; height: 64px; margin: 0 auto 24px auto; display: block; color: var(--customer-primary);"></i>
+                            <h4 style="color: var(--customer-dark);">No Payment History</h4>
+                            <p class="text-muted mb-4">You haven't made any payments yet. Your payment history will appear here once you make bookings.</p>
+                            <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary">
+                                <i data-lucide="car" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Browse Cars
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="paymentDetailsContent">
+            <!-- Content will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function viewPaymentDetails(paymentId) {
+        $.get('/Payment/PaymentDetails/' + paymentId, function(data) {
+            $('#paymentDetailsContent').html(data);
+            $('#paymentDetailsModal').modal('show');
+        }).fail(function() {
+            alert('Error loading payment details.');
+        });
+    }
+</script>
