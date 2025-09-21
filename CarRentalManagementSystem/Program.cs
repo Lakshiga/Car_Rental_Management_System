@@ -58,6 +58,12 @@ builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IEmailS
 builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IPaymentService, CarRentalManagementSystem.Services.PaymentService>();
 builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IRentService, CarRentalManagementSystem.Services.RentService>();
 
+// Register AI Assistant Services
+builder.Services.AddHttpClient<CarRentalManagementSystem.Services.Interfaces.IAIAssistantService, CarRentalManagementSystem.Services.AIAssistantService>();
+builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IAIAssistantService, CarRentalManagementSystem.Services.AIAssistantService>();
+builder.Services.AddScoped<CarRentalManagementSystem.Services.CarRentalDataFeedService>();
+builder.Services.AddScoped<CarRentalManagementSystem.Services.CarRentalFAQService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
