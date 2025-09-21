@@ -64,7 +64,7 @@ namespace CarRentalManagementSystem.Services
             }
         }
 
-        public async Task<(bool Success, int ReturnId)> ProcessReturnAsync(int rentId, int odometerEnd, DateTime actualReturnDate)
+        public async Task<(bool Success, int ReturnId)> ProcessReturnAsync(int rentId, int odometerEnd, DateTime actualReturnDate, bool hasDamage = false, string? damageReason = null, decimal damageAmount = 0)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace CarRentalManagementSystem.Services
 
                 // Calculate distance driven and expected distance
                 var totalKmDriven = odometerEnd - rent.OdometerStart;
-                var expectedKm = GetExpectedKilometers(rent.Booking);
+                var expectedKm = GetExpectedKilometers(rent.Booking, actualReturnDate);
                 
                 // Calculate extra distance (only when driven distance exceeds expected distance)
                 var extraKm = Math.Max(0, totalKmDriven - expectedKm);
@@ -86,8 +86,8 @@ namespace CarRentalManagementSystem.Services
                 // Calculate extra charges based on extra distance
                 var extraCharges = extraKm * rent.Booking.Car.PerKmRate;
                 
-                // The total due should be the base amount plus any extra charges
-                var totalDue = rent.Booking.TotalCost + extraCharges;
+                // The total due should be the base amount plus any extra charges plus damage amount
+                var totalDue = rent.Booking.TotalCost + extraCharges + damageAmount;
                 
                 // Calculate final payment due (minus advance payment already made)
                 var advancePaid = rent.Booking.TotalCost * 0.5m; // 50% was paid as advance
@@ -105,7 +105,10 @@ namespace CarRentalManagementSystem.Services
                     AdvancePaid = advancePaid,
                     FinalPaymentDue = finalPaymentDue,
                     PaymentStatus = finalPaymentDue > 0 ? "Pending" : "Completed",
-                    FinalPaymentDate = finalPaymentDue <= 0 ? actualReturnDate : null
+                    FinalPaymentDate = finalPaymentDue <= 0 ? actualReturnDate : null,
+                    HasDamage = hasDamage,
+                    DamageReason = damageReason,
+                    DamageAmount = damageAmount
                 };
 
                 _context.Returns.Add(returnRecord);
@@ -181,7 +184,7 @@ namespace CarRentalManagementSystem.Services
             return rent != null ? MapToResponseDTO(rent) : null;
         }
 
-        public async Task<decimal> CalculateExtraChargesAsync(int rentId, int odometerEnd)
+        public async Task<decimal> CalculateExtraChargesAsync(int rentId, int odometerEnd, DateTime actualReturnDate)
         {
             var rent = await _context.Rents
                 .Include(r => r.Booking)
@@ -192,7 +195,7 @@ namespace CarRentalManagementSystem.Services
                 return 0;
 
             var totalKmDriven = odometerEnd - rent.OdometerStart;
-            var expectedKm = GetExpectedKilometers(rent.Booking);
+            var expectedKm = GetExpectedKilometers(rent.Booking, actualReturnDate);
             var extraKm = Math.Max(0, totalKmDriven - expectedKm);
 
             return extraKm * rent.Booking.Car.PerKmRate;
@@ -258,15 +261,14 @@ namespace CarRentalManagementSystem.Services
                 .ToListAsync();
         }
 
-        private int GetExpectedKilometers(Booking booking)
+        private int GetExpectedKilometers(Booking booking, DateTime actualReturnDate)
         {
-            // Calculate expected kilometers based on rental duration and car's allowed KM per day
-            var rentalDays = (booking.ReturnDate - booking.PickupDate).Days;
+            // Calculate expected kilometers based on actual rental duration
+            var rentalDays = (actualReturnDate - booking.PickupDate).Days;
             if (rentalDays <= 0) rentalDays = 1;
             
-            // Use the car's specific AllowedKmPerDay setting, fallback to 100 if not set
-            var allowedKmPerDay = booking.Car?.AllowedKmPerDay ?? 100;
-            return rentalDays * allowedKmPerDay;
+            // Use 100 KM per day as per the requirement
+            return rentalDays * 100;
         }
 
         private RentResponseDTO MapToResponseDTO(Rent rent)

@@ -41,6 +41,15 @@ namespace CarRentalManagementSystem.Models
         
         public DateTime? FinalPaymentDate { get; set; }
         
+        // Damage fields
+        public bool HasDamage { get; set; } = false;
+        
+        [StringLength(500)]
+        public string? DamageReason { get; set; }
+        
+        [Range(0, double.MaxValue)]
+        public decimal DamageAmount { get; set; } = 0;
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties
