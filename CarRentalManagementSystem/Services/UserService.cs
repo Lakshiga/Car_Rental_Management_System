@@ -242,6 +242,8 @@ namespace CarRentalManagementSystem.Services
 
         public async Task<bool> RegisterStaffAsync(StaffRegistrationRequestDTO request)
         {
+            Console.WriteLine($"RegisterStaffAsync called: FirstName={request.FirstName}, LastName={request.LastName}, Email={request.Email}, Username={request.Username}, Password={request.Password}");
+            
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -251,12 +253,35 @@ namespace CarRentalManagementSystem.Services
                 
                 if (existingStaff != null)
                 {
+                    Console.WriteLine("Email already exists in database");
                     await transaction.RollbackAsync();
                     return false;
                 }
 
-                // Generate credentials
-                var (username, password) = await GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+                // Generate credentials if not provided
+                string username, password;
+                if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+                {
+                    var credentials = await GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+                    username = credentials.Username;
+                    password = credentials.Password;
+                }
+                else
+                {
+                    username = request.Username;
+                    password = request.Password;
+                }
+
+                // Check if username already exists
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Username == username);
+                
+                if (existingUser != null)
+                {
+                    Console.WriteLine("Username already exists in database");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
 
                 // Create user with password reset requirement
                 var user = new User
@@ -264,7 +289,7 @@ namespace CarRentalManagementSystem.Services
                     Username = username,
                     Password = BCrypt.Net.BCrypt.HashPassword(password),
                     Role = "Staff",
-                    RequirePasswordReset = true,
+                    RequirePasswordReset = string.IsNullOrEmpty(request.Password), // Only require reset if password was auto-generated
                     CreatedAt = DateTime.Now
                 };
 
@@ -290,6 +315,7 @@ namespace CarRentalManagementSystem.Services
 
                 // Commit transaction
                 await transaction.CommitAsync();
+                Console.WriteLine($"Staff registered successfully: {request.FirstName} {request.LastName} ({request.Email})");
                 return true;
             }
             catch (Exception ex)

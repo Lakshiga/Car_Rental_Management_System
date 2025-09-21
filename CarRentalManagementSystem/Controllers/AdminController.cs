@@ -392,9 +392,35 @@ namespace CarRentalManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddStaff([FromBody] DTOs.StaffRegistrationRequestDTO request)
         {
+            Console.WriteLine($"AddStaff called with data: FirstName={request.FirstName}, LastName={request.LastName}, Email={request.Email}, Username={request.Username}, Password={request.Password}");
+            
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
+            {
+                Console.WriteLine("Unauthorized access attempt");
                 return Json(new { success = false, message = "Unauthorized" });
+            }
+
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(request.FirstName))
+            {
+                return Json(new { success = false, message = "First name is required." });
+            }
+            
+            if (string.IsNullOrWhiteSpace(request.LastName))
+            {
+                return Json(new { success = false, message = "Last name is required." });
+            }
+            
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return Json(new { success = false, message = "Email address is required." });
+            }
+            
+            if (string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                return Json(new { success = false, message = "Phone number is required." });
+            }
 
             if (!ModelState.IsValid)
             {
@@ -409,15 +435,35 @@ namespace CarRentalManagementSystem.Controllers
 
             try
             {
-                // Generate credentials first
-                var (username, password) = await _userService.GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+                Console.WriteLine("Starting staff registration process...");
                 
                 // Register staff
                 var result = await _userService.RegisterStaffAsync(request);
+                Console.WriteLine($"Staff registration result: {result}");
                 
                 if (result)
                 {
+                    Console.WriteLine("Staff registration successful, generating credentials...");
+                    
+                    // Get the generated credentials for email
+                    string username, password;
+                    if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+                    {
+                        Console.WriteLine("Generating auto-credentials...");
+                        var credentials = await _userService.GenerateStaffCredentialsAsync(request.Email, request.FirstName);
+                        username = credentials.Username;
+                        password = credentials.Password;
+                        Console.WriteLine($"Generated credentials - Username: {username}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Using provided credentials...");
+                        username = request.Username;
+                        password = request.Password;
+                    }
+                    
                     // Send email with credentials
+                    Console.WriteLine("Sending credentials email...");
                     var emailResult = await _emailService.SendStaffCredentialsAsync(
                         request.Email, 
                         $"{request.FirstName} {request.LastName}", 
@@ -429,6 +475,9 @@ namespace CarRentalManagementSystem.Controllers
                         ? "Staff member added successfully! Login credentials have been sent to their email."
                         : "Staff member added successfully, but failed to send email. Please provide credentials manually.";
                     
+                    Console.WriteLine($"Staff added successfully: {request.FirstName} {request.LastName} ({request.Email})");
+                    Console.WriteLine($"Email sent: {emailResult}");
+                    
                     return Json(new { success = true, message = message, staff = new { 
                         firstName = request.FirstName,
                         lastName = request.LastName,
@@ -437,6 +486,7 @@ namespace CarRentalManagementSystem.Controllers
                     }});
                 }
                 
+                Console.WriteLine($"Failed to add staff member: {request.Email} may already be in use");
                 return Json(new { success = false, message = "Failed to add staff member. Email may already be in use." });
             }
             catch (Exception ex)

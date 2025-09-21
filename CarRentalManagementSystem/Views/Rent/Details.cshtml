@@ -1,0 +1,310 @@
+@model CarRentalManagementSystem.DTOs.RentResponseDTO
+@{
+    ViewData["Title"] = "Rent Details";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-key me-2"></i>Rent Details
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Rent Management
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Rental Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rent ID:</label>
+                            <p class="form-control-plaintext">#@Model.RentID</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Booking ID:</label>
+                            <p class="form-control-plaintext">
+                                <a href="@Url.Action("PreviewBooking", "Admin", new { id = Model.BookingID })" class="text-decoration-none">
+                                    #@Model.BookingID
+                                </a>
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Customer Name:</label>
+                            <p class="form-control-plaintext">@Model.BookingDetails?.CustomerName</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Customer NIC:</label>
+                            <p class="form-control-plaintext">@Model.BookingDetails?.NICNumber</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rent Start Date:</label>
+                            <p class="form-control-plaintext">@Model.RentDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Expected Return Date:</label>
+                            <p class="form-control-plaintext">@Model.BookingDetails?.ReturnDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Actual Return Date:</label>
+                            <p class="form-control-plaintext">
+                                @if (Model.ActualReturnDate.HasValue)
+                                {
+                                    @Model.ActualReturnDate.Value.ToString("MMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not returned yet</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Status:</label>
+                            <p class="form-control-plaintext">
+                                @if (Model.IsReturned)
+                                {
+                                    <span class="badge bg-success">Returned</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Active</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-car me-2"></i>Vehicle Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        @if (!string.IsNullOrEmpty(Model.BookingDetails?.CarDetails?.ImageUrl))
+                        {
+                            <img src="@Model.BookingDetails.CarDetails.ImageUrl" alt="@Model.BookingDetails.CarDetails.CarName" class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="height: 200px;">
+                                <i class="fas fa-car fa-3x text-muted"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Car Name:</label>
+                                    <p class="form-control-plaintext">@Model.BookingDetails?.CarDetails?.CarName</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Brand:</label>
+                                    <p class="form-control-plaintext">@Model.BookingDetails?.CarDetails?.Brand</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Number Plate:</label>
+                                    <p class="form-control-plaintext">@Model.BookingDetails?.CarDetails?.NumberPlate</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Type:</label>
+                                    <p class="form-control-plaintext">@Model.BookingDetails?.CarDetails?.CarType</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Rent Per Day:</label>
+                                    <p class="form-control-plaintext">₹@Model.BookingDetails?.CarDetails?.RentPerDay.ToString("F2")</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Allowed KM:</label>
+                                    <p class="form-control-plaintext">@(Model.BookingDetails?.CarDetails?.AllowedKmPerDay) KM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i>Odometer Readings
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Start Reading:</label>
+                    <p class="form-control-plaintext">@(Model.OdometerStart) KM</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">End Reading:</label>
+                    <p class="form-control-plaintext">
+                        @if (Model.OdometerEnd.HasValue)
+                        {
+                            @($"{Model.OdometerEnd.Value} KM")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not returned yet</span>
+                        }
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Total Distance:</label>
+                    <p class="form-control-plaintext">
+                        @if (Model.OdometerEnd.HasValue)
+                        {
+                            @($"{Model.OdometerEnd.Value - Model.OdometerStart} KM")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not calculated yet</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator me-2"></i>Financial Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Total Rent Amount:</label>
+                    <p class="form-control-plaintext">₹@Model.BookingDetails?.TotalCost.ToString("F2")</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Extra Charges:</label>
+                    <p class="form-control-plaintext">₹@(Model.ExtraCharges?.ToString("F2") ?? "0.00")</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Total Amount:</label>
+                    <p class="form-control-plaintext fw-bold text-primary">₹@(Model.TotalDue?.ToString("F2") ?? Model.BookingDetails?.TotalCost.ToString("F2"))</p>
+                </div>
+                @if (Model.IsReturned)
+                {
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Payment Status:</label>
+                        <p class="form-control-plaintext">
+                            @if (Model.TotalDue == 0 || Model.TotalDue == null)
+                            {
+                                <span class="badge bg-success">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Pending</span>
+                            }
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (!Model.IsReturned)
+        {
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools me-2"></i>Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <a href="@Url.Action("ProcessReturn", new { rentId = Model.RentID })" 
+                       class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-undo me-1"></i>Process Return
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.IsReturned && (Model.TotalDue > 0))
+{
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Pending Payment
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">This rental has been returned but the final payment is still pending.</p>
+                    <button class="btn btn-primary" onclick="processFinalPayment(@Model.RentID)">
+                        <i class="fas fa-credit-card me-1"></i>Process Final Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function processFinalPayment(rentId) {
+            if (confirm('Are you sure you want to process the final payment for this rental?')) {
+                $.post('@Url.Action("ProcessFinalPayment")', { returnId: rentId }, function(response) {
+                    if (response.success) {
+                        showAlert('success', response.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        showAlert('danger', response.message || 'Failed to process final payment.');
+                    }
+                }).fail(function() {
+                    showAlert('danger', 'An error occurred while processing the payment.');
+                });
+            }
+        }
+
+        function showAlert(type, message) {
+            // Remove existing alerts
+            $('.alert').remove();
+            
+            const alertHtml = 
+                '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                    message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>';
+            
+            // Add new alert at the top of main content
+            $('main').prepend(alertHtml);
+            
+            // Auto-dismiss success alerts after 5 seconds
+            if (type === 'success') {
+                setTimeout(function() {
+                    $('.alert-success').fadeOut(function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+        }
+    </script>
+}
