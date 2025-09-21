@@ -81,16 +81,46 @@ namespace CarRentalManagementSystem.Services
             return await SendEmailAsync(customerEmail, subject, body);
         }
 
-        public async Task<bool> SendBookingRejectionAsync(string customerEmail, string customerName, int bookingId)
+        public async Task<bool> SendBookingRejectionAsync(string customerEmail, string customerName, int bookingId, string rejectionReason, decimal advanceAmount)
         {
-            var subject = "Booking Update - Car Rental System";
+            var subject = "Booking Rejected - Refund Information - Car Rental System";
             var body = $@"
-                <h2>Booking Status Update</h2>
+                <h2>Booking Rejection Notice</h2>
                 <p>Dear {customerName},</p>
-                <p>We regret to inform you that your booking request could not be approved at this time.</p>
-                <p><strong>Booking ID:</strong> {bookingId}</p>
-                <p>This could be due to car unavailability or other factors. Please feel free to make a new booking or contact us for assistance.</p>
-                <p>Thank you for your understanding.</p>
+                <p>We regret to inform you that your booking request has been rejected.</p>
+                
+                <div style=""background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #dc3545;"">
+                    <h3>Booking Details:</h3>
+                    <p><strong>Booking ID:</strong> #{bookingId}</p>
+                    <p><strong>Rejection Reason:</strong> {rejectionReason}</p>
+                    <p><strong>Advance Payment Amount:</strong> ₹{advanceAmount:F2}</p>
+                </div>
+                
+                <div style=""background-color: #d4edda; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745;"">
+                    <h3>💰 Refund Information:</h3>
+                    <p><strong>Your advance payment of ₹{advanceAmount:F2} will be refunded.</strong></p>
+                    <p><strong>Important:</strong> To collect your refund, please visit our office with:</p>
+                    <ul>
+                        <li>Valid government-issued photo ID</li>
+                        <li>Original payment receipt or booking confirmation</li>
+                        <li>Bank account details for transfer (if applicable)</li>
+                    </ul>
+                    <p><strong>Office Hours:</strong> Monday to Friday, 9:00 AM - 6:00 PM</p>
+                    <p><strong>Office Address:</strong> [Your Office Address Here]</p>
+                    <p><strong>Contact:</strong> +1 (555) 123-4567</p>
+                </div>
+                
+                <div style=""background-color: #fff3cd; padding: 15px; margin: 20px 0; border-left: 4px solid #ffc107;"">
+                    <h4>📝 Next Steps:</h4>
+                    <ul>
+                        <li>Visit our office within 30 days to collect your refund</li>
+                        <li>Feel free to make a new booking with different dates or vehicle</li>
+                        <li>Contact us if you have any questions about this rejection</li>
+                    </ul>
+                </div>
+                
+                <p>We apologize for any inconvenience caused and thank you for your understanding.</p>
+                <p>If you have any questions, please don't hesitate to contact us.</p>
                 <br>
                 <p>Best regards,<br>Car Rental Management Team</p>
             ";

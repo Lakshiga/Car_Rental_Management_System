@@ -139,27 +139,43 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><span class="text-muted">2 hours ago</span></td>
-                                <td><strong>New booking request</strong></td>
-                                <td>John Doe</td>
-                                <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(1)">View</button></td>
-                            </tr>
-                            <tr>
-                                <td><span class="text-muted">4 hours ago</span></td>
-                                <td><strong>Car returned</strong></td>
-                                <td>Jane Smith</td>
-                                <td><span class="badge bg-success">Completed</span></td>
-                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(2)">View</button></td>
-                            </tr>
-                            <tr>
-                                <td><span class="text-muted">1 day ago</span></td>
-                                <td><strong>New car added</strong></td>
-                                <td>Admin</td>
-                                <td><span class="badge bg-info">System</span></td>
-                                <td><button class="btn btn-sm btn-admin-secondary" onclick="viewActivityDetails(3)">View</button></td>
-                            </tr>
+                            @if (ViewBag.RecentBookings != null && ((List<CarRentalManagementSystem.Models.Booking>)ViewBag.RecentBookings).Any())
+                            {
+                                @foreach (var booking in (List<CarRentalManagementSystem.Models.Booking>)ViewBag.RecentBookings)
+                                {
+                                    var timeAgo = DateTime.Now - booking.CreatedAt;
+                                    string timeDisplay;
+                                    if (timeAgo.TotalHours < 1)
+                                        timeDisplay = $"{(int)timeAgo.TotalMinutes} minutes ago";
+                                    else if (timeAgo.TotalDays < 1)
+                                        timeDisplay = $"{(int)timeAgo.TotalHours} hours ago";
+                                    else
+                                        timeDisplay = $"{(int)timeAgo.TotalDays} days ago";
+
+                                    string statusClass = booking.Status switch
+                                    {
+                                        "Pending" => "bg-warning text-dark",
+                                        "Approved" => "bg-success",
+                                        "Rejected" => "bg-danger",
+                                        "Completed" => "bg-info",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <tr>
+                                        <td><span class="text-muted">@timeDisplay</span></td>
+                                        <td><strong>New booking request</strong></td>
+                                        <td>@booking.Customer?.FullName</td>
+                                        <td><span class="badge @statusClass">@booking.Status</span></td>
+                                        <td><button class="btn btn-sm btn-admin-secondary" onclick="viewBookingDetails(@booking.BookingID)">View</button></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No recent activity</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -252,6 +268,12 @@
         function viewActivityDetails(activityId) {
             alert('View details for activity ID: ' + activityId + '. This would show more detailed information about the activity.');
             // In a real implementation, this would load detailed information about the activity
+        }
+
+        // View booking details function
+        function viewBookingDetails(bookingId) {
+            // Redirect to booking details page
+            window.location.href = '@Url.Action("Bookings", "Admin")' + '?bookingId=' + bookingId;
         }
     </script>
 }
