@@ -22,7 +22,6 @@
 </head>
 <body>
     @{ 
-        var userRole = Context.Session.GetString("UserRole");
         var adminAvatar = Context.Session.GetString("AvatarUrl"); 
         var displayName = Context.Session.GetString("DisplayName") ?? (userRole ?? "Admin"); 
         var dashboardTitle = userRole == "Staff" ? "Staff Dashboard" : "Admin Dashboard";
