@@ -127,5 +127,27 @@ namespace CarRentalManagementSystem.Controllers
 
             return PartialView("~/Views/Payment/_PaymentDetailsPartial.cshtml", payment);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CustomerPaymentDetails(int id)
+        {
+            var customerIdString = HttpContext.Session.GetString("CustomerId");
+            if (string.IsNullOrEmpty(customerIdString))
+                return RedirectToAction("Login", "Account");
+
+            var payment = await _paymentService.GetPaymentByIdAsync(id);
+            if (payment == null)
+                return NotFound();
+
+            // Verify that this payment belongs to the current customer
+            var customerId = int.Parse(customerIdString);
+            var bookings = await _bookingService.GetBookingsByCustomerAsync(customerId);
+            var bookingIds = bookings.Select(b => b.BookingID).ToHashSet();
+
+            if (!bookingIds.Contains(payment.BookingID))
+                return Forbid();
+
+            return PartialView("~/Views/Payment/_CustomerPaymentDetailsPartial.cshtml", payment);
+        }
     }
 }

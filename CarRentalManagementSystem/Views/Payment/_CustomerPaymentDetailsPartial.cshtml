@@ -1,0 +1,142 @@
+@model CarRentalManagementSystem.DTOs.PaymentResponseDTO
+
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i data-lucide="credit-card" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+        Payment Details
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i data-lucide="receipt" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+                        Payment Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Payment ID:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-primary">#@Model.PaymentID</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Amount:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="h5 text-success">₹@Model.Amount.ToString("F2")</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Payment Method:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.PaymentMethod
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Status:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @if (Model.Status == "Completed")
+                            {
+                                <span class="badge bg-success">@Model.Status</span>
+                            }
+                            else if (Model.Status == "Failed")
+                            {
+                                <span class="badge bg-danger">@Model.Status</span>
+                            }
+                            else if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning">@Model.Status</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@Model.Status</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Payment Date:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.PaymentDate.ToString("MMM dd, yyyy hh:mm tt")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i data-lucide="calendar" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+                        Booking Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Booking ID:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <a href="@Url.Action("Details", "Booking", new { id = Model.BookingID })" class="text-decoration-none">
+                                <span class="badge bg-info">#@Model.BookingID</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Transaction ID:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <code>@(Model.StripePaymentIntentId ?? "N/A")</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @if (Model.Status == "Completed")
+    {
+        <div class="alert alert-success mt-3">
+            <i data-lucide="check-circle" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+            <strong>Payment Successful!</strong> Your payment has been processed successfully and your booking is confirmed.
+        </div>
+    }
+    else if (Model.Status == "Failed")
+    {
+        <div class="alert alert-danger mt-3">
+            <i data-lucide="x-circle" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+            <strong>Payment Failed!</strong> There was an issue processing your payment. Please try again or contact support.
+        </div>
+    }
+    else if (Model.Status == "Pending")
+    {
+        <div class="alert alert-warning mt-3">
+            <i data-lucide="clock" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+            <strong>Payment Pending!</strong> Your payment is being processed. Please wait for confirmation.
+        </div>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    @if (Model.Status == "Completed")
+    {
+        <a href="@Url.Action("Receipt", "Booking", new { id = Model.BookingID })" class="btn btn-primary" target="_blank">
+            <i data-lucide="download" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+            Download Receipt
+        </a>
+    }
+</div>

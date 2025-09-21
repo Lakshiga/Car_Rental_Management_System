@@ -183,6 +183,50 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Bookings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label for="customerNameFilter" class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" id="customerNameFilter" placeholder="Enter customer name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateFilter" class="form-label">Booking Date</label>
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Rented">Rented</option>
+                            <option value="Pending Return">Pending Return</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="carNameFilter" class="form-label">Car Name</label>
+                        <input type="text" class="form-control" id="carNameFilter" placeholder="Enter car name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         function viewBookingDetails(bookingId) {
@@ -350,8 +394,51 @@
 
         // Filter Bookings function
         function filterBookings() {
-            alert('Filter functionality would be implemented here.');
-            // This would typically open a modal or show filter options
+            $('#filterModal').modal('show');
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            var customerName = $('#customerNameFilter').val().toLowerCase();
+            var date = $('#dateFilter').val();
+            var status = $('#statusFilter').val();
+            var carName = $('#carNameFilter').val().toLowerCase();
+            
+            $('#bookingsTable tbody tr').each(function() {
+                var row = $(this);
+                var rowCustomerName = row.find('td:eq(1)').text().toLowerCase();
+                var rowDate = row.find('td:eq(4)').text(); // Assuming pickup date is in 5th column
+                var rowStatus = row.find('.badge').text();
+                var rowCarName = row.find('td:eq(3)').text().toLowerCase(); // Assuming car name is in 4th column
+                
+                var showRow = true;
+                
+                if (customerName && !rowCustomerName.includes(customerName)) {
+                    showRow = false;
+                }
+                
+                if (date && !rowDate.includes(date)) {
+                    showRow = false;
+                }
+                
+                if (status && rowStatus !== status) {
+                    showRow = false;
+                }
+                
+                if (carName && !rowCarName.includes(carName)) {
+                    showRow = false;
+                }
+                
+                row.toggle(showRow);
+            });
+            
+            $('#filterModal').modal('hide');
+        }
+        
+        // Clear filters
+        function clearFilters() {
+            $('#filterForm')[0].reset();
+            $('#bookingsTable tbody tr').show();
         }
         
         // Export Bookings function
