@@ -59,7 +59,22 @@
                         <i class="fas fa-credit-card"></i> Payment Help
                     </button>
                 }
-                else if (isAdminOrStaff)
+                else if (userRole == "Admin")
+                {
+                    <button class="quick-action-btn" data-message="Show pending bookings">
+                        <i class="fas fa-clock"></i> Pending
+                    </button>
+                    <button class="quick-action-btn" data-message="Show staff management options">
+                        <i class="fas fa-users"></i> Staff Mgmt
+                    </button>
+                    <button class="quick-action-btn" data-message="Show system analytics">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                    <button class="quick-action-btn" data-message="How do I manage car inventory?">
+                        <i class="fas fa-car"></i> Inventory
+                    </button>
+                }
+                else if (userRole == "Staff")
                 {
                     <button class="quick-action-btn" data-message="Show pending bookings">
                         <i class="fas fa-clock"></i> Pending
@@ -67,8 +82,11 @@
                     <button class="quick-action-btn" data-message="How do I approve a booking?">
                         <i class="fas fa-check"></i> Approve
                     </button>
-                    <button class="quick-action-btn" data-message="Show system statistics">
-                        <i class="fas fa-chart-bar"></i> Stats
+                    <button class="quick-action-btn" data-message="How do I process a return?">
+                        <i class="fas fa-undo"></i> Returns
+                    </button>
+                    <button class="quick-action-btn" data-message="Show customer service tips">
+                        <i class="fas fa-headset"></i> Support
                     </button>
                 }
                 else
@@ -93,7 +111,22 @@
                     </div>
                     <div class="message-content">
                         <p>
-                            Hi, welcome to Car Rental Pro. How can I help you?
+                            @if (isCustomer)
+                            {
+                                @:Hello! I'm here to help you with your car rental needs. I can assist with bookings, payments, and answer questions about your rentals.
+                            }
+                            else if (userRole == "Admin")
+                            {
+                                @:Hello Admin! I can help you with all administrative functions including booking management, staff management, inventory control, and system analytics.
+                            }
+                            else if (userRole == "Staff")
+                            {
+                                @:Hello! I'm here to help you with daily operations including processing bookings, handling rentals and returns, and providing customer support.
+                            }
+                            else
+                            {
+                                @:Hi! Welcome to Car Rental Pro. I can provide general information about our services and help you get started. Please create an account for personalized assistance.
+                            }
                         </p>
                         <small class="message-time">Just now</small>
                     </div>

@@ -8,9 +8,11 @@
     @{ 
         var userId = Context.Session.GetString("UserId");
         var staffId = Context.Session.GetString("StaffId");
+        var userRole = Context.Session.GetString("UserRole");
     }
     
     <!-- User Context Metadata for AI Assistant -->
+    <meta name="user-role" content="@userRole" />
     <meta name="user-id" content="@userId" />
     <meta name="staff-id" content="@staffId" />
     
