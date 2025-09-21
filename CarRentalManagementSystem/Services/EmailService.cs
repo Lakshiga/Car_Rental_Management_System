@@ -19,6 +19,7 @@ namespace CarRentalManagementSystem.Services
             {
                 var emailSettings = _configuration.GetSection("EmailSettings");
                 string fromEmail = emailSettings["From"]!;
+                string username = emailSettings["Username"] ?? fromEmail;
                 string password = emailSettings["Password"]!;
 
                 using var message = new MailMessage(fromEmail, toEmail)
@@ -30,7 +31,7 @@ namespace CarRentalManagementSystem.Services
 
                 using var smtp = new SmtpClient(emailSettings["SmtpServer"], int.Parse(emailSettings["Port"]!))
                 {
-                    Credentials = new NetworkCredential(fromEmail, password),
+                    Credentials = new NetworkCredential(username, password),
                     EnableSsl = true
                 };
 
@@ -39,7 +40,9 @@ namespace CarRentalManagementSystem.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Email Error: " + ex.Message);
+                Console.WriteLine($"Email Error: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
                 return false;
             }
         }
@@ -113,6 +116,8 @@ namespace CarRentalManagementSystem.Services
 
         public async Task<bool> SendStaffCredentialsAsync(string staffEmail, string staffName, string username, string password)
         {
+            Console.WriteLine($"Sending staff credentials email to: {staffEmail}");
+            
             var subject = "Welcome to Car Rental Management System - Your Login Credentials";
             var body = $@"
                 <h2>Welcome to Our Team!</h2>
@@ -141,7 +146,9 @@ namespace CarRentalManagementSystem.Services
                 <p>Best regards,<br>Car Rental Management Team</p>
             ";
 
-            return await SendEmailAsync(staffEmail, subject, body);
+            var result = await SendEmailAsync(staffEmail, subject, body);
+            Console.WriteLine($"Email send result: {result}");
+            return result;
         }
     }
 }

@@ -4,6 +4,7 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -167,6 +168,28 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Username
+                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username">
+                                    <div class="invalid-feedback"></div>
+                                    <div class="form-text">Leave empty to auto-generate</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>Password
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                    <div class="invalid-feedback"></div>
+                                    <div class="form-text">Leave empty to auto-generate</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label for="role" class="form-label">
                                         <i class="fas fa-user-tag me-1"></i>Role
                                     </label>
@@ -176,7 +199,7 @@
                         </div>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            <strong>Note:</strong> Username and password will be automatically generated and sent to the staff member's email address.
+                            <strong>Note:</strong> If username and password are left empty, they will be automatically generated and sent to the staff member's email address.
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -261,15 +284,31 @@
 </div>
 
 <script>
+    // Global functions that need to be accessible from HTML onclick handlers
     function addNewStaff() {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded');
+            return;
+        }
+        
         // Reset form
         $('#staffForm')[0].reset();
         $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
+        
+        // Clear username and password fields specifically
+        $('#username').val('');
+        $('#password').val('');
+        
         $('#staffModal').modal('show');
     }
     
     function editStaff(staffId) {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded');
+            return;
+        }
+        
         // Fetch staff details and populate the edit form
         $.get('/Admin/GetStaff/' + staffId, function(data) {
             if (data) {
@@ -288,6 +327,11 @@
     }
     
     function deleteStaff(staffId) {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded');
+            return;
+        }
+        
         if (confirm('Are you sure you want to delete this staff member? This action cannot be undone.')) {
             $.post('/Admin/DeleteStaff/' + staffId, function(response) {
                 if (response.success) {
@@ -305,196 +349,12 @@
         }
     }
     
-    // Handle staff form submission
-    $('#staffForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        // Clear previous validation
-        $('.form-control').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-        
-        // Get form data
-        const formData = {
-            firstName: $('#firstName').val().trim(),
-            lastName: $('#lastName').val().trim(),
-            email: $('#email').val().trim(),
-            phoneNumber: $('#phoneNumber').val().trim()
-        };
-        
-        // Basic validation
-        let isValid = true;
-        
-        if (!formData.firstName) {
-            showValidationError('firstName', 'First name is required');
-            isValid = false;
-        }
-        
-        if (!formData.lastName) {
-            showValidationError('lastName', 'Last name is required');
-            isValid = false;
-        }
-        
-        if (!formData.email) {
-            showValidationError('email', 'Email address is required');
-            isValid = false;
-        } else if (!isValidEmail(formData.email)) {
-            showValidationError('email', 'Please enter a valid email address');
-            isValid = false;
-        }
-        
-        if (!formData.phoneNumber) {
-            showValidationError('phoneNumber', 'Phone number is required');
-            isValid = false;
-        }
-        
-        if (!isValid) {
-            return;
-        }
-        
-        // Disable submit button and show loading
-        const $submitBtn = $('#submitStaffBtn');
-        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Adding Staff...');
-        
-        // Submit form
-        $.ajax({
-            url: '@Url.Action("AddStaff", "Admin")',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function(response) {
-                if (response.success) {
-                    $('#staffModal').modal('hide');
-                    
-                    // Show success message
-                    showAlert('success', response.message || 'Staff member added successfully! Login credentials have been sent to their email.');
-                    
-                    // Reload page to show new staff after a brief delay
-                    setTimeout(function() {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    // Handle validation errors
-                    if (response.errors) {
-                        for (const field in response.errors) {
-                            const fieldName = field.charAt(0).toLowerCase() + field.slice(1);
-                            showValidationError(fieldName, response.errors[field][0]);
-                        }
-                    } else {
-                        showAlert('danger', response.message || 'Failed to add staff member.');
-                    }
-                }
-            },
-            error: function(xhr) {
-                let errorMessage = 'An error occurred while adding the staff member.';
-                
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    // Handle validation errors
-                    const errors = xhr.responseJSON.errors;
-                    for (const field in errors) {
-                        const fieldName = field.charAt(0).toLowerCase() + field.slice(1);
-                        showValidationError(fieldName, errors[field][0]);
-                    }
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                }
-                
-                showAlert('danger', errorMessage);
-            },
-            complete: function() {
-                // Re-enable submit button
-                $submitBtn.prop('disabled', false).html('<i class="fas fa-user-plus me-1"></i>Add Staff Member');
-            }
-        });
-    });
-    
-    // Handle edit staff form submission
-    $('#editStaffForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        // Clear previous validation
-        $('.form-control').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-        
-        // Get form data
-        const formData = {
-            staffId: $('#editStaffId').val(),
-            firstName: $('#editFirstName').val().trim(),
-            lastName: $('#editLastName').val().trim(),
-            email: $('#editEmail').val().trim(),
-            phoneNo: $('#editPhoneNumber').val().trim()
-        };
-        
-        // Basic validation
-        let isValid = true;
-        
-        if (!formData.firstName) {
-            showValidationError('editFirstName', 'First name is required');
-            isValid = false;
-        }
-        
-        if (!formData.lastName) {
-            showValidationError('editLastName', 'Last name is required');
-            isValid = false;
-        }
-        
-        if (!formData.email) {
-            showValidationError('editEmail', 'Email address is required');
-            isValid = false;
-        } else if (!isValidEmail(formData.email)) {
-            showValidationError('editEmail', 'Please enter a valid email address');
-            isValid = false;
-        }
-        
-        if (!formData.phoneNo) {
-            showValidationError('editPhoneNumber', 'Phone number is required');
-            isValid = false;
-        }
-        
-        if (!isValid) {
-            return;
-        }
-        
-        // Disable submit button and show loading
-        const $submitBtn = $('#updateStaffBtn');
-        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Updating Staff...');
-        
-        // Submit form
-        $.ajax({
-            url: '@Url.Action("UpdateStaff", "Admin")',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function(response) {
-                if (response.success) {
-                    $('#editStaffModal').modal('hide');
-                    showAlert('success', response.message || 'Staff member updated successfully!');
-                    
-                    // Reload page to show updated staff
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1500);
-                } else {
-                    showAlert('danger', response.message || 'Failed to update staff member.');
-                }
-            },
-            error: function() {
-                showAlert('danger', 'An error occurred while updating the staff member.');
-            },
-            complete: function() {
-                // Re-enable submit button
-                $submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i>Update Staff Member');
-            }
-        });
-    });
-    
-    // Reset form when modal is hidden
-    $('#staffModal').on('hidden.bs.modal', function() {
-        $('#staffForm')[0].reset();
-        $('.form-control').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-    });
-    
     function showValidationError(fieldName, message) {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded');
+            return;
+        }
+        
         const $field = $('#' + fieldName);
         const $feedback = $field.siblings('.invalid-feedback');
         
@@ -508,11 +368,19 @@
     }
     
     function showAlert(type, message) {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded');
+            return;
+        }
+        
+        console.log('Showing alert:', type, message);
+        
         // Remove existing alerts of the same type
         $('.alert-' + type).remove();
         
         const alertHtml = 
             '<div class="alert alert-' + type + ' alert-dismissible fade show mt-3" role="alert">' +
+                '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-triangle') + ' me-2"></i>' +
                 message +
                 '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
             '</div>';
@@ -529,17 +397,264 @@
             }, 5000);
         }
     }
-    
-    // Initialize DataTable for better table functionality
-    $(document).ready(function() {
-        if ($('#staffTable').length) {
-            $('#staffTable').DataTable({
-                "pageLength": 10,
-                "order": [[ 0, "desc" ]],
-                "columnDefs": [
-                    { "orderable": false, "targets": [7] }
-                ]
-            });
+
+    // Ensure jQuery and DataTable are loaded before executing
+    function initializeStaffPage() {
+        if (typeof $ === 'undefined') {
+            console.log('jQuery not loaded yet, retrying...');
+            setTimeout(initializeStaffPage, 100);
+            return;
         }
-    });
+        
+        if (typeof $.fn.DataTable === 'undefined') {
+            console.log('DataTable not loaded yet, retrying...');
+            setTimeout(initializeStaffPage, 100);
+            return;
+        }
+        
+        $(document).ready(function() {
+            // Initialize DataTable for better table functionality
+            if ($('#staffTable').length) {
+                try {
+                    $('#staffTable').DataTable({
+                        "pageLength": 10,
+                        "order": [[ 0, "desc" ]],
+                        "columnDefs": [
+                            { "orderable": false, "targets": [7] }
+                        ]
+                    });
+                    console.log('DataTable initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing DataTable:', error);
+                }
+            }
+
+            // Handle staff form submission
+            $('#staffForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Clear previous validation
+                $('.form-control').removeClass('is-invalid');
+                $('.invalid-feedback').text('');
+                
+                // Get form data
+                const formData = {
+                    firstName: $('#firstName').val().trim(),
+                    lastName: $('#lastName').val().trim(),
+                    email: $('#email').val().trim(),
+                    phoneNumber: $('#phoneNumber').val().trim(),
+                    username: $('#username').val().trim() || '', // Ensure empty string if not provided
+                    password: $('#password').val().trim() || '', // Ensure empty string if not provided
+                    role: 'Staff'
+                };
+                
+                // Basic validation
+                let isValid = true;
+                
+                if (!formData.firstName || formData.firstName.trim() === '') {
+                    showValidationError('firstName', 'First name is required');
+                    isValid = false;
+                }
+                
+                if (!formData.lastName || formData.lastName.trim() === '') {
+                    showValidationError('lastName', 'Last name is required');
+                    isValid = false;
+                }
+                
+                if (!formData.email || formData.email.trim() === '') {
+                    showValidationError('email', 'Email address is required');
+                    isValid = false;
+                } else if (!isValidEmail(formData.email)) {
+                    showValidationError('email', 'Please enter a valid email address');
+                    isValid = false;
+                }
+                
+                if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
+                    showValidationError('phoneNumber', 'Phone number is required');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    console.log('Form validation failed, stopping submission');
+                    return;
+                }
+                
+                console.log('All validations passed, proceeding with form submission');
+                
+                // Disable submit button and show loading
+                const $submitBtn = $('#submitStaffBtn');
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Adding Staff...');
+                
+                // Debug logging
+                console.log('Submitting staff form with data:', formData);
+                console.log('Form validation passed, proceeding with submission...');
+                console.log('Username provided:', formData.username ? 'Yes' : 'No');
+                console.log('Password provided:', formData.password ? 'Yes' : 'No');
+                
+                // Submit form
+                $.ajax({
+                    url: '@Url.Action("AddStaff", "Admin")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        console.log('Server response:', response);
+                        if (response.success) {
+                            // Reset form
+                            $('#staffForm')[0].reset();
+                            $('.form-control').removeClass('is-invalid');
+                            $('.invalid-feedback').text('');
+                            
+                            // Hide modal
+                            $('#staffModal').modal('hide');
+                            
+                            // Show success message
+                            showAlert('success', response.message || 'Staff member added successfully! Login credentials have been sent to their email.');
+                            
+                            // Refresh the staff table without full page reload
+                            setTimeout(function() {
+                                // Reload the page to show new staff member
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            // Handle validation errors
+                            if (response.errors) {
+                                for (const field in response.errors) {
+                                    const fieldName = field.charAt(0).toLowerCase() + field.slice(1);
+                                    showValidationError(fieldName, response.errors[field][0]);
+                                }
+                            } else {
+                                showAlert('danger', response.message || 'Failed to add staff member.');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error:', xhr);
+                        console.log('Response Text:', xhr.responseText);
+                        console.log('Status:', xhr.status);
+                        console.log('Error:', error);
+                        
+                        let errorMessage = 'An error occurred while adding the staff member.';
+                        
+                        if (xhr.status === 0) {
+                            errorMessage = 'Network error. Please check your internet connection and try again.';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error. Please try again later.';
+                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            // Handle validation errors
+                            const errors = xhr.responseJSON.errors;
+                            for (const field in errors) {
+                                const fieldName = field.charAt(0).toLowerCase() + field.slice(1);
+                                showValidationError(fieldName, errors[field][0]);
+                            }
+                            return; // Don't show general error if we have field-specific errors
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        
+                        showAlert('danger', errorMessage);
+                    },
+                    complete: function() {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).html('<i class="fas fa-user-plus me-1"></i>Add Staff Member');
+                    }
+                });
+            });
+
+            // Handle edit staff form submission
+            $('#editStaffForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Clear previous validation
+                $('.form-control').removeClass('is-invalid');
+                $('.invalid-feedback').text('');
+                
+                // Get form data
+                const formData = {
+                    staffId: $('#editStaffId').val(),
+                    firstName: $('#editFirstName').val().trim(),
+                    lastName: $('#editLastName').val().trim(),
+                    email: $('#editEmail').val().trim(),
+                    phoneNo: $('#editPhoneNumber').val().trim()
+                };
+                
+                // Basic validation
+                let isValid = true;
+                
+                if (!formData.firstName) {
+                    showValidationError('editFirstName', 'First name is required');
+                    isValid = false;
+                }
+                
+                if (!formData.lastName) {
+                    showValidationError('editLastName', 'Last name is required');
+                    isValid = false;
+                }
+                
+                if (!formData.email) {
+                    showValidationError('editEmail', 'Email address is required');
+                    isValid = false;
+                } else if (!isValidEmail(formData.email)) {
+                    showValidationError('editEmail', 'Please enter a valid email address');
+                    isValid = false;
+                }
+                
+                if (!formData.phoneNo) {
+                    showValidationError('editPhoneNumber', 'Phone number is required');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    return;
+                }
+                
+                // Disable submit button and show loading
+                const $submitBtn = $('#updateStaffBtn');
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Updating Staff...');
+                
+                // Submit form
+                $.ajax({
+                    url: '@Url.Action("UpdateStaff", "Admin")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#editStaffModal').modal('hide');
+                            showAlert('success', response.message || 'Staff member updated successfully!');
+                            
+                            // Reload page to show updated staff
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('danger', response.message || 'Failed to update staff member.');
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'An error occurred while updating the staff member.');
+                    },
+                    complete: function() {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i>Update Staff Member');
+                    }
+                });
+            });
+
+            // Reset form when modal is hidden
+            $('#staffModal').on('hidden.bs.modal', function() {
+                $('#staffForm')[0].reset();
+                $('.form-control').removeClass('is-invalid');
+                $('.invalid-feedback').text('');
+                
+                // Clear username and password fields specifically
+                $('#username').val('');
+                $('#password').val('');
+            });
+        });
+    }
+    
+    // Start initialization
+    console.log('Staff page script loaded');
+    initializeStaffPage();
 </script>

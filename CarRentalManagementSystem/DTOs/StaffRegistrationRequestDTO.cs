@@ -22,6 +22,12 @@ namespace CarRentalManagementSystem.DTOs
         [RegularExpression(@"^[\d\s\-\+\(\)]+$", ErrorMessage = "Please enter a valid phone number")]
         public string PhoneNumber { get; set; } = string.Empty;
         
+        [StringLength(50, ErrorMessage = "Username cannot exceed 50 characters")]
+        public string Username { get; set; } = string.Empty;
+        
+        [StringLength(100, ErrorMessage = "Password cannot exceed 100 characters")]
+        public string Password { get; set; } = string.Empty;
+        
         public string Role { get; set; } = "Staff";
     }
 }
