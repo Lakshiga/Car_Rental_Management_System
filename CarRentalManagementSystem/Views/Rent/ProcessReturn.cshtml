@@ -42,8 +42,54 @@
                         <div class="mb-3">
                             <label asp-for="ActualReturnDate" class="form-label">Actual Return Date & Time</label>
                             <input asp-for="ActualReturnDate" class="form-control" type="datetime-local" 
-                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" onchange="calculateExtraCharges()" />
                             <span asp-validation-for="ActualReturnDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Damage Assessment -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-tools"></i> Damage Assessment</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="HasDamage" class="form-check-input" type="checkbox" id="hasDamageCheckbox" onchange="toggleDamageFields()" />
+                                        <label asp-for="HasDamage" class="form-check-label">
+                                            Do you have any damage?
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="damageFields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label asp-for="DamageReason" class="form-label">Damage Reason *</label>
+                                        <textarea asp-for="DamageReason" class="form-control" rows="3" 
+                                                  placeholder="Please describe the damage in detail..."></textarea>
+                                        <span asp-validation-for="DamageReason" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="DamageAmount" class="form-label">Damage Amount (₹) *</label>
+                                        <input asp-for="DamageAmount" class="form-control" type="number" 
+                                               step="0.01" min="0" placeholder="0.00" onchange="calculateExtraCharges()" />
+                                        <span asp-validation-for="DamageAmount" class="text-danger"></span>
+                                        <div class="form-text">Enter the estimated repair cost for the damage</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Return Checklist:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Inspect car for any new damages</li>
+                                <li>Check fuel level (should match pickup level)</li>
+                                <li>Verify all car accessories are present</li>
+                                <li>Record accurate final odometer reading</li>
+                                <li>Collect any outstanding payments</li>
+                            </ul>
                         </div>
 
                         <!-- Extra Charges Calculation -->
@@ -59,7 +105,7 @@
                                         <p><strong>Total Distance:</strong> <span id="totalDistance">-</span> KM</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Expected Distance:</strong> <span id="expectedDistance">@((rent.BookingDetails?.ReturnDate - rent.BookingDetails?.PickupDate)?.Days * 100 ?? 0)</span> KM</p>
+                                        <p><strong>Expected Distance:</strong> <span id="expectedDistance">-</span> KM</p>
                                         <p><strong>Extra Distance:</strong> <span id="extraDistance">-</span> KM</p>
                                         <p><strong>Per KM Rate:</strong> ₹@(rent.BookingDetails?.CarDetails?.PerKmRate ?? 0)</p>
                                     </div>
@@ -72,6 +118,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6><strong>Extra Charges:</strong> ₹<span id="extraCharges">0.00</span></h6>
+                                        <h6><strong>Damage Amount:</strong> ₹<span id="damageAmount">0.00</span></h6>
                                         <p><strong>Final Payment Due:</strong> ₹<span id="finalPaymentDue">@((rent.BookingDetails?.TotalCost ?? 0) * 0.5m)</span></p>
                                     </div>
                                 </div>
@@ -86,18 +133,6 @@
                                     • Final payment must be collected before completing return
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Return Checklist:</strong>
-                            <ul class="mb-0 mt-2">
-                                <li>Inspect car for any new damages</li>
-                                <li>Check fuel level (should match pickup level)</li>
-                                <li>Verify all car accessories are present</li>
-                                <li>Record accurate final odometer reading</li>
-                                <li>Collect any outstanding payments</li>
-                            </ul>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -165,8 +200,38 @@ else
         const perKmRate = @(rent?.BookingDetails?.CarDetails?.PerKmRate ?? 0);
         const baseAmount = @(rent?.BookingDetails?.TotalCost ?? 0);
         const startingKM = @(rent?.OdometerStart ?? 0);
-        const expectedDistance = @((rent?.BookingDetails?.ReturnDate - rent?.BookingDetails?.PickupDate)?.Days * (rent?.BookingDetails?.CarDetails?.AllowedKmPerDay ?? 100) ?? 0);
+        const pickupDate = new Date('@rent?.BookingDetails?.PickupDate.ToString("yyyy-MM-dd")');
         const advancePaid = baseAmount * 0.5;
+
+        function toggleDamageFields() {
+            const hasDamage = document.getElementById('hasDamageCheckbox').checked;
+            const damageFields = document.getElementById('damageFields');
+            
+            if (hasDamage) {
+                damageFields.style.display = 'block';
+                // Make damage fields required
+                document.querySelector('textarea[name="DamageReason"]').required = true;
+                document.querySelector('input[name="DamageAmount"]').required = true;
+            } else {
+                damageFields.style.display = 'none';
+                // Clear damage fields and make them not required
+                document.querySelector('textarea[name="DamageReason"]').value = '';
+                document.querySelector('input[name="DamageAmount"]').value = '';
+                document.querySelector('textarea[name="DamageReason"]').required = false;
+                document.querySelector('input[name="DamageAmount"]').required = false;
+                // Recalculate without damage
+                calculateExtraCharges();
+            }
+        }
+
+        function calculateExpectedDistance() {
+            const returnDateInput = document.getElementById('ActualReturnDate');
+            if (!returnDateInput.value) return 0;
+            
+            const returnDate = new Date(returnDateInput.value);
+            const rentalDays = Math.max(1, Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24)));
+            return rentalDays * 100; // 100 KM per day
+        }
 
         function calculateExtraCharges() {
             const endingKM = parseInt(document.getElementById('OdometerEnd').value) || 0;
@@ -178,17 +243,30 @@ else
             }
 
             const totalDistance = endingKM - startingKM;
+            const expectedDistance = calculateExpectedDistance();
             const extraDistance = Math.max(0, totalDistance - expectedDistance);
             const extraCharges = extraDistance * perKmRate;
-            const totalDue = baseAmount + extraCharges;
+            
+            // Get damage amount if damage checkbox is checked
+            const hasDamage = document.getElementById('hasDamageCheckbox').checked;
+            const damageAmount = hasDamage ? (parseFloat(document.querySelector('input[name="DamageAmount"]').value) || 0) : 0;
+            
+            const totalDue = baseAmount + extraCharges + damageAmount;
             const finalPaymentDue = totalDue - advancePaid;
 
             document.getElementById('endingKM').textContent = endingKM;
             document.getElementById('totalDistance').textContent = totalDistance;
+            document.getElementById('expectedDistance').textContent = expectedDistance;
             document.getElementById('extraDistance').textContent = extraDistance;
             document.getElementById('extraCharges').textContent = extraCharges.toFixed(2);
+            document.getElementById('damageAmount').textContent = damageAmount.toFixed(2);
             document.getElementById('totalDue').textContent = totalDue.toFixed(2);
             document.getElementById('finalPaymentDue').textContent = finalPaymentDue.toFixed(2);
         }
+
+        // Initialize calculation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateExtraCharges();
+        });
     </script>
 }

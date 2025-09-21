@@ -113,7 +113,7 @@ namespace CarRentalManagementSystem.Controllers
                 return View(request);
             }
 
-            var result = await _rentService.ProcessReturnAsync(request.RentID, request.OdometerEnd, request.ActualReturnDate);
+            var result = await _rentService.ProcessReturnAsync(request.RentID, request.OdometerEnd, request.ActualReturnDate, request.HasDamage, request.DamageReason, request.DamageAmount ?? 0);
             
             if (result.Success)
             {
@@ -140,13 +140,13 @@ namespace CarRentalManagementSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CalculateExtraCharges(int rentId, int odometerEnd)
+        public async Task<IActionResult> CalculateExtraCharges(int rentId, int odometerEnd, DateTime actualReturnDate)
         {
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin" && userRole != "Staff")
                 return Json(new { success = false, message = "Unauthorized" });
 
-            var extraCharges = await _rentService.CalculateExtraChargesAsync(rentId, odometerEnd);
+            var extraCharges = await _rentService.CalculateExtraChargesAsync(rentId, odometerEnd, actualReturnDate);
             return Json(new { success = true, extraCharges = extraCharges });
         }
 

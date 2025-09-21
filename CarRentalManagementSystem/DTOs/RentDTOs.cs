@@ -26,5 +26,8 @@ namespace CarRentalManagementSystem.DTOs
         public int RentID { get; set; }
         public int OdometerEnd { get; set; }
         public DateTime ActualReturnDate { get; set; } = DateTime.Now;
+        public bool HasDamage { get; set; }
+        public string? DamageReason { get; set; }
+        public decimal? DamageAmount { get; set; }
     }
 }
