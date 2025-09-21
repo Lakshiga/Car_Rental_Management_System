@@ -1,0 +1,483 @@
+@{
+    var userRole = Context.Session.GetString("UserRole");
+    var isCustomer = !string.IsNullOrEmpty(Context.Session.GetString("CustomerId"));
+    var isAdminOrStaff = userRole == "Admin" || userRole == "Staff";
+    var isLoggedIn = isCustomer || isAdminOrStaff;
+    var showChatbot = true; // Show on all pages
+    var chatCleared = TempData["ChatCleared"] as string;
+    
+    // Determine user context
+    string assistantTitle = "AI Assistant";
+    string assistantType = "General Support";
+    
+    if (isCustomer)
+    {
+        assistantTitle = "AI Assistant";
+        assistantType = "Customer Support";
+    }
+    else if (isAdminOrStaff)
+    {
+        assistantTitle = "AI Assistant";
+        assistantType = userRole + " Support";
+    }
+}
+
+@if (showChatbot)
+{
+    <!-- AI Assistant Floating Button -->
+    <div id="ai-assistant-float-btn" class="ai-assistant-float-btn" title="Chat with AI Assistant">
+        <i class="fas fa-robot"></i>
+        <div class="pulse-animation"></div>
+    </div>
+
+    <!-- AI Assistant Modal -->
+    <div id="ai-assistant-modal" class="ai-assistant-modal">
+        <div class="ai-assistant-modal-content">
+            <!-- Header -->
+            <div class="ai-assistant-header">
+                <div class="ai-assistant-title">
+                    <i class="fas fa-robot"></i>
+                    <span>@assistantTitle</span>
+                    <small class="assistant-type">@assistantType</small>
+                </div>
+                <button id="ai-assistant-close" class="ai-assistant-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="ai-assistant-quick-actions">
+                @if (isCustomer)
+                {
+                    <button class="quick-action-btn" data-message="How do I book a car?">
+                        <i class="fas fa-car"></i> Book Car
+                    </button>
+                    <button class="quick-action-btn" data-message="Show my current bookings">
+                        <i class="fas fa-list"></i> My Bookings
+                    </button>
+                    <button class="quick-action-btn" data-message="How do I make a payment?">
+                        <i class="fas fa-credit-card"></i> Payment Help
+                    </button>
+                }
+                else if (isAdminOrStaff)
+                {
+                    <button class="quick-action-btn" data-message="Show pending bookings">
+                        <i class="fas fa-clock"></i> Pending
+                    </button>
+                    <button class="quick-action-btn" data-message="How do I approve a booking?">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="quick-action-btn" data-message="Show system statistics">
+                        <i class="fas fa-chart-bar"></i> Stats
+                    </button>
+                }
+                else
+                {
+                    <button class="quick-action-btn" data-message="Tell me about your car rental services">
+                        <i class="fas fa-info"></i> Services
+                    </button>
+                    <button class="quick-action-btn" data-message="What cars do you have available?">
+                        <i class="fas fa-car"></i> Available Cars
+                    </button>
+                    <button class="quick-action-btn" data-message="How does the booking process work?">
+                        <i class="fas fa-question"></i> How to Book
+                    </button>
+                }
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div id="ai-assistant-messages" class="ai-assistant-messages">
+                <div class="ai-message welcome-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>
+                            Hi, welcome to Car Rental Pro. How can I help you?
+                        </p>
+                        <small class="message-time">Just now</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="ai-typing-indicator" class="ai-typing-indicator" style="display: none;">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="ai-assistant-input-area">
+                <div class="input-container">
+                    <input type="text" id="ai-assistant-input" placeholder="Type your message..." autocomplete="off">
+                    <button id="ai-assistant-send" class="send-btn" type="button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-hint">
+                    <small>💡 I can only help with car rental related questions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- AI Assistant Styles -->
+<style>
+.ai-assistant-float-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    color: white;
+    font-size: 24px;
+}
+
+.ai-assistant-float-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+.pulse-animation {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    background: #ff4757;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+.ai-assistant-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    backdrop-filter: blur(5px);
+}
+
+.ai-assistant-modal-content {
+    position: absolute;
+    bottom: 10px;
+    right: 30px;
+    width: 380px;
+    height: 450px;
+    background: white;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideInUp 0.3s ease;
+}
+
+@@keyframes slideInUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.ai-assistant-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.ai-assistant-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ai-assistant-title i {
+    font-size: 16px;
+}
+
+.assistant-type {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.ai-assistant-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.ai-assistant-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ai-assistant-quick-actions {
+    padding: 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quick-action-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.quick-action-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.ai-assistant-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    font-size: 12px;
+}
+
+.ai-message, .user-message {
+    display: flex;
+    margin-bottom: 12px;
+    animation: fadeInUp 0.3s ease;
+    font-size: 12px;
+}
+
+@@keyframes fadeInUp {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.ai-message .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+}
+
+.message-content {
+    max-width: 75%;
+    margin: 0 10px;
+}
+
+.ai-message .message-content {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px 12px 12px 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px 12px 4px 12px;
+    font-size: 12px;
+}
+
+.message-content p {
+    margin: 0;
+    line-height: 1.3;
+    font-size: 12px;
+}
+
+.message-time {
+    display: block;
+    margin-top: 3px;
+    opacity: 0.6;
+    font-size: 10px;
+}
+
+.welcome-message .message-content {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 1px solid #667eea;
+    color: #333;
+}
+
+.ai-typing-indicator {
+    display: flex;
+    margin: 0 15px 12px 15px;
+}
+
+.typing-dots {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px 12px 12px 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    background: #667eea;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+.ai-assistant-input-area {
+    padding: 10px 15px;
+    background: white;
+    border-top: 1px solid #dee2e6;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#ai-assistant-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    outline: none;
+    font-size: 12px;
+    transition: border-color 0.2s;
+}
+
+#ai-assistant-input:focus {
+    border-color: #667eea;
+}
+
+.send-btn {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    font-size: 12px;
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.input-hint {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.input-hint small {
+    color: #6c757d;
+    font-size: 9px;
+}
+
+/* Mobile Responsive */
+@@media (max-width: 768px) {
+    .ai-assistant-modal-content {
+        width: calc(100% - 20px);
+        height: 350px;
+        right: 10px;
+        bottom: 0;
+        left: 10px;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .ai-assistant-float-btn {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+</style>
+
+@if (!string.IsNullOrEmpty(chatCleared))
+{
+    <script>
+        // Clear all chat histories after logout
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof clearAllAIChats === 'function') {
+                clearAllAIChats();
+            }
+        });
+    </script>
+}
