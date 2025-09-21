@@ -6,13 +6,11 @@
     <title>@ViewData["Title"] - Car Rental Admin</title>
     
     @{ 
-        var userRole = Context.Session.GetString("UserRole");
         var userId = Context.Session.GetString("UserId");
         var staffId = Context.Session.GetString("StaffId");
     }
     
     <!-- User Context Metadata for AI Assistant -->
-    <meta name="user-role" content="@userRole" />
     <meta name="user-id" content="@userId" />
     <meta name="staff-id" content="@staffId" />
     
@@ -22,6 +20,7 @@
 </head>
 <body>
     @{ 
+        var userRole = Context.Session.GetString("UserRole");
         var adminAvatar = Context.Session.GetString("AvatarUrl"); 
         var displayName = Context.Session.GetString("DisplayName") ?? (userRole ?? "Admin"); 
         var dashboardTitle = userRole == "Staff" ? "Staff Dashboard" : "Admin Dashboard";

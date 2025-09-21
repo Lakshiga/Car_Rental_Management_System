@@ -126,6 +126,7 @@
                                 <th>Activity</th>
                                 <th>User</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,18 +135,21 @@
                                 <td>New booking request</td>
                                 <td>John Doe</td>
                                 <td><span class="badge bg-warning">Pending</span></td>
+                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(1)">View</button></td>
                             </tr>
                             <tr>
                                 <td>4 hours ago</td>
                                 <td>Car returned</td>
                                 <td>Jane Smith</td>
                                 <td><span class="badge bg-success">Completed</span></td>
+                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(2)">View</button></td>
                             </tr>
                             <tr>
                                 <td>1 day ago</td>
                                 <td>New car added</td>
                                 <td>Admin</td>
                                 <td><span class="badge bg-info">System</span></td>
+                                <td><button class="btn btn-sm btn-outline-primary" onclick="viewActivityDetails(3)">View</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -233,6 +237,12 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+        
+        // View Activity Details function
+        function viewActivityDetails(activityId) {
+            alert('View details for activity ID: ' + activityId + '. This would show more detailed information about the activity.');
+            // In a real implementation, this would load detailed information about the activity
         }
     </script>
 }
