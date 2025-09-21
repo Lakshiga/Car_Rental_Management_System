@@ -28,10 +28,16 @@ class AIAssistant {
                 id: customerId,
                 role: 'Customer'
             };
-        } else if (userRole === 'Admin' || userRole === 'Staff') {
+        } else if (userRole === 'Admin') {
             return {
                 type: 'admin',
-                id: staffId || userId || 'admin',
+                id: userId || 'admin',
+                role: userRole
+            };
+        } else if (userRole === 'Staff') {
+            return {
+                type: 'staff',
+                id: staffId || 'staff',
                 role: userRole
             };
         } else {
@@ -49,6 +55,8 @@ class AIAssistant {
                 return '/api/aiassistant/customer';
             case 'admin':
                 return '/api/aiassistant/admin';
+            case 'staff':
+                return '/api/aiassistant/staff';
             case 'guest':
                 return '/api/aiassistant/guest';
             default:
@@ -368,7 +376,15 @@ class AIAssistant {
     async getContextualHelp() {
         try {
             const currentPage = window.location.pathname.split('/').pop() || 'dashboard';
-            const contextEndpoint = this.userType === 'customer' ? '/api/aiassistant/context/customer' : '/api/aiassistant/context/admin';
+            let contextEndpoint = '/api/aiassistant/context/guest';
+            
+            if (this.userType === 'customer') {
+                contextEndpoint = '/api/aiassistant/context/customer';
+            } else if (this.userType === 'admin') {
+                contextEndpoint = '/api/aiassistant/context/admin';
+            } else if (this.userType === 'staff') {
+                contextEndpoint = '/api/aiassistant/context/staff';
+            }
             
             const response = await fetch(`${contextEndpoint}?page=${currentPage}`);
             const data = await response.json();

@@ -16,6 +16,38 @@ namespace CarRentalManagementSystem.Services
             var knowledgeBase = @"
 # Enhanced Car Rental Management System Knowledge Base
 
+## User Flow Guides
+
+### CUSTOMER FLOW (Quick Steps)
+1. **Register/Login** → Create account or sign in
+2. **Browse Cars** → View available vehicles with details
+3. **Select & Book** → Choose car, dates, upload license
+4. **Wait for Approval** → Admin reviews and approves booking
+5. **Make Payment** → Pay 50% advance via credit card
+6. **Get Confirmation** → Receive booking confirmation email
+7. **Pick Up Car** → Collect vehicle with odometer reading
+8. **Return Car** → Return vehicle and complete settlement
+
+### ADMIN FLOW (Management Steps)
+1. **Dashboard Overview** → View system statistics and metrics
+2. **Review Bookings** → Approve/reject customer requests
+3. **Manage Fleet** → Add/edit/remove cars from inventory
+4. **Staff Management** → Add/manage staff accounts
+5. **Customer Management** → View customer profiles and history
+6. **Process Rentals** → Confirm rentals and handle returns
+7. **Payment Oversight** → Monitor transactions and settlements
+8. **Generate Reports** → Business analytics and insights
+
+### STAFF FLOW (Operational Steps)
+1. **Dashboard Review** → Check pending tasks and operations
+2. **Process Bookings** → Approve/reject customer requests
+3. **Rental Operations** → Confirm rentals and odometer readings
+4. **Handle Returns** → Process vehicle returns and damage assessment
+5. **Customer Service** → Assist customers with inquiries
+6. **Settlement Processing** → Complete final payments and charges
+7. **Status Updates** → Update booking and rental statuses
+8. **Documentation** → Maintain rental records and receipts
+
 ## Project-Specific FAQ Responses
 
 ### Core Rental Questions & Answers
