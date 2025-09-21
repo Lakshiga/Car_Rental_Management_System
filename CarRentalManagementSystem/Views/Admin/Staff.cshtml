@@ -416,12 +416,23 @@
             // Initialize DataTable for better table functionality
             if ($('#staffTable').length) {
                 try {
-                    $('#staffTable').DataTable({
+                    const table = $('#staffTable').DataTable({
                         "pageLength": 10,
                         "order": [[ 0, "desc" ]],
                         "columnDefs": [
                             { "orderable": false, "targets": [7] }
-                        ]
+                        ],
+                        "drawCallback": function(settings) {
+                            // Hide pagination if there are fewer than 5 rows
+                            const info = this.api().page.info();
+                            const totalRows = info.recordsTotal;
+                            
+                            if (totalRows < 5) {
+                                $('.dataTables_paginate').hide();
+                            } else {
+                                $('.dataTables_paginate').show();
+                            }
+                        }
                     });
                     console.log('DataTable initialized successfully');
                 } catch (error) {
@@ -621,7 +632,7 @@
                     success: function(response) {
                         if (response.success) {
                             $('#editStaffModal').modal('hide');
-                            showAlert('success', response.message || 'Staff member updated successfully!');
+                            showAlert('success', 'Update Successful!');
                             
                             // Reload page to show updated staff
                             setTimeout(function() {

@@ -44,6 +44,16 @@ namespace CarRentalManagementSystem.Controllers
             ViewBag.PendingBookings = bookings.Count(b => b.Status == "Pending");
             ViewBag.UserRole = userRole;
 
+            // Get recent activity data - last 3 bookings
+            var recentBookings = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.Car)
+                .OrderByDescending(b => b.CreatedAt)
+                .Take(3)
+                .ToListAsync();
+
+            ViewBag.RecentBookings = recentBookings;
+
             return View();
         }
 
@@ -319,21 +329,47 @@ namespace CarRentalManagementSystem.Controllers
             return Json(new { success = false, message = "Failed to confirm booking. Booking must be in Pending status." });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RejectBooking(int bookingId)
+        [HttpGet]
+        public async Task<IActionResult> GetBookingForRejection(int bookingId)
         {
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin" && userRole != "Staff")
                 return Json(new { success = false, message = "Unauthorized" });
 
+            var booking = await _bookingService.GetBookingByIdAsync(bookingId);
+            if (booking == null)
+                return Json(new { success = false, message = "Booking not found." });
+
+            var advanceAmount = booking.TotalCost * 0.5m; // 50% advance payment
+            
+            return Json(new { 
+                success = true, 
+                bookingId = booking.BookingID,
+                customerName = booking.CustomerName,
+                carName = booking.CarDetails?.CarName,
+                totalCost = booking.TotalCost,
+                advanceAmount = advanceAmount
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectBooking(int bookingId, string rejectionReason)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin" && userRole != "Staff")
+                return Json(new { success = false, message = "Unauthorized" });
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+                return Json(new { success = false, message = "Rejection reason is required." });
+
             var username = HttpContext.Session.GetString("DisplayName") ?? "Unknown";
             var rejectedByText = $"{userRole} ({username})";
             
-            var result = await _bookingService.RejectBookingAsync(bookingId, rejectedByText);
+            var result = await _bookingService.RejectBookingAsync(bookingId, rejectedByText, rejectionReason);
             
-            if (result)
+            if (result.Success)
             {
-                // Send rejection email
+                // Send rejection email with refund instructions
                 var booking = await _bookingService.GetBookingByIdAsync(bookingId);
                 if (booking != null)
                 {
@@ -342,14 +378,15 @@ namespace CarRentalManagementSystem.Controllers
                     
                     if (customer != null)
                     {
-                        await _emailService.SendBookingRejectionAsync(customer.Email, customer.FullName, bookingId);
+                        var advanceAmount = booking.TotalCost * 0.5m; // 50% advance payment
+                        await _emailService.SendBookingRejectionAsync(customer.Email, customer.FullName, bookingId, rejectionReason, advanceAmount);
                     }
                 }
                 
-                return Json(new { success = true, message = "Booking rejected successfully!" });
+                return Json(new { success = true, message = result.Message });
             }
             
-            return Json(new { success = false, message = "Failed to reject booking." });
+            return Json(new { success = false, message = result.Message ?? "Failed to reject booking." });
         }
 
         [HttpPost]

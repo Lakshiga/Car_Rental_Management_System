@@ -13,7 +13,7 @@ namespace CarRentalManagementSystem.Services.Interfaces
         Task<decimal> CalculateRentalCostAsync(int carId, DateTime pickupDate, DateTime returnDate);
         Task<bool> ConfirmBookingAsync(int bookingId);
         Task<bool> ApproveBookingAsync(int bookingId, string approvedBy);
-        Task<bool> RejectBookingAsync(int bookingId, string rejectedBy);
+        Task<(bool Success, string? Message)> RejectBookingAsync(int bookingId, string rejectedBy, string rejectionReason);
         Task<(bool Success, int RentId)> StartRentAsync(int bookingId, int odometerStart);
     }
 }
