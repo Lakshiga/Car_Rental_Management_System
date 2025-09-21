@@ -131,6 +131,8 @@ namespace CarRentalManagementSystem.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            // Add a flag to indicate logout happened so frontend can clear chat histories
+            TempData["ChatCleared"] = "true";
             return RedirectToAction("Index", "Home");
         }
 

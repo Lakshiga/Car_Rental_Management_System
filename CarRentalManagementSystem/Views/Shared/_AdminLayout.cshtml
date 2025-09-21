@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Car Rental Admin</title>
+    
+    @{ 
+        var userRole = Context.Session.GetString("UserRole");
+        var userId = Context.Session.GetString("UserId");
+        var staffId = Context.Session.GetString("StaffId");
+    }
+    
+    <!-- User Context Metadata for AI Assistant -->
+    <meta name="user-role" content="@userRole" />
+    <meta name="user-id" content="@userId" />
+    <meta name="staff-id" content="@staffId" />
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -151,9 +163,13 @@
         </div>
     </div>
 
+    <!-- AI Assistant Chatbot -->
+    @await Html.PartialAsync("_AIAssistantPartial")
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/ai-assistant.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
