@@ -1,5 +1,8 @@
 using CarRentalManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
+using CarRentalManagementSystem.Interfaces;
+using CarRentalManagementSystem.Repositories;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -57,6 +60,12 @@ builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IBookin
 builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IEmailService, CarRentalManagementSystem.Services.EmailService>();
 builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IPaymentService, CarRentalManagementSystem.Services.PaymentService>();
 builder.Services.AddScoped<CarRentalManagementSystem.Services.Interfaces.IRentService, CarRentalManagementSystem.Services.RentService>();
+
+// Register Repositories
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register AI Assistant Services
 builder.Services.AddHttpClient<CarRentalManagementSystem.Services.Interfaces.IAIAssistantService, CarRentalManagementSystem.Services.AIAssistantService>();
