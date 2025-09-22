@@ -30,8 +30,12 @@ namespace CarRentalManagementSystem.Controllers
             {
                 var customerIdString = HttpContext.Session.GetString("CustomerId");
                 var userIdString = HttpContext.Session.GetString("UserId");
+                var userRole = HttpContext.Session.GetString("UserRole");
                 if (string.IsNullOrEmpty(customerIdString) || string.IsNullOrEmpty(userIdString))
                     return Json(new { success = false, message = "Please login to make a booking." });
+
+                if (userRole != "Customer")
+                    return Json(new { success = false, message = "Only customers can make bookings." });
 
                 var customerId = int.Parse(customerIdString);
                 var userId = int.Parse(userIdString);
@@ -57,6 +61,10 @@ namespace CarRentalManagementSystem.Controllers
 
                 if (!ModelState.IsValid)
                     return Json(new { success = false, message = "Invalid booking data." });
+
+                // Ensure dates are provided (enforce filtering first)
+                if (model.PickupDate == default || model.ReturnDate == default)
+                    return Json(new { success = false, message = "Please select pickup and return dates before booking." });
 
                 // Validate dates (allow today's date, disallow past dates)
                 if (model.PickupDate.Date < DateTime.Today)
@@ -99,11 +107,19 @@ namespace CarRentalManagementSystem.Controllers
             {
                 var customerIdString = HttpContext.Session.GetString("CustomerId");
                 var userIdString = HttpContext.Session.GetString("UserId");
+                var userRole = HttpContext.Session.GetString("UserRole");
                 if (string.IsNullOrEmpty(customerIdString) || string.IsNullOrEmpty(userIdString))
                     return Json(new { success = false, message = "Please login to make a booking." });
 
+                if (userRole != "Customer")
+                    return Json(new { success = false, message = "Only customers can make bookings." });
+
                 var customerId = int.Parse(customerIdString);
                 var userId = int.Parse(userIdString);
+
+                // Ensure dates are provided (enforce filtering first)
+                if (model.PickupDate == default || model.ReturnDate == default)
+                    return Json(new { success = false, message = "Please select pickup and return dates before booking." });
 
                 // Validate dates (allow today's date, disallow past dates)
                 if (model.PickupDate.Date < DateTime.Today)

@@ -3,10 +3,24 @@
     ViewData["Title"] = "Sign Up";
 }
 
+@section Styles {
+    <style>
+        .form-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
+        .form-header { text-align: center; }
+        .form-header .icon { width: 48px; height: 48px; margin: 0 auto; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(59,130,246,.15), rgba(99,102,241,.15)); border: 1px solid #e5e7eb; border-radius: 12px; }
+        .form-header .icon i { width: 24px; height: 24px; color: #3b82f6; }
+        .form-container .form-label { color: #334155; font-weight: 600; }
+        .form-container .form-control { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
+        .form-container .input-group-text, .form-container .btn.btn-outline-secondary { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
+        .form-container .btn.btn-primary { background: linear-gradient(135deg,#3b82f6,#6366f1); border: none; font-weight: 600; letter-spacing: .2px; }
+        .form-container .btn.btn-primary:hover { filter: brightness(1.05); }
+        @@media (max-width: 576px) { .form-container { padding: 1.25rem; } }
+    </style>
+}
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="form-container" style="margin: 1.5rem 0; padding: 1.5rem;">
+        <div class="col-md-12 col-lg-10">
+            <div class="form-container">
                 <div class="form-header text-center mb-3">
                     <div class="icon">
                         <i data-lucide="user-plus"></i>
@@ -75,7 +89,6 @@
                                     <div class="input-group">
                                         <span class="input-group-text"><i data-lucide="lock"></i></span>
                                         <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm password" required autocomplete="new-password" id="confirmPasswordInput" />
-                                        <button type="button" class="btn btn-outline-secondary" id="togglePassword2" tabindex="-1"><i data-lucide="eye"></i></button>
                                     </div>
                                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                                     <small id="pwdMatchText" class="text-muted"></small>
@@ -117,7 +130,6 @@
             const strengthText = document.getElementById('pwdStrengthText');
             const matchText = document.getElementById('pwdMatchText');
             const toggle1 = document.getElementById('togglePassword');
-            const toggle2 = document.getElementById('togglePassword2');
 
             function calcStrength(value) {
                 let score = 0;
@@ -159,7 +171,8 @@
                 });
             }
             if (toggle1 && pwd) toggle(toggle1, pwd);
-            if (toggle2 && confirm) toggle(toggle2, confirm);
         })();
     </script>
 }
+
+@section HideFooter { }

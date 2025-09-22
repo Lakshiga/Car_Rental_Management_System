@@ -4,19 +4,22 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-credit-card me-2"></i>Payments Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2" role="group">
+            <button class="btn btn-outline-secondary" onclick="exportPayments()">
+                <i class="fas fa-download me-1"></i>Export
+            </button>
+            <button class="btn btn-outline-secondary" onclick="filterPayments()">
+                <i class="fas fa-filter me-1"></i>Filter
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-credit-card me-2"></i>Payments Management</h2>
-            <div class="btn-group" role="group">
-                <button class="btn btn-outline-secondary" onclick="exportPayments()">
-                    <i class="fas fa-download me-1"></i>Export
-                </button>
-                <button class="btn btn-outline-secondary" onclick="filterPayments()">
-                    <i class="fas fa-filter me-1"></i>Filter
-                </button>
-            </div>
-        </div>
         
         @if (Model.Any())
         {
@@ -59,7 +62,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle" id="paymentsTable">
-                            <thead class="table-dark">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Payment ID</th>
                                     <th>Booking ID</th>

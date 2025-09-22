@@ -137,6 +137,20 @@ namespace CarRentalManagementSystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetMyLicense()
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString) || userRole != "Customer")
+                return Json(new { success = false, message = "Not logged in as customer" });
+
+            var userId = int.Parse(userIdString);
+            var customer = await _userService.GetCustomerByUserIdAsync(userId);
+            var license = customer?.LicenseNo ?? string.Empty;
+            return Json(new { success = true, licenseNo = license });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Profile()
         {
             var userRole = HttpContext.Session.GetString("UserRole");

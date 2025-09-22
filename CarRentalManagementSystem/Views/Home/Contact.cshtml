@@ -2,31 +2,31 @@
     ViewData["Title"] = "Contact Us";
 }
 
-<!-- Contact Hero Section -->
-<div class="contact-hero">
-    <div class="hero-overlay"></div>
-    <div class="container">
+<!-- Contact Hero Section (aligned with Home) -->
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-accent) 100%); position: relative; overflow: hidden;">
+    <div class="hero-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); z-index: 1;"></div>
+    <div class="container" style="position: relative; z-index: 2;">
         <div class="row align-items-center min-vh-50">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <div class="hero-content">
-                    <h1 class="hero-title">
-                        <i data-lucide="phone" class="hero-icon"></i>
+                    <h1 class="display-4 fw-bold mb-4 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        <i data-lucide="phone" class="me-2" style="width: 36px; height: 36px;"></i>
                         Get In Touch
                     </h1>
-                    <p class="hero-subtitle">We're here to help you with all your car rental needs. Contact us anytime!</p>
+                    <p class="lead mb-4 text-white-50" style="font-size: 1.2rem; line-height: 1.6;">We're here to help you with all your car rental needs. Contact us anytime!</p>
                     <div class="contact-methods">
                         <div class="method-item">
                             <i data-lucide="phone" class="method-icon"></i>
                             <div class="method-info">
                                 <span class="method-label">Call Us</span>
-                                <span class="method-value">+1 (555) 123-4567</span>
+                                <span class="method-value">+94 771234567</span>
                             </div>
                         </div>
                         <div class="method-item">
                             <i data-lucide="mail" class="method-icon"></i>
                             <div class="method-info">
                                 <span class="method-label">Email Us</span>
-                                <span class="method-value">info@carrental.com</span>
+                                <span class="method-value">info@carrentpro.com</span>
                             </div>
                         </div>
                         <div class="method-item">
@@ -39,21 +39,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 text-center">
-                <div class="hero-visual">
-                    <div class="contact-animation">
-                        <div class="contact-bubble bubble-1">
-                            <i data-lucide="phone" class="bubble-icon"></i>
-                        </div>
-                        <div class="contact-bubble bubble-2">
-                            <i data-lucide="mail" class="bubble-icon"></i>
-                        </div>
-                        <div class="contact-bubble bubble-3">
-                            <i data-lucide="message-circle" class="bubble-icon"></i>
-                        </div>
-                        <div class="center-bubble">
-                            <i data-lucide="headphones" class="center-icon"></i>
-                        </div>
+            <div class="col-lg-6">
+                <div class="hero-image-container" style="position: relative;">
+                    <img src="~/images/cars/1.jpg" alt="Contact CarRentalPro" class="img-fluid rounded shadow-lg"
+                         style="max-height: 500px; object-fit: cover; border-radius: 20px !important; width: 100%;"
+                         onerror="this.src='https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?q=80&w=1200&auto=format&fit=crop'">
+                    <div class="floating-badge" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <span class="text-primary fw-bold">We’re here 24/7</span>
                     </div>
                 </div>
             </div>
@@ -167,9 +159,9 @@
                             <div class="info-content">
                                 <h6 class="info-label">Office Address</h6>
                                 <p class="info-text">
-                                    123 Main Street<br>
-                                    Downtown District<br>
-                                    City, State 12345
+                                    Mann's school lane<br>
+                                    Uduvil<br>
+                                    Chunnakam
                                 </p>
                             </div>
                         </div>
@@ -180,7 +172,7 @@
                             </div>
                             <div class="info-content">
                                 <h6 class="info-label">Phone Number</h6>
-                                <p class="info-text">+1 (555) 123-4567</p>
+                                <p class="info-text">+94 771234565</p>
                             </div>
                         </div>
 
@@ -190,7 +182,7 @@
                             </div>
                             <div class="info-content">
                                 <h6 class="info-label">Email Address</h6>
-                                <p class="info-text">infocynexblazer@gmail.com</p>
+                                <p class="info-text">infocarrentpro@gmail.com</p>
                             </div>
                         </div>
 
@@ -266,7 +258,7 @@
                     <i class="fas fa-phone-alt fa-3x text-success mb-3"></i>
                     <h5 class="card-title">Call Us</h5>
                     <p class="card-text">Speak directly with our team</p>
-                    <a href="tel:+15551234567" class="btn btn-success">
+                    <a href="tel:+94771234567" class="btn btn-success">
                         <i class="fas fa-phone me-1"></i>Call Now
                     </a>
                 </div>
@@ -278,7 +270,7 @@
                     <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
                     <h5 class="card-title">Email Us</h5>
                     <p class="card-text">Send us your inquiries</p>
-                    <a href="mailto:infocynexblazer@gmail.com" class="btn btn-primary">
+                    <a href="mailto:infocarrentpro@gmail.com" class="btn btn-primary">
                         <i class="fas fa-envelope me-1"></i>Send Email
                     </a>
                 </div>

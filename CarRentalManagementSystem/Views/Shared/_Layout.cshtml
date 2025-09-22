@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     @{ 
@@ -49,27 +50,27 @@
                 <div class="collapse navbar-collapse align-items-center" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link modern-nav-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" && ViewContext.RouteData.Values["action"]?.ToString()=="Index"?" active":"")" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i data-lucide="home" class="nav-icon"></i>Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="About">
+                            <a class="nav-link modern-nav-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" && ViewContext.RouteData.Values["action"]?.ToString()=="About"?" active":"")" asp-area="" asp-controller="Home" asp-action="About">
                                 <i data-lucide="info" class="nav-icon"></i>About
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="BrowseCars">
+                            <a class="nav-link modern-nav-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" && ViewContext.RouteData.Values["action"]?.ToString()=="BrowseCars"?" active":"")" asp-area="" asp-controller="Home" asp-action="BrowseCars">
                                 <i data-lucide="car" class="nav-icon"></i>Cars
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Gallery">
+                            <a class="nav-link modern-nav-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" && ViewContext.RouteData.Values["action"]?.ToString()=="Gallery"?" active":"")" asp-area="" asp-controller="Home" asp-action="Gallery">
                                 <i data-lucide="image" class="nav-icon"></i>Gallery
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
+                            <a class="nav-link modern-nav-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" && ViewContext.RouteData.Values["action"]?.ToString()=="Contact"?" active":"")" asp-area="" asp-controller="Home" asp-action="Contact">
                                 <i data-lucide="phone" class="nav-icon"></i>Contact
                             </a>
                         </li>
@@ -97,10 +98,10 @@
                                         <span class="user-name">@(Context.Session.GetString("CustomerName") ?? Context.Session.GetString("DisplayName") ?? Context.Session.GetString("Username"))</span>
                                     </a>
                                     <ul class="dropdown-menu modern-dropdown">
-                                        <li><a class="dropdown-item modern-dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                        <li><a class="dropdown-item modern-dropdown-item@(ViewContext.RouteData.Values["controller"]?.ToString()=="Admin" && ViewContext.RouteData.Values["action"]?.ToString()=="Dashboard"?" active":"")" asp-controller="Admin" asp-action="Dashboard">
                                             <i data-lucide="layout-dashboard" class="dropdown-icon"></i>Dashboard
                                         </a></li>
-                                        <li><a class="dropdown-item modern-dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <li><a class="dropdown-item modern-dropdown-item@(ViewContext.RouteData.Values["controller"]?.ToString()=="Account" && ViewContext.RouteData.Values["action"]?.ToString()=="Profile"?" active":"")" asp-controller="Account" asp-action="Profile">
                                             <i data-lucide="user" class="dropdown-icon"></i>Profile
                                         </a></li>
                                         <li><hr class="dropdown-divider modern-divider"></li>
@@ -130,13 +131,13 @@
                                         <span class="user-name">@(Context.Session.GetString("CustomerName") ?? Context.Session.GetString("DisplayName") ?? Context.Session.GetString("Username"))</span>
                                     </a>
                                     <ul class="dropdown-menu modern-dropdown">
-                                        <li><a class="dropdown-item modern-dropdown-item" asp-controller="Customer" asp-action="Dashboard">
+                                        <li><a class="dropdown-item modern-dropdown-item@(ViewContext.RouteData.Values["controller"]?.ToString()=="Customer" && ViewContext.RouteData.Values["action"]?.ToString()=="Dashboard"?" active":"")" asp-controller="Customer" asp-action="Dashboard">
                                             <i data-lucide="layout-dashboard" class="dropdown-icon"></i>Dashboard
                                         </a></li>
-                                        <li><a class="dropdown-item modern-dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <li><a class="dropdown-item modern-dropdown-item@(ViewContext.RouteData.Values["controller"]?.ToString()=="Account" && ViewContext.RouteData.Values["action"]?.ToString()=="Profile"?" active":"")" asp-controller="Account" asp-action="Profile">
                                             <i data-lucide="user" class="dropdown-icon"></i>Profile
                                         </a></li>
-                                        <li><a class="dropdown-item modern-dropdown-item" asp-controller="Booking" asp-action="MyBookings">
+                                        <li><a class="dropdown-item modern-dropdown-item@(ViewContext.RouteData.Values["controller"]?.ToString()=="Booking" && ViewContext.RouteData.Values["action"]?.ToString()=="MyBookings"?" active":"")" asp-controller="Booking" asp-action="MyBookings">
                                             <i data-lucide="calendar" class="dropdown-icon"></i>My Bookings
                                         </a></li>
                                         <li><hr class="dropdown-divider modern-divider"></li>
@@ -150,12 +151,12 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link modern-nav-link auth-link" asp-controller="Account" asp-action="Login">
+                                <a class="nav-link modern-nav-link auth-link@(ViewContext.RouteData.Values["controller"]?.ToString()=="Account" && ViewContext.RouteData.Values["action"]?.ToString()=="Login"?" active":"")" asp-controller="Account" asp-action="Login">
                                     <i data-lucide="log-in" class="nav-icon"></i>Sign In
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link modern-nav-link auth-link signup-btn" asp-controller="Account" asp-action="Register">
+                                <a class="nav-link modern-nav-link auth-link signup-btn@(ViewContext.RouteData.Values["controller"]?.ToString()=="Account" && ViewContext.RouteData.Values["action"]?.ToString()=="Register"?" active":"")" asp-controller="Account" asp-action="Register">
                                     <i data-lucide="user-plus" class="nav-icon"></i>Sign Up
                                 </a>
                             </li>
@@ -192,6 +193,12 @@
     <!-- AI Assistant Chatbot -->
     @await Html.PartialAsync("_AIAssistantPartial")
 
+    @if (IsSectionDefined("HideFooter"))
+    {
+        @await RenderSectionAsync("HideFooter", required: false)
+    }
+    else
+    {
     <footer class="modern-footer">
         <div class="footer-content">
             <div class="container">
@@ -227,15 +234,15 @@
                         <div class="footer-contact">
                             <div class="contact-item">
                                 <i data-lucide="mail" class="contact-icon"></i>
-                                <span>infocynexblazer@gmail.com</span>
+                                <span>infocarrentpro@gmail.com</span>
                             </div>
                             <div class="contact-item">
                                 <i data-lucide="phone" class="contact-icon"></i>
-                                <span>+1 (555) 123-4567</span>
+                                <span>+94 771234567</span>
                             </div>
                             <div class="contact-item">
                                 <i data-lucide="map-pin" class="contact-icon"></i>
-                                <span>123 Main Street, City</span>
+                                <span>Mann's School Lane Uduvil</span>
                             </div>
                         </div>
                     </div>
@@ -277,6 +284,7 @@
             </div>
         </div>
     </footer>
+    }
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
