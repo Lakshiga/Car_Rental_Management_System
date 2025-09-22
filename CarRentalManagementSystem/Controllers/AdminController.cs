@@ -526,11 +526,10 @@ namespace CarRentalManagementSystem.Controllers
                 Console.WriteLine($"Failed to add staff member: {request.Email} may already be in use");
                 return Json(new { success = false, message = "Failed to add staff member. Email may already be in use." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the actual error for debugging
-                Console.WriteLine($"Error in AddStaff: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                // Error details are omitted in response for security; add logging as needed.
                 
                 return Json(new { success = false, message = "An error occurred while adding the staff member." });
             }
@@ -614,7 +613,7 @@ namespace CarRentalManagementSystem.Controllers
                 });
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "Failed to retrieve staff details." });
             }
@@ -643,7 +642,7 @@ namespace CarRentalManagementSystem.Controllers
                 
                 return Json(new { success = false, message = "Failed to update staff member." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "An error occurred while updating the staff member." });
             }
@@ -687,7 +686,7 @@ namespace CarRentalManagementSystem.Controllers
                     return Json(new { success = false, message = "Failed to delete staff member." });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "An error occurred while deleting the staff member." });
             }

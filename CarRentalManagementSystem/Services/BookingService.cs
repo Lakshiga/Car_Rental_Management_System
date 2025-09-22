@@ -1,20 +1,28 @@
 using Microsoft.EntityFrameworkCore;
-using CarRentalManagementSystem.Data;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 using CarRentalManagementSystem.DTOs;
 using CarRentalManagementSystem.Models;
 using CarRentalManagementSystem.Services.Interfaces;
 using CarRentalManagementSystem.Enums;
+using CarRentalManagementSystem.Interfaces;
 
 namespace CarRentalManagementSystem.Services
 {
     public class BookingService : IBookingService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBookingRepository _bookingRepo;
+        private readonly IPaymentRepository _paymentRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly ICarRepository _carRepo;
         private readonly ICarService _carService;
 
-        public BookingService(ApplicationDbContext context, ICarService carService)
+        public BookingService(IBookingRepository bookingRepo, IPaymentRepository paymentRepo, IUserRepository userRepo, ICarRepository carRepo, ICarService carService)
         {
-            _context = context;
+            _bookingRepo = bookingRepo;
+            _paymentRepo = paymentRepo;
+            _userRepo = userRepo;
+            _carRepo = carRepo;
             _carService = carService;
         }
 
@@ -30,7 +38,7 @@ namespace CarRentalManagementSystem.Services
                 var totalCost = await CalculateRentalCostAsync(request.CarID, request.PickupDate, request.ReturnDate);
 
                 // Get customer details
-                var customer = await _context.Customers.FindAsync(customerId);
+                var customer = await _userRepo.GetCustomerByIdAsync(customerId);
                 if (customer == null)
                     return (false, 0);
 
@@ -48,8 +56,7 @@ namespace CarRentalManagementSystem.Services
                     LicenseBackImage = await SaveImageAsync(request.LicenseBackImage)
                 };
 
-                _context.Bookings.Add(booking);
-                await _context.SaveChangesAsync();
+                await _bookingRepo.AddAsync(booking);
 
                 return (true, booking.BookingID);
             }
@@ -61,33 +68,21 @@ namespace CarRentalManagementSystem.Services
 
         public async Task<IEnumerable<BookingResponseDTO>> GetBookingsByCustomerAsync(int customerId)
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.Car)
-                .Include(b => b.Customer)
-                .Where(b => b.CustomerID == customerId)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
+            var bookings = await _bookingRepo.GetByCustomerAsync(customerId);
 
             return bookings.Select(MapToResponseDTO);
         }
 
         public async Task<IEnumerable<BookingResponseDTO>> GetAllBookingsAsync()
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.Car)
-                .Include(b => b.Customer)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
+            var bookings = await _bookingRepo.GetAllAsync();
 
             return bookings.Select(MapToResponseDTO);
         }
 
         public async Task<BookingResponseDTO?> GetBookingByIdAsync(int bookingId)
         {
-            var booking = await _context.Bookings
-                .Include(b => b.Car)
-                .Include(b => b.Customer)
-                .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+            var booking = await _bookingRepo.GetByIdAsync(bookingId);
 
             return booking != null ? MapToResponseDTO(booking) : null;
         }
@@ -96,12 +91,12 @@ namespace CarRentalManagementSystem.Services
         {
             try
             {
-                var booking = await _context.Bookings.FindAsync(bookingId);
+                var booking = await _bookingRepo.GetByIdAsync(bookingId);
                 if (booking == null)
                     return false;
 
                 booking.Status = status;
-                await _context.SaveChangesAsync();
+                await _bookingRepo.UpdateAsync(booking);
                 return true;
             }
             catch
@@ -112,7 +107,7 @@ namespace CarRentalManagementSystem.Services
 
         public async Task<decimal> CalculateRentalCostAsync(int carId, DateTime pickupDate, DateTime returnDate)
         {
-            var car = await _context.Cars.FindAsync(carId);
+            var car = await _carRepo.GetByIdAsync(carId);
             if (car == null)
                 return 0;
 
@@ -127,12 +122,12 @@ namespace CarRentalManagementSystem.Services
         {
             try
             {
-                var booking = await _context.Bookings.FindAsync(bookingId);
+                var booking = await _bookingRepo.GetByIdAsync(bookingId);
                 if (booking == null || booking.Status != "Pending")
                     return false;
 
                 booking.Status = "Confirmed";
-                await _context.SaveChangesAsync();
+                await _bookingRepo.UpdateAsync(booking);
                 return true;
             }
             catch
@@ -145,14 +140,14 @@ namespace CarRentalManagementSystem.Services
         {
             try
             {
-                var booking = await _context.Bookings.FindAsync(bookingId);
+                var booking = await _bookingRepo.GetByIdAsync(bookingId);
                 if (booking == null || booking.Status != "Confirmed")
                     return false;
 
                 booking.Status = "Approved";
                 booking.ApprovedBy = approvedBy;
                 booking.ApprovedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
+                await _bookingRepo.UpdateAsync(booking);
                 return true;
             }
             catch
@@ -166,8 +161,7 @@ namespace CarRentalManagementSystem.Services
             try
             {
                 // Get the booking
-                var booking = await _context.Bookings
-                    .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+                var booking = await _bookingRepo.GetByIdAsync(bookingId);
                 
                 if (booking == null)
                 {
@@ -184,7 +178,7 @@ namespace CarRentalManagementSystem.Services
                     booking.ApprovedBy = $"Rejected by {rejectedBy} - Reason: {rejectionReason}";
                     booking.ApprovedAt = DateTime.Now;
                     
-                    await _context.SaveChangesAsync();
+                    await _bookingRepo.UpdateAsync(booking);
                 }
 
                 // Record refund as a negative payment to affect revenue calculations
@@ -197,8 +191,7 @@ namespace CarRentalManagementSystem.Services
                     PaymentStatus = "Refunded"
                 };
 
-                _context.Payments.Add(refundPayment);
-                await _context.SaveChangesAsync();
+                await _paymentRepo.AddAsync(refundPayment);
 
                 return (true, $"Refunded successfully! Advance payment of ₹{advanceAmount:F2} has been deducted from revenue.");
             }
@@ -214,17 +207,13 @@ namespace CarRentalManagementSystem.Services
             try
             {
                 // Verify booking exists and is approved
-                var booking = await _context.Bookings
-                    .Include(b => b.Car)
-                    .Include(b => b.Customer)
-                    .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+                var booking = await _bookingRepo.GetByIdAsync(bookingId);
 
                 if (booking == null || booking.Status != "Approved")
                     return (false, 0);
 
                 // Check if rent already exists for this booking
-                var existingRent = await _context.Rents
-                    .FirstOrDefaultAsync(r => r.BookingID == bookingId);
+                var existingRent = await _bookingRepo.GetRentByBookingIdAsync(bookingId);
 
                 if (existingRent != null)
                     return (false, existingRent.RentID); // Already rented
@@ -237,16 +226,20 @@ namespace CarRentalManagementSystem.Services
                     RentDate = DateTime.Now
                 };
 
-                _context.Rents.Add(rent);
+                await _bookingRepo.AddRentAsync(rent);
 
                 // Update booking status to "Rented"
                 booking.Status = "Rented";
 
                 // Update car status to "Rented"
-                booking.Car.Status = "Rented";
-                booking.Car.IsAvailable = false;
+                if (booking.Car != null)
+                {
+                    booking.Car.Status = "Rented";
+                    booking.Car.IsAvailable = false;
+                    await _carRepo.UpdateAsync(booking.Car);
+                }
 
-                await _context.SaveChangesAsync();
+                await _bookingRepo.UpdateAsync(booking);
 
                 return (true, rent.RentID);
             }

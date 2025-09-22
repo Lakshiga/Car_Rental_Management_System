@@ -104,12 +104,12 @@ namespace CarRentalManagementSystem.Services
                 CustomerID = customer.CustomerID,
                 FullName = $"{customer.FirstName} {customer.LastName}",
                 Email = customer.Email,
-                Phone = customer.PhoneNo,
-                ImageUrl = customer.ImageUrl,
+                Phone = customer.PhoneNo ?? string.Empty,
+                ImageUrl = customer.ImageUrl ?? string.Empty,
                 Role = customer.User.Role,
-                NIC = customer.NIC,
-                LicenseNo = customer.LicenseNo,
-                Address = customer.Address
+                NIC = customer.NIC ?? string.Empty,
+                LicenseNo = customer.LicenseNo ?? string.Empty,
+                Address = customer.Address ?? string.Empty
             };
         }
 
