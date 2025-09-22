@@ -105,6 +105,7 @@ namespace CarRentalManagementSystem.Services
                 .Where(b => b.CarID == carId && 
                            b.Status != "Rejected" && 
                            b.Status != "Returned" &&
+                           b.Status != "Completed" &&
                            ((b.PickupDate <= pickupDate && b.ReturnDate >= pickupDate) ||
                             (b.PickupDate <= returnDate && b.ReturnDate >= returnDate) ||
                             (b.PickupDate >= pickupDate && b.ReturnDate <= returnDate)))
