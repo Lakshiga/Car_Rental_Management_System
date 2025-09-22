@@ -360,6 +360,10 @@ namespace CarRentalManagementSystem.Services
                 if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.Password))
                     return false;
 
+                // Prevent reusing the same password
+                if (BCrypt.Net.BCrypt.Verify(request.NewPassword, user.Password))
+                    return false;
+
                 // Update password and clear reset requirement
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
                 user.RequirePasswordReset = false;

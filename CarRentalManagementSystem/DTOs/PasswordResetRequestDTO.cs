@@ -9,6 +9,8 @@ namespace CarRentalManagementSystem.DTOs
         
         [Required(ErrorMessage = "New password is required")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
+        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{6,}$",
+            ErrorMessage = "Password must contain upper, lower, number, and special character")]
         public string NewPassword { get; set; } = string.Empty;
         
         [Required(ErrorMessage = "Password confirmation is required")]

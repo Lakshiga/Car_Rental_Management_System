@@ -604,6 +604,10 @@ main.col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
   box-shadow: 0 15px 40px rgba(30, 64, 175, 0.15);
 }
 
+.stats-card:hover::before {
+  filter: brightness(1.15) saturate(1.2);
+}
+
 .stats-card.success::before {
   background: linear-gradient(90deg, var(--customer-success), #10b981);
 }

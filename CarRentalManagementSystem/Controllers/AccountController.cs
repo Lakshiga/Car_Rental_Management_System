@@ -294,8 +294,9 @@ namespace CarRentalManagementSystem.Controllers
             
             if (result)
             {
-                TempData["SuccessMessage"] = "Password reset successfully! Please complete your profile.";
-                return RedirectToAction("CompleteProfile");
+                // Show success then take user to Login so they can authenticate with the NEW password
+                TempData["SuccessMessage"] = "Password reset successfully! Please login with your new password.";
+                return RedirectToAction("Login");
             }
             
             ModelState.AddModelError("", "Failed to reset password. Please check your current password.");
