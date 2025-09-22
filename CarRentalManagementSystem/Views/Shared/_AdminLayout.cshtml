@@ -23,7 +23,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
-<body>
+<body class="admin-layout">
     @{ 
         var userRole = Context.Session.GetString("UserRole");
         var adminAvatar = Context.Session.GetString("AvatarUrl"); 
@@ -100,36 +100,36 @@
                         @if (ViewBag.UserRole == "Admin")
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Customers">
+                                <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Admin" && ViewContext.RouteData.Values["Action"]?.ToString()=="Customers")?"active":"")" asp-controller="Admin" asp-action="Customers">
                                     <i class="fas fa-users"></i> Customers
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Staff">
+                                <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Admin" && ViewContext.RouteData.Values["Action"]?.ToString()=="Staff")?"active":"")" asp-controller="Admin" asp-action="Staff">
                                     <i class="fas fa-user-tie"></i> Staff
                                 </a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Rent" asp-action="Index">
-                                <i class="fas fa-key"></i> Rent Management
+                            <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Rent" && ViewContext.RouteData.Values["Action"]?.ToString()=="Index")?"active":"")" asp-controller="Rent" asp-action="Index">
+                                <i class="fas fa-key"></i> Rent 
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Rent" asp-action="ActiveRents">
+                            <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Rent" && ViewContext.RouteData.Values["Action"]?.ToString()=="ActiveRents")?"active":"")" asp-controller="Rent" asp-action="ActiveRents">
                                 <i class="fas fa-car"></i> Active Rents
                             </a>
                         </li>
                         @if (ViewBag.UserRole == "Admin")
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Payment" asp-action="Index">
+                                <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Payment" && ViewContext.RouteData.Values["Action"]?.ToString()=="Index")?"active":"")" asp-controller="Payment" asp-action="Index">
                                     <i class="fas fa-credit-card"></i> Payments
                                 </a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Admin" asp-action="History">
+                            <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString()=="Admin" && ViewContext.RouteData.Values["Action"]?.ToString()=="History")?"active":"")" asp-controller="Admin" asp-action="History">
                                 <i class="fas fa-history"></i> History
                             </a>
                         </li>

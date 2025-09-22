@@ -1,3 +1,59 @@
+/* ===== Admin Layout Spacing Fixes ===== */
+/* The public site adds body padding-top:56px for the fixed navbar. That doubled with
+   admin main margin creates extra white space. Remove the body padding for admin pages
+   and rely on main's margin to offset the fixed admin navbar. */
+body.admin-layout {
+  padding-top: 0 !important;
+}
+
+/* Tighten the top spacing in admin main area */
+body.admin-layout main.col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
+  margin-top: 64px !important;   /* offset fixed-top navbar + small breathing room */
+  padding-top: 1rem !important;  /* consistent top spacing across all admin pages */
+}
+
+/* Ensure page titles are not hidden behind the fixed navbar and anchor jumps align nicely */
+body.admin-layout main h1,
+body.admin-layout main .page-title {
+  margin-top: 0.3rem;
+  scroll-margin-top: 72px;
+}
+
+/* Increase spacing between sidebar buttons to reduce empty bottom space */
+body.admin-layout .admin-sidebar .nav {
+  display: flex;
+  flex-direction: column;
+  /* Fill available height so spacing stretches to bottom */
+  min-height: calc(100vh - 56px - 24px);
+  justify-content: space-between;
+  gap: 10px; /* base gap when content exceeds height */
+  padding: 12px 8px 12px 8px;
+}
+
+/* ===== Customer/Public Layout Spacing (matches admin visual) ===== */
+/* The public layout uses <main class="main-content"> in Views/Shared/_Layout.cshtml */
+main.main-content {
+  padding-top: 1.5rem; /* 56px navbar + 24px padding ≈ 80px visual offset (matches admin) */
+}
+
+main.main-content h1,
+main.main-content .page-title {
+  margin-top: 0.3rem; /* align heading spacing to match admin */
+  scroll-margin-top: 72px; /* ensure anchor jumps reveal titles below fixed navbar */
+}
+
+/* ===== Admin DataTables header color fix (force white) ===== */
+body.admin-layout table.dataTable thead th,
+body.admin-layout table.dataTable thead td {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border-bottom: 2px solid #dee2e6 !important;
+}
+
+body.admin-layout table.dataTable.no-footer {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
 html {
   font-size: 14px;
   scroll-behavior: smooth;
@@ -1405,10 +1461,10 @@ main.col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
 }
 
 .admin-cars-table th {
-  color: #ffffff;
+  color: #212529;
   font-weight: 600;
-  background-color: #343a40 !important;
-  border-color: #495057;
+  background-color: #ffffff !important;
+  border-color: #dee2e6;
 }
 
 .admin-cars-table td {
@@ -1463,6 +1519,38 @@ main.col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
   border-radius: 6px;
   font-size: 0.8rem;
   padding: 6px 10px;
+}
+
+/* Admin Staff table alignment */
+.admin-staff-table th,
+.admin-staff-table td {
+  vertical-align: middle;
+}
+
+.admin-staff-table thead th { 
+  text-align: center; 
+  background-color: #ffffff;
+  color: #1e293b;
+}
+
+.admin-staff-table thead th:nth-child(2), 
+.admin-staff-table thead th:nth-child(3), 
+.admin-staff-table thead th:nth-child(4)  {
+  text-align: left;
+}
+
+.admin-staff-table tbody td { 
+  text-align: center; 
+}
+
+.admin-staff-table tbody td:nth-child(2), 
+.admin-staff-table tbody td:nth-child(3), 
+.admin-staff-table tbody td:nth-child(4)  {
+  text-align: left;
+}
+
+.admin-staff-table tbody td:nth-child(2) .d-flex {
+  justify-content: flex-start !important;
 }
 
 /* Customer Profile Dropdown */
@@ -3463,6 +3551,17 @@ body {
     z-index: 2;
 }
 
+.cars-hero .hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+}
+
 .hero-features {
     display: flex;
     gap: 1.5rem;
@@ -4617,6 +4716,33 @@ body {
     z-index: 2;
 }
 
+/* Blurred Hero Variant (used by Gallery header) */
+.blurred-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.blurred-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--hero-bg);
+    background-size: var(--hero-size, cover);
+    background-position: var(--hero-position, center);
+    background-repeat: no-repeat;
+    filter: blur(var(--hero-blur, 6px)) brightness(var(--hero-brightness, 0.75));
+    transform: scale(var(--hero-scale, 1));
+    z-index: 0;
+}
+
+.blurred-hero .hero-overlay {
+    background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2));
+}
+
+.blurred-hero .hero-content { color: #fff; }
+.blurred-hero .hero-title { color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+.blurred-hero .hero-subtitle { color: rgba(255,255,255,0.9); }
+
 .gallery-stats {
     display: flex;
     gap: 2rem;
@@ -4772,39 +4898,49 @@ body {
     width: 100%;
     position: relative;
     overflow: hidden;
+    min-height: 120px; /* enforce equal height */
 }
 
-.tab-link::before {
+.gallery-tabs .tab-link::before { /* ensure correct overlay behavior for gallery cards */
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: linear-gradient(135deg, var(--customer-primary), var(--customer-accent));
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 1;
 }
 
-.tab-link.active::before,
-.tab-link:hover::before {
+.gallery-tabs .tab-link.active::before,
+.gallery-tabs .tab-link:hover::before {
     opacity: 1;
 }
 
-.tab-link.active,
-.tab-link:hover {
+.gallery-tabs .tab-link.active,
+.gallery-tabs .tab-link:hover {
     border-color: var(--customer-primary);
     transform: translateY(-4px);
     box-shadow: 0 10px 30px rgba(44, 90, 160, 0.15);
 }
 
-.tab-link.active .tab-icon,
-.tab-link.active .tab-title,
-.tab-link.active .tab-description,
-.tab-link:hover .tab-icon,
-.tab-link:hover .tab-title,
-.tab-link:hover .tab-description {
+/* Prevent white flash/background on click/focus */
+.gallery-tabs .tab-link:focus,
+.gallery-tabs .tab-link:active,
+.gallery-tabs .tab-link.active {
+    background-color: transparent !important;
+}
+
+/* Ensure equal visual size for cards */
+.gallery-tabs .tab-link {
+    min-height: 120px;
+}
+
+.gallery-tabs .tab-link.active .tab-icon,
+.gallery-tabs .tab-link.active .tab-title,
+.gallery-tabs .tab-link.active .tab-description,
+.gallery-tabs .tab-link:hover .tab-icon,
+.gallery-tabs .tab-link:hover .tab-title,
+.gallery-tabs .tab-link:hover .tab-description {
     color: var(--customer-light);
 }
 
@@ -4819,10 +4955,11 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
-.tab-link.active .tab-icon-wrapper,
-.tab-link:hover .tab-icon-wrapper {
+.gallery-tabs .tab-link.active .tab-icon-wrapper,
+.gallery-tabs .tab-link:hover .tab-icon-wrapper {
     background: rgba(255,255,255,0.2);
 }
 
@@ -4836,6 +4973,8 @@ body {
 .tab-content {
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
 }
 
 .tab-title {
@@ -4850,6 +4989,12 @@ body {
     font-size: 0.8rem;
     color: var(--customer-text);
     transition: color 0.3s ease;
+}
+
+/* Override Bootstrap pills active background turning the button white */
+.nav-pills .tab-link.active,
+.nav-pills .tab-link:focus {
+    background-color: transparent !important;
 }
 
 /* Gallery Content */

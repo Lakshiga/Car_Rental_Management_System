@@ -2,38 +2,54 @@
     ViewData["Title"] = "About Us";
 }
 
-<!-- About Hero Section -->
-<div class="modern-hero about-hero py-5 mb-5" style="background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-accent) 100%); position: relative; overflow: hidden;">
+<!-- About Hero Section (aligned with Home) -->
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-accent) 100%); position: relative; overflow: hidden;">
     <div class="hero-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); z-index: 1;"></div>
     <div class="container" style="position: relative; z-index: 2;">
         <div class="row align-items-center min-vh-50">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <div class="hero-content">
-                    <h1 class="hero-title">
-                        <i data-lucide="info" class="hero-icon"></i>
+                    <h1 class="display-4 fw-bold mb-4 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        <i data-lucide="info" class="me-2" style="width: 36px; height: 36px;"></i>
                         About CarRentalPro
                     </h1>
-                    <p class="hero-subtitle">Your trusted partner for reliable, affordable, and convenient car rental services since 2020.</p>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">5000+</div>
-                            <div class="stat-label">Happy Customers</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">50+</div>
-                            <div class="stat-label">Premium Cars</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">4.9</div>
-                            <div class="stat-label">Star Rating</div>
+                    <p class="lead mb-4 text-white-50" style="font-size: 1.2rem; line-height: 1.6;">
+                        Your trusted partner for reliable, affordable, and convenient car rental services since 2020.
+                    </p>
+                    <div class="hero-stats mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">5000+</h3>
+                                    <p class="text-white-50 mb-0 small">Happy Customers</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">50+</h3>
+                                    <p class="text-white-50 mb-0 small">Premium Cars</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="text-white fw-bold mb-1">4.9</h3>
+                                    <p class="text-white-50 mb-0 small">Star Rating</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <a href="@Url.Action("Contact")" class="btn btn-light btn-lg shadow-lg" style="border-radius: 12px; padding: 12px 30px; font-weight: 600;">
+                        <i data-lucide="phone" class="me-2" style="width: 20px; height: 20px;"></i> Contact Us
+                    </a>
                 </div>
             </div>
-            <div class="col-lg-4 text-center">
-                <div class="hero-visual">
-                    <div class="hero-circle">
-                        <i data-lucide="car" class="hero-main-icon"></i>
+            <div class="col-lg-6">
+                <div class="hero-image-container" style="position: relative;">
+                    <img src="~/images/car_gallary/car3.jpg" alt="About CarRentalPro" class="img-fluid rounded shadow-lg" 
+                         style="max-height: 500px; object-fit: cover; border-radius: 20px !important; width: 100%;"
+                         onerror="this.src='https://images.unsplash.com/photo-1549924231-f129b911e442?q=80&w=1200&auto=format&fit=crop'">
+                    <div class="floating-badge" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <span class="text-primary fw-bold">Since 2020</span>
                     </div>
                 </div>
             </div>
@@ -86,7 +102,7 @@
             </div>
             <div class="col-lg-6 mb-4">
                 <div class="image-container">
-                    <img src="~/images/about-us.jpg" alt="Our Company" class="modern-image">
+                    <img src="~/images/team/team7.jpg" alt="Our Company" class="modern-image">
                 </div>
             </div>
         </div>
@@ -235,7 +251,7 @@
             <div class="col-md-4 mb-4">
                 <div class="team-card">
                     <div class="team-image-wrapper">
-                        <img src="~/images/team/team1.jpg" alt="CEO" class="team-image">
+                        <img src="~/images/team/team5.jpg" alt="CEO" class="team-image">
                     </div>
                     <div class="team-info">
                         <h5 class="team-name">John Smith</h5>
@@ -323,7 +339,7 @@
                     </div>
                     <div class="testimonial-footer">
                         <div class="customer-info">
-                            <img src="~/images/profiles/profile1.jpg" alt="Customer" class="customer-avatar">
+                            <img src="~/images/team/team.jpg" alt="Customer" class="customer-avatar">
                             <div class="customer-details">
                                 <h6 class="customer-name">Emma Wilson</h6>
                                 <span class="customer-type">Regular Customer</span>
@@ -354,7 +370,7 @@
                     </div>
                     <div class="testimonial-footer">
                         <div class="customer-info">
-                            <img src="~/images/profiles/profile2.jpg" alt="Customer" class="customer-avatar">
+                            <img src="~/images/team/team2.jpg" alt="Customer" class="customer-avatar">
                             <div class="customer-details">
                                 <h6 class="customer-name">David Brown</h6>
                                 <span class="customer-type">Business Traveler</span>
@@ -385,7 +401,7 @@
                     </div>
                     <div class="testimonial-footer">
                         <div class="customer-info">
-                            <img src="~/images/profiles/profile3.jpg" alt="Customer" class="customer-avatar">
+                            <img src="~/images/team/team6.jpg" alt="Customer" class="customer-avatar">
                             <div class="customer-details">
                                 <h6 class="customer-name">Lisa Garcia</h6>
                                 <span class="customer-type">Family Vacation</span>
@@ -416,7 +432,7 @@
                 <div class="video-container">
                     <div class="video-wrapper">
                         <div class="ratio ratio-16x9">
-                            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Company Video" allowfullscreen></iframe>
+                            <iframe src="https://www.youtube-nocookie.com/embed/heQLSkC9Zf8?rel=0" title="Company Video" allowfullscreen></iframe>
                         </div>
                     </div>
                     <div class="video-stats">
