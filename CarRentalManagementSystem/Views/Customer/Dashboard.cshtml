@@ -20,7 +20,7 @@
                             </nav>
                         </div>
                         <div>
-                            <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary">
+                            <a href="@Url.Action("BrowseCars", "Home", new { newBooking = 1 })" class="btn btn-customer-primary">
                                 <i data-lucide="plus" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> New Booking
                             </a>
                         </div>
@@ -96,7 +96,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3 mb-3">
-                                <a href="@Url.Action("BrowseCars", "Home")" class="btn btn-customer-primary w-100 py-3">
+                                <a href="@Url.Action("BrowseCars", "Home", new { newBooking = 1 })" class="btn btn-customer-primary w-100 py-3">
                                     <i data-lucide="car" style="width: 32px; height: 32px; margin: 0 auto 8px auto; display: block;"></i>
                                     Browse Cars
                                 </a>

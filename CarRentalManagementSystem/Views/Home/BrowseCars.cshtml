@@ -386,7 +386,8 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">License Number</label>
-                                <input type="text" class="form-control" id="licenseNumber" name="LicenseNumber" required>
+                                <input type="text" class="form-control" id="licenseNumber" name="LicenseNumber" required readonly>
+                                <div class="form-text">This comes from your profile. Update it from Profile if needed.</div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">License Front Image</label>
@@ -425,6 +426,19 @@
             $('#fuelType').val(urlParams.get('fuelType') || '');
             $('#seatingCapacity').val(urlParams.get('seatingCapacity') || '');
             $('#priceRange').val(urlParams.get('priceRange') || '');
+            // If arriving from Dashboard New Booking, jump to filters and focus date
+            if (urlParams.get('newBooking') === '1') {
+                const $filterSection = $('.search-filter-section');
+                if ($filterSection.length) {
+                    $('html, body').animate({ scrollTop: $filterSection.offset().top - 80 }, 400, function () {
+                        $('#pickupDate').trigger('focus');
+                    });
+                    // Ensure filter body visible
+                    if (!filtersVisible) {
+                        toggleFilters();
+                    }
+                }
+            }
             
             // Set minimum date to today
             const today = new Date().toISOString().split('T')[0];

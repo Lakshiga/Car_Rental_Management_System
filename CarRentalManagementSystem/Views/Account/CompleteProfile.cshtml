@@ -81,6 +81,35 @@
                             <strong>Note:</strong> Once you complete your profile, you'll gain full access to the system features.
                         </div>
                         
+                        <!-- Inline Password Reset (optional, for convenience) -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="fas fa-key me-1"></i> Reset Password (Recommended on first login)
+                            </div>
+                            <div class="card-body">
+                                <form asp-action="ResetPassword" asp-controller="Account" method="post" class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" name="CurrentPassword" class="form-control" placeholder="Enter current password" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" name="NewPassword" class="form-control" placeholder="Enter new password (min 6 chars)" minlength="6" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <input type="password" name="ConfirmPassword" class="form-control" placeholder="Confirm new password" minlength="6" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-save me-1"></i> Update Password
+                                        </button>
+                                        <small class="text-muted ms-2">You will be asked to login again with the new password.</small>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-check me-1"></i>Complete Profile
