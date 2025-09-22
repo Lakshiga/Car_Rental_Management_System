@@ -41,7 +41,7 @@ namespace CarRentalManagementSystem.Controllers
             ViewBag.TotalFleet = cars.Count();
             ViewBag.AvailableCars = cars.Count(c => c.AvailabilityStatus == "Available");
             ViewBag.TotalBookings = bookings.Count();
-            ViewBag.PendingBookings = bookings.Count(b => b.Status == "Pending");
+            ViewBag.PendingBookings = bookings.Count(b => b.Status == "Pending" || b.Status == "Confirmed");            
             ViewBag.UserRole = userRole;
 
             // Get recent activity data - last 3 bookings
@@ -604,16 +604,15 @@ namespace CarRentalManagementSystem.Controllers
                 if (staff == null)
                     return Json(new { success = false, message = "Staff member not found." });
 
+                // Return flattened object to match frontend expectations
                 return Json(new { 
-                    success = true, 
-                    staff = new {
-                        staffID = staff.StaffID,
-                        firstName = staff.FirstName,
-                        lastName = staff.LastName,
-                        email = staff.Email,
-                        phoneNo = staff.PhoneNumber ?? ""
-                    }
+                    staffID = staff.StaffID,
+                    firstName = staff.FirstName,
+                    lastName = staff.LastName,
+                    email = staff.Email,
+                    phoneNo = staff.PhoneNumber ?? ""
                 });
+
             }
             catch (Exception ex)
             {
@@ -639,7 +638,7 @@ namespace CarRentalManagementSystem.Controllers
                 
                 if (result)
                 {
-                    return Json(new { success = true, message = "Staff member updated successfully!" });
+                    return Json(new { success = true, message = "Updated Successfully" });
                 }
                 
                 return Json(new { success = false, message = "Failed to update staff member." });

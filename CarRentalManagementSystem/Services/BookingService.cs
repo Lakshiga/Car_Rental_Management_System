@@ -171,12 +171,11 @@ namespace CarRentalManagementSystem.Services
                 
                 if (booking == null)
                 {
-                    // Even if booking not found, return success for demo
-                    return (true, "Successfully Refunded! Advance payment has been deducted from total revenue.");
+                    return (false, "Booking not found.");
                 }
 
-                // Calculate advance payment amount (demo mode)
-                var advanceAmount = booking.TotalCost * 0.5m; // 50% advance payment
+                // Calculate advance payment amount (assumed 50%)
+                var advanceAmount = booking.TotalCost * 0.5m;
                 
                 // Update booking status (only if not already rejected)
                 if (booking.Status != "Rejected")
@@ -185,18 +184,28 @@ namespace CarRentalManagementSystem.Services
                     booking.ApprovedBy = $"Rejected by {rejectedBy} - Reason: {rejectionReason}";
                     booking.ApprovedAt = DateTime.Now;
                     
-                    // Save booking changes
                     await _context.SaveChangesAsync();
                 }
-                
-                // Always return success message
-                return (true, $"Successfully Refunded! Advance payment of ₹{advanceAmount:F2} has been deducted from total revenue.");
+
+                // Record refund as a negative payment to affect revenue calculations
+                var refundPayment = new Payment
+                {
+                    BookingID = bookingId,
+                    AmountPaid = -advanceAmount,
+                    PaymentDate = DateTime.Now,
+                    PaymentType = "Refund",
+                    PaymentStatus = "Refunded"
+                };
+
+                _context.Payments.Add(refundPayment);
+                await _context.SaveChangesAsync();
+
+                return (true, $"Refunded successfully! Advance payment of ₹{advanceAmount:F2} has been deducted from revenue.");
             }
             catch (Exception ex)
             {
-                // Even if there's an error, return success for demo
-                Console.WriteLine($"RejectBookingAsync Error (Demo Mode): {ex.Message}");
-                return (true, "Successfully Refunded! Advance payment has been deducted from total revenue.");
+                Console.WriteLine($"RejectBookingAsync Error: {ex.Message}");
+                return (false, "Failed to reject booking and process refund.");
             }
         }
 

@@ -54,7 +54,8 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-label">Phone Number</label>
-                        <input class="form-control" asp-for="Phone" placeholder="Enter your phone number" />
+                        <input class="form-control" asp-for="Phone" placeholder="Enter your phone number" pattern="^\d{10}$" title="Phone number must be exactly 10 digits" />
+                        <small class="text-muted">Exactly 10 digits</small>
                         <span asp-validation-for="Phone" class="text-danger"></span>
                     </div>
                 </div>
@@ -71,14 +72,16 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-label">NIC Number</label>
-                        <input class="form-control" asp-for="NIC" placeholder="Enter your NIC number" />
+                        <input class="form-control" asp-for="NIC" placeholder="Enter your NIC number" pattern="^(?:\d{12}|\d{9}[VvXx])$" title="NIC must be 12 digits, or 9 digits followed by V or X" />
+                        <small class="text-muted">12 digits, or 9 digits followed by V/X</small>
                         <span asp-validation-for="NIC" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-label">License Number</label>
-                        <input class="form-control" asp-for="LicenseNo" placeholder="Enter your license number" />
+                        <input class="form-control" asp-for="LicenseNo" placeholder="Enter your license number" pattern="^\d{10}[A-Za-z]{3}$" title="License number must be 10 digits followed by 3 letters" />
+                        <small class="text-muted">10 digits followed by 3 letters</small>
                         <span asp-validation-for="LicenseNo" class="text-danger"></span>
                     </div>
                 </div>

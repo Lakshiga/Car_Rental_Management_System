@@ -3,15 +3,20 @@
 }
 
 <!-- FAQ Hero Section -->
-<div class="hero-section bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div class="container">
-        <div class="row align-items-center">
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-accent) 100%); position: relative; overflow: hidden;">
+    <div class="hero-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); z-index: 1;"></div>
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="row align-items-center min-vh-50">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold">Frequently Asked Questions</h1>
-                <p class="lead">Find answers to common questions about our car rental services.</p>
+                <h1 class="display-4 fw-bold mb-4 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                    Frequently Asked Questions
+                </h1>
+                <p class="lead mb-4 text-white-50" style="font-size: 1.2rem; line-height: 1.6;">
+                    Find answers to common questions about our car rental services.
+                </p>
             </div>
             <div class="col-lg-4 text-center">
-                <i class="fas fa-question-circle fa-5x opacity-75"></i>
+                <i class="fas fa-question-circle fa-5x opacity-75 text-white"></i>
             </div>
         </div>
     </div>

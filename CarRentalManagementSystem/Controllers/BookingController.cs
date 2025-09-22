@@ -34,56 +34,31 @@ namespace CarRentalManagementSystem.Controllers
             var customerId = int.Parse(customerIdString);
             var userId = int.Parse(userIdString);
 
-            // Check if customer profile is complete - if not, require additional details
+            // Check if customer profile is complete - if not, prevent booking and ask to update profile
             var customer = await _userService.GetCustomerByUserIdAsync(userId);
             if (customer == null)
                 return Json(new { success = false, message = "Customer profile not found." });
 
-            // If customer profile is incomplete and additional details are provided, update profile first
-            var profileIncomplete = string.IsNullOrEmpty(customer.NIC) || 
-                                  string.IsNullOrEmpty(customer.LicenseNo) || 
-                                  string.IsNullOrEmpty(customer.Phone) || 
-                                  string.IsNullOrEmpty(customer.Address);
+            var profileIncomplete = string.IsNullOrEmpty(customer.NIC) ||
+                                    string.IsNullOrEmpty(customer.LicenseNo) ||
+                                    string.IsNullOrEmpty(customer.Phone) ||
+                                    string.IsNullOrEmpty(customer.Address);
 
             if (profileIncomplete)
-            {
-                // Additional fields should be provided in the request
-                if (string.IsNullOrEmpty(model.CustomerNIC) || 
-                    string.IsNullOrEmpty(model.CustomerPhone) || 
-                    string.IsNullOrEmpty(model.CustomerAddress))
-                {
-                    return Json(new { success = false, message = "Please provide all required personal details to complete your booking." });
-                }
+                return Json(new { success = false, message = "Please update your profile (NIC, License, Phone, Address) before booking." });
 
-                // Update customer profile with the provided details
-                var updateResult = await _userService.UpdateCustomerProfileAsync(customerId, new DTOs.CustomerProfileUpdateDTO
-                {
-                    NIC = model.CustomerNIC,
-                    Phone = model.CustomerPhone,
-                    Address = model.CustomerAddress,
-                    LicenseNo = model.LicenseNumber // Use from booking form
-                });
-
-                if (!updateResult)
-                {
-                    return Json(new { success = false, message = "Failed to update customer profile." });
-                }
-            }
-            else
+            // If profile is complete, use existing license number unless a new one is provided
+            if (string.IsNullOrEmpty(model.LicenseNumber))
             {
-                // If profile is complete, use existing license number unless a new one is provided
-                if (string.IsNullOrEmpty(model.LicenseNumber))
-                {
-                    model.LicenseNumber = customer.LicenseNo;
-                }
+                model.LicenseNumber = customer.LicenseNo;
             }
 
             if (!ModelState.IsValid)
                 return Json(new { success = false, message = "Invalid booking data." });
 
-            // Validate dates
-            if (model.PickupDate <= DateTime.Now)
-                return Json(new { success = false, message = "Pickup date must be in the future." });
+            // Validate dates (allow today's date, disallow past dates)
+            if (model.PickupDate.Date < DateTime.Today)
+                return Json(new { success = false, message = "Pickup date cannot be in the past." });
 
             if (model.ReturnDate <= model.PickupDate)
                 return Json(new { success = false, message = "Return date must be after pickup date." });
@@ -107,7 +82,7 @@ namespace CarRentalManagementSystem.Controllers
                 });
             }
             
-            return Json(new { success = false, message = "Booking failed. Car might not be available for selected dates." });
+            return Json(new { success = false, message = "Booking failed. The selected car is not available for these dates." });
         }
 
         [HttpPost]
@@ -121,9 +96,9 @@ namespace CarRentalManagementSystem.Controllers
             var customerId = int.Parse(customerIdString);
             var userId = int.Parse(userIdString);
 
-            // Validate dates
-            if (model.PickupDate <= DateTime.Now)
-                return Json(new { success = false, message = "Pickup date must be in the future." });
+            // Validate dates (allow today's date, disallow past dates)
+            if (model.PickupDate.Date < DateTime.Today)
+                return Json(new { success = false, message = "Pickup date cannot be in the past." });
 
             if (model.ReturnDate <= model.PickupDate)
                 return Json(new { success = false, message = "Return date must be after pickup date." });
@@ -160,7 +135,7 @@ namespace CarRentalManagementSystem.Controllers
                 });
             }
             
-            return Json(new { success = false, message = "Booking failed. Car might not be available for selected dates." });
+            return Json(new { success = false, message = "Booking failed. The selected car is not available for these dates." });
         }
 
         [HttpGet]

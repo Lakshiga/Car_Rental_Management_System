@@ -24,6 +24,8 @@ namespace CarRentalManagementSystem.DTOs
         
         [Required]
         [StringLength(100)]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$", ErrorMessage = "Password must have at least 8 characters and include an uppercase letter, a number, and a symbol.")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
         

@@ -243,8 +243,23 @@
                     </div>
                 </div>
                 
-                <!-- Detailed booking form for incomplete profiles -->
+                <!-- Detailed booking notice for incomplete profiles -->
                 <div id="detailedBookingForm" class="row" style="display: none;">
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-user-edit me-2"></i>
+                            Your profile is incomplete. Please update your profile (NIC, License, Phone, Address) before booking.
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a href="@Url.Action("Profile", "Account")" class="btn btn-primary">
+                                <i class="fas fa-arrow-right me-1"></i> Go to Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed booking form for incomplete profiles -->
+                <div id="detailedBookingFormComplete" class="row" style="display: none;">
                     <div class="col-md-6">
                         <div class="alert alert-warning">
                             <i class="fas fa-info-circle"></i> Please complete your profile information to enable quick booking in the future.
@@ -354,7 +369,7 @@
 
             // Show loading state
             $('#bookingLoadingState').show();
-            $('#streamlinedBookingForm, #detailedBookingForm').hide();
+            $('#streamlinedBookingForm, #detailedBookingForm, #detailedBookingFormComplete').hide();
             $('#bookingModal').modal('show');
 
             // Get car details
@@ -369,8 +384,9 @@
                         // Show streamlined form
                         setupStreamlinedBooking(carId, data);
                     } else {
-                        // Show detailed form with missing fields
-                        setupDetailedBooking(carId, data, profileData);
+                        // Show notice and disable confirm button
+                        $('#detailedBookingForm').show();
+                        $('#confirmBookingBtn').prop('disabled', true).text('Update profile to continue');
                     }
                 }).fail(function() {
                     $('#bookingLoadingState').hide();
@@ -448,7 +464,7 @@
                 if (!profileData.missingFields.address) $('#addressField').hide();
             }
             
-            $('#detailedBookingForm').show();
+            $('#detailedBookingFormComplete').show();
             
             // Setup date change handlers for full form with immediate calculation
             $('#fullPickupDate, #fullReturnDate').off('change input').on('change input', function() {
@@ -559,32 +575,9 @@
                     }
                 });
             } else {
-                // Use detailed booking for incomplete profiles
-                const formData = new FormData($('#fullBookingForm')[0]);
-                
-                $.ajax({
-                    url: '@Url.Action("CreateBooking", "Booking")',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            $('#bookingModal').modal('hide');
-                            if (response.redirectUrl) {
-                                window.location.href = response.redirectUrl;
-                            } else {
-                                location.reload();
-                            }
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('An error occurred while processing your booking.');
-                    }
-                });
+                // Profile incomplete - prevent booking
+                alert('Please update your profile before making a booking.');
+                window.location.href = '@Url.Action("Profile", "Account")';
             }
         }
 
